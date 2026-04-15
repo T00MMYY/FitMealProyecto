@@ -22,6 +22,9 @@ export default function OAuthSuccess() {
       }
     };
 
+
+    
+
     verifyOAuthLogin();
   }, [navigate]);
 
