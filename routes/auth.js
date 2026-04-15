@@ -12,6 +12,9 @@ const authLimiter = rateLimit({
   legacyHeaders: false
 });
 
+
+
+
 router.post('/register', authLimiter, AuthController.register);
 router.post('/login', authLimiter, AuthController.login);
 
