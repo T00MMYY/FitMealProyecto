@@ -47,7 +47,7 @@ export default function Register() {
     try {
       const { confirmPassword, ...dataToSend } = formData;
       await register(dataToSend);
-      navigate('/');
+      navigate('/onboarding');
     } catch (err) {
       setError(err.response?.data?.error || 'Error al registrar usuario');
     } finally {

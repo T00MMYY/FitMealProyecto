@@ -85,3 +85,10 @@ docker-compose down
 # Parar y eliminar también los volúmenes (⚠️ borra la BD)
 docker-compose down -v
 ```
+
+
+Panel admin
+Arreglar user 
+Formulario
+
+

@@ -11,6 +11,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Ejercicios from "./pages/ejercicios/Ejercicios";
 import Recetas from "./pages/Recetas";
 import RecetaDetalle from "./pages/RecetaDetalle";
+import Onboarding from "./pages/Onboarding";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/ejercicios/:id" element={<Ejercicios />} />
             <Route path="/recetas" element={<Recetas />} />
             <Route path="/recetas/:id" element={<RecetaDetalle />} />
+            <Route path="/onboarding" element={<Onboarding />} />
             <Route
               path="*"
               element={
