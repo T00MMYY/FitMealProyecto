@@ -14,6 +14,7 @@ const passport = require('./config/passport');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
+const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const app = express();
@@ -91,55 +92,19 @@ const adminRouter = require('./routes/admin');
 app.use('/api/admin', adminRouter);
 
 // ============================================
-// RUTA DE BIENVENIDA
+// FRONTEND ESTÁTICO
 // ============================================
 
-app.get('/', (req, res) => {
-  res.json({
-    message: '🎯 Bienvenido a FitMeal API',
-    version: '1.0.0',
-    documentation: `http://localhost:${port}/api-docs`,
-    endpoints: {
-      authentication: {
-        register: 'POST /auth/register',
-        login: 'POST /auth/login',
-        verify: 'GET /auth/verify',
-        github: 'GET /auth/github',
-        google: 'GET /auth/google'
-      },
-      users: {
-        list: 'GET /api/users',
-        get: 'GET /api/users/:id',
-        update: 'PUT /api/users/:id',
-        delete: 'DELETE /api/users/:id'
-      },
-      products: {
-        list: 'GET /api/products',
-        create: 'POST /api/products',
-        get: 'GET /api/products/:id',
-        update: 'PUT /api/products/:id',
-        delete: 'DELETE /api/products/:id'
-      },
-      plans: {
-        list: 'GET /api/plans',
-        create: 'POST /api/plans',
-        get: 'GET /api/plans/:id',
-        update: 'PUT /api/plans/:id',
-        delete: 'DELETE /api/plans/:id'
-      }
-    },
-    status: 'online'
-  });
+app.use(express.static(path.join(__dirname, 'frontend/dist')));
+
+// SPA catch-all: cualquier ruta no reconocida sirve el index.html
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend/dist', 'index.html'));
 });
 
 // ============================================
 // MANEJO DE ERRORES
 // ============================================
-
-// Ruta no encontrada
-app.use((req, res) => {
-  res.status(404).json({ error: 'Ruta no encontrada' });
-});
 
 // Manejo de errores global
 app.use((err, req, res, next) => {
