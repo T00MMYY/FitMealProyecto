@@ -67,8 +67,8 @@ export default function Navbar() {
   <div className="flex items-center gap-4">
     
     <Link 
-      to="/admin">
-      Admin Panel(prueba)
+      to="/admin" className="text-white/80 text-sm italic">
+      Panel Admin(prueba)
     </Link>
 
     <span className="text-white/80 text-sm italic">
