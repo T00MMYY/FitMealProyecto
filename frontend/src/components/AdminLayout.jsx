@@ -18,9 +18,6 @@ const AdminLayout = ({ children }) => {
         {/* Logo/Header */}
         <div className="p-6 border-b border-white/5">
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-black font-bold text-sm">F</span>
-            </div>
             <span className="font-black italic text-xl">FitMeal</span>
           </Link>
           <p className="text-white/40 text-xs mt-2 uppercase tracking-widest">Panel Admin</p>
