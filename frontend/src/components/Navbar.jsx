@@ -64,25 +64,31 @@ export default function Navbar() {
 
         {/* Right side */}
         {isAuthenticated ? (
-          <div className="flex items-center gap-4">
-            <span className="text-white/80 text-sm italic">
-              {user?.nombre || user?.email}
-            </span>
-            <button
-              onClick={logout}
-              className="border border-white text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-colors cursor-pointer"
-            >
-              Cerrar sesión
-            </button>
-          </div>
-        ) : (
-          <Link
-            to="/login"
-            className="border border-white text-white px-8 py-2.5 rounded-full text-lg font-medium hover:bg-white hover:text-black transition-colors"
-          >
-            Login
-          </Link>
-        )}
+  <div className="flex items-center gap-4">
+    
+    <Link 
+      to="/admin">
+      Admin Panel(prueba)
+    </Link>
+
+    <span className="text-white/80 text-sm italic">
+      {user?.nombre || user?.email}
+    </span>
+    <button
+      onClick={logout}
+      className="border border-white text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-colors cursor-pointer"
+    >
+      Cerrar sesión
+    </button>
+  </div>
+) : (
+  <Link
+    to="/login"
+    className="border border-white text-white px-8 py-2.5 rounded-full text-lg font-medium hover:bg-white hover:text-black transition-colors"
+  >
+    Login
+  </Link>
+)}
       </div>
     </nav>
   );

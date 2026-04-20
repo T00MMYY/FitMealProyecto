@@ -86,6 +86,10 @@ app.use('/api/plans', plansRouter);
 app.use('/api/exercises', exercisesRouter);
 app.use('/api/recipes', recipesRouter);
 
+// Rutas de administración
+const adminRouter = require('./routes/admin');
+app.use('/api/admin', adminRouter);
+
 // ============================================
 // RUTA DE BIENVENIDA
 // ============================================

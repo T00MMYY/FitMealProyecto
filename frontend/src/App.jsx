@@ -12,6 +12,10 @@ import Ejercicios from "./pages/ejercicios/Ejercicios";
 import Recetas from "./pages/Recetas";
 import RecetaDetalle from "./pages/RecetaDetalle";
 import Onboarding from "./pages/Onboarding";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminRecipes from "./pages/admin/AdminRecipes";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminExercises from "./pages/admin/AdminExercises";
 
 function App() {
   return (
@@ -31,6 +35,10 @@ function App() {
             <Route path="/recetas" element={<Recetas />} />
             <Route path="/recetas/:id" element={<RecetaDetalle />} />
             <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/recipes" element={<AdminRecipes />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/exercises" element={<AdminExercises />} />
             <Route
               path="*"
               element={
