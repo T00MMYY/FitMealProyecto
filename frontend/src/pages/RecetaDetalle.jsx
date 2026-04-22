@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import api from '../api/axios';
 
 export default function RecetaDetalle() {
   const { id } = useParams();
@@ -9,13 +10,9 @@ export default function RecetaDetalle() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetch(`http://localhost:3000/api/recipes/${id}`)
+    api.get(`/api/recipes/${id}`)
       .then(res => {
-        if (!res.ok) throw new Error('Receta no encontrada');
-        return res.json();
-      })
-      .then(data => {
-        setReceta(data);
+        setReceta(res.data);
         setLoading(false);
       })
       .catch(err => {

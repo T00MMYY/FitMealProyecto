@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../api/axios';
 
 export default function Recetas() {
   const [filtroActivo, setFiltroActivo] = useState('Todas');
@@ -7,10 +8,9 @@ export default function Recetas() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/recipes')
-      .then(res => res.ok ? res.json() : [])
-      .then(data => {
-        setRecetasDB(data);
+    api.get('/api/recipes')
+      .then(res => {
+        setRecetasDB(res.data);
         setLoading(false);
       })
       .catch(err => {

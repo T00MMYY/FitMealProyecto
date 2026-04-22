@@ -2,6 +2,7 @@ import React, { Suspense, useState, useLayoutEffect, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Stage } from "@react-three/drei";
 import { Link } from "react-router-dom";
+import api from "../api/axios";
 
 const CONFIG_CALIBRACION = {
   masculino: {
@@ -89,10 +90,9 @@ export default function Workouts() {
   useEffect(() => {
     if (seleccionado) {
       setCargando(true);
-      fetch(`http://localhost:3000/api/exercises/${seleccionado}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setEjercicios(data);
+      api.get(`/api/exercises/${seleccionado}`)
+        .then((res) => {
+          setEjercicios(res.data);
           setCargando(false);
         })
         .catch((err) => {
