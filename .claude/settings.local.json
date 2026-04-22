@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(curl -sL \"https://stitch.withgoogle.com/project/12334597786222347075\" -o /tmp/stitch_project.html -w \"%{http_code} %{url_effective}\")",
-      "Bash(curl -s \"https://app-companion-430619.appspot.com/v1/projects/12334597786222347075\" -H \"Accept: application/json\" -w \"\\\\n%{http_code}\")"
+      "Bash(curl -s \"https://app-companion-430619.appspot.com/v1/projects/12334597786222347075\" -H \"Accept: application/json\" -w \"\\\\n%{http_code}\")",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -s http://localhost:5173/)",
+      "Bash(curl -s -X POST http://localhost:3000/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"admin@fitmeal.com\",\"password\":\"admin123!\"}')",
+      "Bash(curl -s http://localhost:3000/api/admin/stats -H \"Authorization: Bearer test\")"
     ]
   }
 }
