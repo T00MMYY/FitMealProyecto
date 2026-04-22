@@ -86,17 +86,23 @@ export default function Workouts() {
   const rutaModelo =
     genero === "masculino" ? "/glbs/hombre3D.glb" : "/glbs/mujer3D.glb";
 
+  const handleSelect = (parte) => {
+    setCargando(true);
+    setSeleccionado(parte);
+  };
+
   useEffect(() => {
     if (seleccionado) {
-      setCargando(true);
       fetch(`http://localhost:3000/api/exercises/${seleccionado}`)
         .then((res) => res.json())
         .then((data) => {
           setEjercicios(data);
-          setCargando(false);
         })
         .catch((err) => {
           console.error("Error en el fetch:", err);
+          setEjercicios([]);
+        })
+        .finally(() => {
           setCargando(false);
         });
     }
@@ -108,7 +114,8 @@ export default function Workouts() {
         <button
           onClick={() => {
             setGenero("masculino");
-
+            setCargando(false);
+            setEjercicios([]);
             setSeleccionado(null);
           }}
           className={`px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
@@ -123,7 +130,8 @@ export default function Workouts() {
         <button
           onClick={() => {
             setGenero("femenino");
-
+            setCargando(false);
+            setEjercicios([]);
             setSeleccionado(null);
           }}
           className={`px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
@@ -146,7 +154,7 @@ export default function Workouts() {
                 <Model
                   key={rutaModelo}
                   url={rutaModelo}
-                  onSelect={setSeleccionado}
+                  onSelect={handleSelect}
                   genero={genero}
                 />
               </Stage>
@@ -170,7 +178,11 @@ export default function Workouts() {
           {seleccionado && (
             <div className="p-12 min-w-[450px]">
               <button
-                onClick={() => setSeleccionado(null)}
+                onClick={() => {
+                  setCargando(false);
+                  setEjercicios([]);
+                  setSeleccionado(null);
+                }}
                 className="text-white/30 hover:text-primary text-[10px] font-black mb-10 uppercase tracking-[0.2em]"
               >
                 ← Back to Model

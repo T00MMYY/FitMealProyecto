@@ -45,7 +45,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const { confirmPassword, ...dataToSend } = formData;
+      const { confirmPassword: _confirmPassword, ...dataToSend } = formData;
       await register(dataToSend);
       navigate('/onboarding');
     } catch (err) {

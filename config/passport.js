@@ -50,36 +50,48 @@ async function findOrCreateOAuthUser(profile, provider) {
   return createdUser;
 }
 
-// Estrategia de GitHub
-passport.use(new GitHubStrategy({
-    clientID: process.env.GITHUB_CLIENT_ID,
-    clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: process.env.GITHUB_CALLBACK_URL
-  },
-  async (accessToken, refreshToken, profile, done) => {
-    try {
-      const user = await findOrCreateOAuthUser(profile, 'github');
-      return done(null, user);
-    } catch (error) {
-      return done(error, null);
-    }
-  }
-));
+const hasGitHubOAuth = Boolean(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET);
+const hasGoogleOAuth = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
 
-// Estrategia de Google
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK_URL
-  },
-  async (accessToken, refreshToken, profile, done) => {
-    try {
-      const user = await findOrCreateOAuthUser(profile, 'google');
-      return done(null, user);
-    } catch (error) {
-      return done(error, null);
+// Estrategia de GitHub (solo si hay credenciales configuradas)
+if (hasGitHubOAuth) {
+  passport.use(new GitHubStrategy({
+      clientID: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      callbackURL: process.env.GITHUB_CALLBACK_URL
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const user = await findOrCreateOAuthUser(profile, 'github');
+        return done(null, user);
+      } catch (error) {
+        return done(error, null);
+      }
     }
-  }
-));
+  ));
+}
+
+// Estrategia de Google (solo si hay credenciales configuradas)
+if (hasGoogleOAuth) {
+  passport.use(new GoogleStrategy({
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const user = await findOrCreateOAuthUser(profile, 'google');
+        return done(null, user);
+      } catch (error) {
+        return done(error, null);
+      }
+    }
+  ));
+}
+
+passport.oauthProviders = {
+  github: hasGitHubOAuth,
+  google: hasGoogleOAuth
+};
 
 module.exports = passport;

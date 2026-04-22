@@ -1,5 +1,6 @@
-// Cargar variables de entorno
-require('dotenv').config();
+// Cargar variables de entorno desde el directorio del backend
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const REQUIRED_ENV = ['JWT_SECRET', 'SESSION_SECRET', 'DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
 const missingEnv = REQUIRED_ENV.filter(k => !process.env[k]);

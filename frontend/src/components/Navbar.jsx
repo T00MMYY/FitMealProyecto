@@ -1,14 +1,16 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 const navLinks = [
   { to: '/workouts', label: 'Workouts' },
   {to: '/recetas', label: 'Recetas'},
-  {to: '/products', label: 'Products'},
+  {to: '/products', label: 'Productos'},
 ];
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
+  const { cartCount } = useCart();
   const location = useLocation();
   const isHome = location.pathname === '/';
   const hideNav = ['/login', '/register', '/auth/success'].includes(location.pathname);
@@ -64,31 +66,42 @@ export default function Navbar() {
 
         {/* Right side */}
         {isAuthenticated ? (
-  <div className="flex items-center gap-4">
-    
-    <Link 
-      to="/admin" className="text-white/80 text-sm italic">
-      Panel Admin(prueba)
-    </Link>
-
-    <span className="text-white/80 text-sm italic">
-      {user?.nombre || user?.email}
-    </span>
-    <button
-      onClick={logout}
-      className="border border-white text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-colors cursor-pointer"
-    >
-      Cerrar sesión
-    </button>
-  </div>
-) : (
-  <Link
-    to="/login"
-    className="border border-white text-white px-8 py-2.5 rounded-full text-lg font-medium hover:bg-white hover:text-black transition-colors"
-  >
-    Login
-  </Link>
-)}
+          <div className="flex items-center gap-4">
+            <Link
+              to="/cart"
+              className="border border-white/25 text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white/10 transition-colors"
+            >
+              Carrito ({cartCount})
+            </Link>
+            <Link to="/admin" className="text-white/80 text-sm italic">
+              Panel Admin
+            </Link>
+            <span className="text-white/80 text-sm italic">
+              {user?.nombre || user?.email}
+            </span>
+            <button
+              onClick={logout}
+              className="border border-white text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-colors cursor-pointer"
+            >
+              Cerrar sesión
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-4">
+            <Link
+              to="/cart"
+              className="border border-white/25 text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white/10 transition-colors"
+            >
+              Carrito ({cartCount})
+            </Link>
+            <Link
+              to="/login"
+              className="border border-white text-white px-8 py-2.5 rounded-full text-lg font-medium hover:bg-white hover:text-black transition-colors"
+            >
+              Login
+            </Link>
+          </div>
+        )}
       </div>
     </nav>
   );
