@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import api from '../../api/axios';
 
 export default function Ejercicios() {
   const { id } = useParams();
@@ -13,13 +14,9 @@ export default function Ejercicios() {
     window.scrollTo(0, 0);
     
     // 1. Cargar datos del ejercicio
-    fetch(`http://localhost:3000/api/exercises/detail/${id}`)
+    api.get(`/api/exercises/detail/${id}`)
       .then(res => {
-        if (!res.ok) throw new Error('Ejercicio no encontrado');
-        return res.json();
-      })
-      .then(data => {
-        setExercise(data);
+        setExercise(res.data);
         setLoading(false);
       })
       .catch(err => {

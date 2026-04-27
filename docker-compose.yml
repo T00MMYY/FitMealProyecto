@@ -31,7 +31,24 @@ services:
     command: --default-authentication-plugin=mysql_native_password
 
   # ============================================
-  # API NODE.JS (Accesible desde red local)
+  # NGINX — Reverse Proxy + archivos estáticos
+  # ============================================
+  fitmeal-nginx:
+    image: nginx:alpine
+    container_name: fitmeal-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend/dist:/usr/share/nginx/html:ro
+    depends_on:
+      - fitmeal-api
+    networks:
+      - fitmeal-network
+
+  # ============================================
+  # API NODE.JS (Solo accesible internamente)
   # ============================================
   fitmeal-api:
     build:
@@ -39,8 +56,8 @@ services:
       dockerfile: Dockerfile
     container_name: fitmeal-api
     restart: unless-stopped
-    ports:
-      - "0.0.0.0:3000:3000"  # Accesible desde cualquier IP de tu red local
+    expose:
+      - "3000"
     environment:
       DB_HOST: fitmeal-db
       DB_USER: fitmeal_user
@@ -56,16 +73,13 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
-      NODE_ENV: development
-      FRONTEND_URL: http://localhost:5173
+      NODE_ENV: production
+      ALLOWED_ORIGINS: https://fitmeal.website
     depends_on:
       fitmeal-db:
         condition: service_healthy
     networks:
       - fitmeal-network
-    volumes:
-      - .:/app
-      - /app/node_modules
 
   # ============================================
   # PHPMYADMIN (Administrar BD desde navegador)

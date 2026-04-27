@@ -15,7 +15,6 @@ const passport = require('./config/passport');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
-const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const app = express();
@@ -91,17 +90,6 @@ app.use('/api/recipes', recipesRouter);
 // Rutas de administración
 const adminRouter = require('./routes/admin');
 app.use('/api/admin', adminRouter);
-
-// ============================================
-// FRONTEND ESTÁTICO
-// ============================================
-
-app.use(express.static(path.join(__dirname, 'frontend/dist')));
-
-// SPA catch-all: cualquier ruta no reconocida sirve el index.html
-app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend/dist', 'index.html'));
-});
 
 // ============================================
 // MANEJO DE ERRORES
