@@ -25,6 +25,8 @@ INSERT INTO productos (nombre_producto, descripcion, precio, stock, id_categoria
 
 INSERT INTO productos (nombre_producto, descripcion, precio, stock, id_categoria, imagen_url, estado) VALUES
 ('Protein Whey Coffee', 'Proteína en polvo sabor café con whey protein premium', 43.99, 50, (SELECT id_categoria FROM categorias_productos WHERE nombre='Proteinas'), NULL, 'disponible'),
+('Protein Whey Chocolate', 'Proteína en polvo sabor chocolate con whey protein premium', 43.99, 50, (SELECT id_categoria FROM categorias_productos WHERE nombre='Proteinas'), NULL, 'disponible'),
+('Protein Whey Vanilla', 'Proteína en polvo sabor vainilla con whey protein premium', 43.99, 50, (SELECT id_categoria FROM categorias_productos WHERE nombre='Proteinas'), NULL, 'disponible'),
 ('Protein Cacahuetes', 'Proteína en polvo sabor cacahuetes premium', 49.99, 50, (SELECT id_categoria FROM categorias_productos WHERE nombre='Proteinas'), NULL, 'disponible'),
 ('Protein Avellanas', 'Proteína en polvo sabor avellanas premium', 38.99, 50, (SELECT id_categoria FROM categorias_productos WHERE nombre='Proteinas'), NULL, 'disponible'),
 ('Protein Stracciatella', 'Proteína en polvo sabor stracciatella premium', 42.99, 50, (SELECT id_categoria FROM categorias_productos WHERE nombre='Proteinas'), NULL, 'disponible'),

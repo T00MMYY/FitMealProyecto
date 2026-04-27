@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
+  // Carga el carrito guardado en localStorage al arrancar
   const [cartItems, setCartItems] = useState(() => {
     try {
       const saved = localStorage.getItem('fitmeal_cart');
@@ -13,73 +14,62 @@ export function CartProvider({ children }) {
     }
   });
 
+  // Guarda el carrito en localStorage cada vez que cambia
   useEffect(() => {
     localStorage.setItem('fitmeal_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
+  // Añade un producto al carrito.
+  // Si ya existe (mismo id y talla), suma la cantidad en vez de duplicarlo.
   const addToCart = (item) => {
     setCartItems((prev) => {
-      const existingIndex = prev.findIndex(
-        (p) => p.id === item.id && p.talla === item.talla
-      );
+      const yaExiste = prev.find((p) => p.id === item.id && p.talla === item.talla);
 
-      if (existingIndex === -1) {
+      if (!yaExiste) {
         return [...prev, item];
       }
 
-      const next = [...prev];
-      next[existingIndex] = {
-        ...next[existingIndex],
-        cantidad: next[existingIndex].cantidad + item.cantidad,
-      };
-      return next;
+      return prev.map((p) =>
+        p.id === item.id && p.talla === item.talla
+          ? { ...p, cantidad: p.cantidad + item.cantidad }
+          : p
+      );
     });
   };
 
+  // Cambia la cantidad de un producto (mínimo 1)
   const updateCartItemQuantity = (id, talla, cantidad) => {
     setCartItems((prev) =>
-      prev.map((item) => {
-        if (item.id === id && item.talla === talla) {
-          return {
-            ...item,
-            cantidad: Math.max(1, cantidad),
-          };
-        }
-        return item;
-      })
+      prev.map((item) =>
+        item.id === id && item.talla === talla
+          ? { ...item, cantidad: Math.max(1, cantidad) }
+          : item
+      )
     );
   };
 
+  // Elimina un producto del carrito por id y talla
   const removeFromCart = (id, talla) => {
     setCartItems((prev) => prev.filter((item) => !(item.id === id && item.talla === talla)));
   };
 
-  const clearCart = () => {
-    setCartItems([]);
-  };
+  // Vacía el carrito entero
+  const clearCart = () => setCartItems([]);
 
+  // Total de unidades en el carrito
   const cartCount = useMemo(
-    () => cartItems.reduce((acc, item) => acc + (item.cantidad || 0), 0),
+    () => cartItems.reduce((total, item) => total + (item.cantidad || 0), 0),
     [cartItems]
   );
 
+  // Precio total del carrito
   const cartSubtotal = useMemo(
-    () => cartItems.reduce((acc, item) => acc + Number(item.precio) * Number(item.cantidad), 0),
+    () => cartItems.reduce((total, item) => total + Number(item.precio) * Number(item.cantidad), 0),
     [cartItems]
   );
 
   return (
-    <CartContext.Provider
-      value={{
-        cartItems,
-        addToCart,
-        updateCartItemQuantity,
-        removeFromCart,
-        clearCart,
-        cartCount,
-        cartSubtotal,
-      }}
-    >
+    <CartContext.Provider value={{ cartItems, addToCart, updateCartItemQuantity, removeFromCart, clearCart, cartCount, cartSubtotal }}>
       {children}
     </CartContext.Provider>
   );
