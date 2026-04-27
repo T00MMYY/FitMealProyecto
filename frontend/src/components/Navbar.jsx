@@ -74,7 +74,7 @@ export default function Navbar() {
               Carrito ({cartCount})
             </Link>
             <Link to="/admin" className="text-white/80 text-sm italic">
-              Panel Admin
+              {user?.id_rol === 1 ? 'Perfil admin' : 'Perfil'}
             </Link>
             <span className="text-white/80 text-sm italic">
               {user?.nombre || user?.email}

@@ -301,11 +301,6 @@ CREATE TABLE `usuarios` (
 INSERT INTO `usuarios` (`id_usuario`, `email`, `password_hash`, `nombre`, `apellidos`, `telefono`, `fecha_nacimiento`, `peso`, `altura`, `genero`, `nivel_actividad`, `experiencia`, `lugar_entrenamiento`, `objetivo`, `preferencia_alimentaria`, `tiempo_cocinar`, `onboarding_completado`, `id_rol`, `estado_cuenta`, `ultimo_acceso`, `created_at`, `updated_at`) VALUES
 (1, 'admin@fitmeal.com', '\\/eP5ps4xTbpx6/FI2N/ywgiTfs5qYuQsK', 'Admin', 'FitMeal', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, 'activo', NULL, '2026-02-02 17:29:02', '2026-02-02 17:29:02'),
 (2, 'Kevincasled@gmail.com', '$2b$10$vDLWug0/FwEIRzVIqPlKk.p79GxBjoPAVP7WuGbUt05dcRx299iuq', 'kevin', 'Castellon', '692552075', '2004-04-08', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2, 'activo', '2026-02-11 18:00:11', '2026-02-11 17:59:43', '2026-02-11 18:00:11'),
-(3, 'tommy@gmail.com', '$2b$10$J34nfM9FZRNL2gqGpBHqB.fhh9LOWvrakGBVKeYZUHTkjRryTvTxm', 'Tommy', 'Figueroa', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, 'activo', '2026-04-20 14:15:56', '2026-02-25 16:53:07', '2026-04-20 14:15:56'),
-(4, 'tommy2@prueba.com', '$2b$10$ygMNnc9/5ARwO8ONwE8/2e.fYzOyHrTn1WK.BsA5bLV.L3lbLFRMW', 'Tommy', 'Figueroa', '609410425', '2003-12-14', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2, 'activo', '2026-04-20 14:15:33', '2026-04-15 08:09:29', '2026-04-20 14:15:33'),
-(5, 'test@example.com', '$2b$10$BWwY8e.Z59wBSBUKxHe5d.0cUSVmC10tCoY0SPywSkE8KNho5wlCK', 'Test', 'User', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2, 'activo', '2026-04-27 13:46:11', '2026-04-27 13:45:54', '2026-04-27 13:46:11'),
-(6, 'tommy32@gmail.com', '$2b$10$muMHchAvwoDwf2cH0CpNl.wbADkuZce9E1MwySz83EeaIjlkpQvQi', 'Tommy', 'Figueroa', NULL, NULL, 76.00, 157.00, 'masculino', '1.55', 'Intermedio', 'Gimnasio', 'ganar_musculo', 'Sin preferencia', 'menos_20', 1, 2, 'activo', '2026-04-27 13:58:36', '2026-04-27 13:47:12', '2026-04-27 13:58:36');
-
 --
 -- Índices para tablas volcadas
 --
