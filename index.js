@@ -27,6 +27,12 @@ const swaggerDocument = YAML.load('./monlau-FitMealAPI-1.0.0-resolved.yaml');
 // MIDDLEWARES
 // ============================================
 
+// Middleware de logging global
+app.use((req, res, next) => {
+  console.log(`📨 ${req.method} ${req.path}`);
+  next();
+});
+
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',');
 app.use(cors({
   origin: allowedOrigins,
@@ -47,7 +53,7 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: 'strict',
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
     maxAge: 24 * 60 * 60 * 1000
   }
 }));
@@ -109,8 +115,19 @@ app.use((err, req, res, next) => {
 // INICIAR SERVIDOR
 // ============================================
 
-app.listen(port, '0.0.0.0', () => {
+const server = app.listen(port, '0.0.0.0', () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
   console.log(`📖 Documentación en http://localhost:${port}/api-docs`);
+  console.log(`✅ Listo para recibir solicitudes\n`);
+});
+
+// Manejar errores no capturados
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error.message);
+  process.exit(1);
 });
 

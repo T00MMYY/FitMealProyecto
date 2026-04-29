@@ -9,28 +9,34 @@ class AuthController {
    */
   static async register(req, res) {
     try {
+      console.log('📝 Inicio de registro - Body:', req.body);
       const { email, password, nombre, apellidos, telefono, fecha_nacimiento } = req.body;
 
       // Validar campos requeridos
       if (!email || !password || !nombre) {
+        console.log('❌ Campos requeridos faltantes');
         return res.status(400).json({ 
           error: 'Email, contraseña y nombre son obligatorios' 
         });
       }
 
       // Verificar si el usuario ya existe
+      console.log('🔍 Buscando usuario existente...');
       const existingUser = await User.findByEmail(email);
       if (existingUser) {
+        console.log('❌ Email ya registrado');
         return res.status(409).json({ 
           error: 'El email ya está registrado' 
         });
       }
 
       // Hashear la contraseña
+      console.log('🔐 Hasheando contraseña...');
       const salt = await bcrypt.genSalt(10);
       const password_hash = await bcrypt.hash(password, salt);
 
       // Crear el usuario
+      console.log('➕ Creando usuario en BD...');
       const newUser = await User.create({
         email,
         password_hash,
@@ -42,10 +48,13 @@ class AuthController {
         estado_cuenta: 'activo'
       });
 
+      console.log('✅ Usuario creado:', newUser.id_usuario);
+
       // Eliminar el hash del password de la respuesta
       delete newUser.password_hash;
 
       // Generar token JWT
+      console.log('🎫 Generando token...');
       const token = generateToken({
         id_usuario: newUser.id_usuario,
         email: newUser.email,
@@ -55,13 +64,15 @@ class AuthController {
       // Set httpOnly cookie
       res.cookie('fitmeal_token', token, COOKIE_CONFIG);
 
+      console.log('✨ Registro exitoso');
       res.status(201).json({
         message: 'Usuario registrado con éxito',
         user: newUser,
         token
       });
     } catch (error) {
-      console.error('Error en registro:', error);
+      console.error('❌ Error en registro:', error.message);
+      console.error('Stack:', error.stack);
       res.status(500).json({ 
         error: 'Error al registrar usuario',
         ...(process.env.NODE_ENV !== 'production' && { details: error.message })

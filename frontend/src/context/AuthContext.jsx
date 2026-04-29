@@ -78,15 +78,15 @@ export function AuthProvider({ children }) {
   };
 
   const value = {
-    user,
-    token: null,
-    loading,
-    isAuthenticated: !!user,
-    login,
-    register,
-    logout,
-    setTokenExternal,
-  };
+  user,
+  loading,
+  isAuthenticated: !!user,
+  isOnboardingCompleted: user?.onboarding_completado === 1, // <--- Útil para ProtectedRoutes
+  login,
+  register,
+  logout,
+  setTokenExternal,
+};
 
   return (
     <AuthContext.Provider value={value}>
