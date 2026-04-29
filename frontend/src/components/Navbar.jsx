@@ -2,11 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 
-const navLinks = [
-  { to: '/workouts', label: 'Workouts' },
-  {to: '/recetas', label: 'Recetas'},
-  {to: '/products', label: 'Productos'},
-];
+
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -16,6 +12,12 @@ export default function Navbar() {
   const hideNav = ['/login', '/register', '/auth/success'].includes(location.pathname);
 
   if (hideNav) return null;
+
+  const navLinks = [
+    { to: '/workouts', label: 'Workouts' },
+    { to: '/recetas', label: 'Recetas' },
+    { to: '/products', label: 'Productos' },
+  ];
 
   return (
     <nav
@@ -73,7 +75,7 @@ export default function Navbar() {
             >
               Carrito ({cartCount})
             </Link>
-            <Link to="/admin" className="text-white/80 text-sm italic">
+            <Link to={user?.id_rol === 1 ? "/admin" : "/perfil"} className="text-white/80 text-sm italic">
               {user?.id_rol === 1 ? 'Perfil admin' : 'Perfil'}
             </Link>
             <span className="text-white/80 text-sm italic">

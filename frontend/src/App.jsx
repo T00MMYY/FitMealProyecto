@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
@@ -14,14 +15,17 @@ import Ejercicios from "./pages/ejercicios/Ejercicios";
 import Recetas from "./pages/Recetas";
 import RecetaDetalle from "./pages/RecetaDetalle";
 import Onboarding from "./pages/Onboarding";
+import Perfil from "./pages/Perfil";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminRecipes from "./pages/admin/AdminRecipes";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminExercises from "./pages/admin/AdminExercises";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
 function App() {
   return (
-    <BrowserRouter>
+    <>
+      <BrowserRouter>
       <CartProvider>
         <AuthProvider>
           <div className="min-h-screen">
@@ -39,10 +43,11 @@ function App() {
               <Route path="/recetas" element={<Recetas />} />
               <Route path="/recetas/:id" element={<RecetaDetalle />} />
               <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/recipes" element={<AdminRecipes />} />
-              <Route path="/admin/users" element={<AdminUsers />} />
-              <Route path="/admin/exercises" element={<AdminExercises />} />
+              <Route path="/perfil" element={<Perfil />} />
+              <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
+              <Route path="/admin/recipes" element={<AdminProtectedRoute><AdminRecipes /></AdminProtectedRoute>} />
+              <Route path="/admin/users" element={<AdminProtectedRoute><AdminUsers /></AdminProtectedRoute>} />
+              <Route path="/admin/exercises" element={<AdminProtectedRoute><AdminExercises /></AdminProtectedRoute>} />
               <Route
                 path="*"
                 element={
@@ -65,6 +70,8 @@ function App() {
         </AuthProvider>
       </CartProvider>
     </BrowserRouter>
+    <Toaster />
+    </>
   );
 }
 

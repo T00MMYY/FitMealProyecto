@@ -47,7 +47,7 @@ class AuthController {
 
       // Generar token JWT
       const token = generateToken({
-        id_usuario: newUser.id,
+        id_usuario: newUser.id_usuario,
         email: newUser.email,
         id_rol: newUser.id_rol
       });

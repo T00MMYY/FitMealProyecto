@@ -24,8 +24,12 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(email, password);
-      navigate('/');
+      const response = await login(email, password);
+      if (response?.user?.id_rol === 1) {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError(err.response?.data?.error || 'Error al iniciar sesion');
     } finally {

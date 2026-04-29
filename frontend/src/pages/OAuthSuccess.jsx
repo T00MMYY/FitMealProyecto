@@ -13,7 +13,11 @@ export default function OAuthSuccess() {
         if (response.data.user) {
           // Store user in localStorage so AuthContext picks it up on next mount
           localStorage.setItem('user', JSON.stringify(response.data.user));
-          navigate('/', { replace: true });
+          if (response.data.user.id_rol === 1) {
+            navigate('/admin', { replace: true });
+          } else {
+            navigate('/', { replace: true });
+          }
         } else {
           navigate('/login', { replace: true });
         }

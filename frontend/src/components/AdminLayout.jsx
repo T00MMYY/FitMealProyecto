@@ -1,8 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const AdminLayout = ({ children }) => {
   const location = useLocation();
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light') setIsDark(false);
+  }, []);
+
+  const toggleTheme = () => {
+    setIsDark(!isDark);
+    localStorage.setItem('theme', !isDark ? 'dark' : 'light');
+  };
 
   const menuItems = [
     { path: '/admin', label: 'Dashboard' },
@@ -12,15 +23,18 @@ const AdminLayout = ({ children }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex">
+    <div className={`min-h-screen ${isDark ? 'bg-[#0a0a0a] text-white' : 'bg-gray-100 text-black'} flex`}>
       {/* Sidebar */}
-      <div className="w-64 bg-[#0d0d0d] border-r border-white/5 flex flex-col">
+      <div className={`w-64 ${isDark ? 'bg-[#0d0d0d]' : 'bg-white'} border-r border-gray-300 flex flex-col`}>
         {/* Logo/Header */}
-        <div className="p-6 border-b border-white/5">
+        <div className="p-6 border-b border-gray-300">
           <Link to="/" className="flex items-center gap-3">
             <span className="font-black italic text-xl">FitMeal</span>
           </Link>
-          <p className="text-white/40 text-xs mt-2 uppercase tracking-widest">Panel Admin</p>
+          <p className={`${isDark ? 'text-white/40' : 'text-gray-600'} text-xs mt-2 uppercase tracking-widest`}>Panel Admin</p>
+          <button onClick={toggleTheme} className="mt-2 text-sm underline">
+            {isDark ? 'Modo Claro' : 'Modo Oscuro'}
+          </button>
         </div>
 
         {/* Navigation */}
