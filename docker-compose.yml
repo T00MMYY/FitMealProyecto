@@ -4,27 +4,26 @@ name: FitMeal
 
 services:
   # ============================================
-  # BASE DE DATOS MYSQL (Solo accesible internamente)
+  # BASE DE DATOS MYSQL
   # ============================================
   fitmeal-db:
     image: mysql:8.0
     container_name: FitMeal
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: FitMealRoot123
+      MYSQL_ROOT_PASSWORD: 
       MYSQL_DATABASE: fitness_platform
       MYSQL_USER: fitmeal_user
-      MYSQL_PASSWORD: FitMeal123
-    # Puerto expuesto para MySQL Workbench y acceso externo
+      MYSQL_PASSWORD: 
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - fitmeal-data:/var/lib/mysql
       - ./compartido/fitness_platform_backup.sql:/docker-entrypoint-initdb.d/01-schema.sql
     networks:
       - fitmeal-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pFitMealRoot123"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -48,7 +47,7 @@ services:
       - fitmeal-network
 
   # ============================================
-  # API NODE.JS (Solo accesible internamente)
+  # API NODE.JS
   # ============================================
   fitmeal-api:
     build:
@@ -61,20 +60,20 @@ services:
     environment:
       DB_HOST: fitmeal-db
       DB_USER: fitmeal_user
-      DB_PASSWORD: FitMeal123
+      DB_PASSWORD: 
       DB_NAME: fitness_platform
       DB_PORT: 3306
       PORT: 3000
-      JWT_SECRET: ${JWT_SECRET}
-      SESSION_SECRET: ${SESSION_SECRET}
-      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
-      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
-      GITHUB_CALLBACK_URL: ${GITHUB_CALLBACK_URL}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
+      JWT_SECRET: 
+      SESSION_SECRET: 
+      GITHUB_CLIENT_ID: 
+      GITHUB_CLIENT_SECRET: 
+      GITHUB_CALLBACK_URL: 
+      GOOGLE_CLIENT_ID: 
+      GOOGLE_CLIENT_SECRET: 
+      GOOGLE_CALLBACK_URL: 
       NODE_ENV: production
-      ALLOWED_ORIGINS: https://fitmeal.website,http://localhost:5173
+      ALLOWED_ORIGINS: 
     depends_on:
       fitmeal-db:
         condition: service_healthy
@@ -82,7 +81,7 @@ services:
       - fitmeal-network
 
   # ============================================
-  # PHPMYADMIN (Administrar BD desde navegador)
+  # PHPMYADMIN
   # ============================================
   fitmeal-phpmyadmin:
     image: phpmyadmin:latest
@@ -92,7 +91,7 @@ services:
       PMA_HOST: fitmeal-db
       PMA_PORT: 3306
       PMA_USER: root
-      PMA_PASSWORD: FitMealRoot123
+      PMA_PASSWORD: 
     ports:
       - "8081:80"
     depends_on:
