@@ -42,7 +42,10 @@ app.use(cors({
 }));
 app.use(helmet());
 app.use(cookieParser());
-app.use(express.json({ limit: '10kb' }));
+const webhookRouter = require("./routes/webhook");
+app.use("/api/webhook", webhookRouter);
+
+app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ limit: '10kb', extended: true }));
 
 // Configuración de sesiones (necesario para Passport)
