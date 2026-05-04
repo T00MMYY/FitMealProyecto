@@ -33,7 +33,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173').split(',');
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176').split(',');
 app.use(cors({
   origin: allowedOrigins,
   credentials: true,

@@ -22,21 +22,20 @@ class Recipe {
    */
   static async create(recipeData) {
     const query = `INSERT INTO recetas 
-      (titulo, descripcion, instrucciones, tiempo_preparacion, dificultad, calorias, proteinas, carbohidratos, grasas, imagen, id_usuario) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      (titulo, calorias, proteina, tiempo, tipo, imagen, carbohidratos, grasas, ingredientes, instrucciones) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     
     const values = [
       recipeData.titulo,
-      recipeData.descripcion,
-      recipeData.instrucciones,
-      recipeData.tiempo_preparacion,
-      recipeData.dificultad,
-      recipeData.calorias,
-      recipeData.proteinas,
-      recipeData.carbohidratos,
-      recipeData.grasas,
-      recipeData.imagen,
-      recipeData.id_usuario
+      recipeData.calorias || 0,
+      recipeData.proteina || recipeData.proteinas || 0,
+      recipeData.tiempo || recipeData.tiempo_preparacion || 0,
+      recipeData.tipo || 'General',
+      recipeData.imagen || null,
+      recipeData.carbohidratos || 0,
+      recipeData.grasas || 0,
+      recipeData.ingredientes || null,
+      recipeData.instrucciones || null
     ];
 
     const [result] = await db.query(query, values);
@@ -48,21 +47,21 @@ class Recipe {
    */
   static async update(id, recipeData) {
     const query = `UPDATE recetas SET 
-      titulo = ?, descripcion = ?, instrucciones = ?, tiempo_preparacion = ?, dificultad = ?, 
-      calorias = ?, proteinas = ?, carbohidratos = ?, grasas = ?, imagen = ? 
+      titulo = ?, calorias = ?, proteina = ?, tiempo = ?, tipo = ?, 
+      imagen = ?, carbohidratos = ?, grasas = ?, ingredientes = ?, instrucciones = ? 
       WHERE id_receta = ?`;
     
     const values = [
       recipeData.titulo,
-      recipeData.descripcion,
-      recipeData.instrucciones,
-      recipeData.tiempo_preparacion,
-      recipeData.dificultad,
-      recipeData.calorias,
-      recipeData.proteinas,
-      recipeData.carbohidratos,
-      recipeData.grasas,
-      recipeData.imagen,
+      recipeData.calorias || 0,
+      recipeData.proteina || recipeData.proteinas || 0,
+      recipeData.tiempo || recipeData.tiempo_preparacion || 0,
+      recipeData.tipo || 'General',
+      recipeData.imagen || null,
+      recipeData.carbohidratos || 0,
+      recipeData.grasas || 0,
+      recipeData.ingredientes || null,
+      recipeData.instrucciones || null,
       id
     ];
 

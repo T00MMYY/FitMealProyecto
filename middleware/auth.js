@@ -24,9 +24,9 @@ const verifyToken = (req, res, next) => {
 const generateToken = (user) => {
   return jwt.sign(
     { 
-      id: user.id_usuario,
+      id_usuario: user.id_usuario || user.id,
       email: user.email,
-      rol: user.id_rol 
+      id_rol: user.id_rol || user.rol
     },
     process.env.JWT_SECRET,
     { expiresIn: '24h' } // Token expira en 24 horas
@@ -41,7 +41,7 @@ const requireRole = (...roles) => {
       return res.status(403).json({ error: 'Token no proporcionado' });
     }
 
-    if (!roles.includes(req.user.rol)) {
+    if (!roles.includes(req.user.id_rol)) {
       return res.status(403).json({ error: 'No tienes permisos para realizar esta acción' });
     }
 

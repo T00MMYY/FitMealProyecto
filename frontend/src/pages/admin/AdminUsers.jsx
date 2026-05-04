@@ -45,34 +45,36 @@ const AdminUsers = () => {
     <AdminLayout>
       <div className="p-6">
         <h1 className="text-4xl font-black italic uppercase mb-8">Usuarios</h1>
-        <div className="bg-[#0d0d0d] border border-white/5 rounded-2xl overflow-hidden">
-          <table className="w-full text-left">
-            <thead className="bg-white/5 text-white/40 text-xs uppercase">
+        <div className="bg-[#0d0d0d] border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-white/[0.02] text-white/40 text-[10px] uppercase tracking-widest">
               <tr>
-                <th className="p-4">Nombre</th>
-                <th className="p-4">Email</th>
-                <th className="p-4">Rol</th>
-                <th className="p-4">Acciones</th>
+                <th className="p-5 font-bold border-b border-white/5">Nombre</th>
+                <th className="p-5 font-bold border-b border-white/5">Email</th>
+                <th className="p-5 font-bold border-b border-white/5">Rol</th>
+                <th className="p-5 font-bold border-b border-white/5 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody className="text-sm">
               {users.map(u => (
-                <tr key={u.id_usuario} className="border-t border-white/5">
-                  <td className="p-4">{u.nombre}</td>
-                  <td className="p-4">{u.email}</td>
-                  <td className="p-4">
+                <tr key={u.id_usuario} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                  <td className="p-5 font-medium">{u.nombre}</td>
+                  <td className="p-5 text-white/60">{u.email}</td>
+                  <td className="p-5">
                     <select 
                       value={u.id_rol} 
                       onChange={(e) => handleRoleChange(u.id_usuario, e.target.value)}
-                      className="bg-transparent"
+                      className="bg-[#1a1a1a] border border-white/10 text-white text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-red-600 transition-all cursor-pointer"
                     >
                       <option value={1}>Admin</option>
                       <option value={2}>Usuario</option>
                       <option value={3}>Premium</option>
                     </select>
                   </td>
-                  <td className="p-4">
-                    <button onClick={() => handleBan(u.id_usuario)} className="text-red-500">Banear</button>
+                  <td className="p-5 text-right">
+                    <button onClick={() => handleBan(u.id_usuario)} className="text-red-500 hover:text-red-400 font-bold text-xs uppercase tracking-wider transition-colors bg-red-500/10 hover:bg-red-500/20 px-3 py-1.5 rounded-lg">
+                      Banear
+                    </button>
                   </td>
                 </tr>
               ))}

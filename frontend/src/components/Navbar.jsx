@@ -16,16 +16,17 @@ export default function Navbar() {
   const navLinks = [
     { to: '/workouts', label: 'Workouts' },
     { to: '/recetas', label: 'Recetas' },
-    { to: '/products', label: 'Productos' },
+    { to: '/products', label: 'Productos' }
   ];
-
+  if (isAuthenticated && user && (Number(user.id_rol) === 1 || Number(user.rol) === 1)) {
+    navLinks.push({ to: '/admin', label: 'Admin' });
+  }
   return (
     <nav
-      className={`${
-        isHome
+      className={`${isHome
           ? 'absolute top-0 left-0 w-full z-20'
           : 'relative bg-gray-900 border-b border-gray-800'
-      } px-8 py-5`}
+        } px-8 py-5`}
     >
       <div className="flex items-center justify-between relative w-full">
         {/* Logo */}
@@ -74,9 +75,6 @@ export default function Navbar() {
               className="border border-white/25 text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-white/10 transition-colors"
             >
               Carrito ({cartCount})
-            </Link>
-            <Link to={user?.id_rol === 1 ? "/admin" : "/perfil"} className="text-white/80 text-sm italic">
-              {user?.id_rol === 1 ? 'Perfil admin' : 'Perfil'}
             </Link>
             <span className="text-white/80 text-sm italic">
               {user?.nombre || user?.email}

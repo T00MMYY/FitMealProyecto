@@ -8,7 +8,7 @@ const AdminRecipes = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState(null);
   const [formData, setFormData] = useState({
-    titulo: '', descripcion: '', instrucciones: '', tiempo_preparacion: '', dificultad: '', calorias: '', proteinas: '', carbohidratos: '', grasas: '', imagen: ''
+    titulo: '', ingredientes: '', instrucciones: '', tiempo: '', tipo: '', calorias: '', proteina: '', carbohidratos: '', grasas: '', imagen: ''
   });
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const AdminRecipes = () => {
       fetchRecipes();
       setShowModal(false);
       setEditingRecipe(null);
-      setFormData({ titulo: '', descripcion: '', instrucciones: '', tiempo_preparacion: '', dificultad: '', calorias: '', proteinas: '', carbohidratos: '', grasas: '', imagen: '' });
+      setFormData({ titulo: '', ingredientes: '', instrucciones: '', tiempo: '', tipo: '', calorias: '', proteina: '', carbohidratos: '', grasas: '', imagen: '' });
     } catch (error) { 
       toast.error('Error al guardar receta');
       console.log("Error al guardar receta"); 
@@ -45,16 +45,16 @@ const AdminRecipes = () => {
   const handleEdit = (recipe) => {
     setEditingRecipe(recipe);
     setFormData({
-      titulo: recipe.titulo,
-      descripcion: recipe.descripcion,
-      instrucciones: recipe.instrucciones,
-      tiempo_preparacion: recipe.tiempo_preparacion,
-      dificultad: recipe.dificultad,
-      calorias: recipe.calorias,
-      proteinas: recipe.proteinas,
-      carbohidratos: recipe.carbohidratos,
-      grasas: recipe.grasas,
-      imagen: recipe.imagen
+      titulo: recipe.titulo || '',
+      ingredientes: recipe.ingredientes || '',
+      instrucciones: recipe.instrucciones || '',
+      tiempo: recipe.tiempo || '',
+      tipo: recipe.tipo || '',
+      calorias: recipe.calorias || '',
+      proteina: recipe.proteina || '',
+      carbohidratos: recipe.carbohidratos || '',
+      grasas: recipe.grasas || '',
+      imagen: recipe.imagen || ''
     });
     setShowModal(true);
   };
@@ -86,99 +86,144 @@ const AdminRecipes = () => {
         </div>
         <div className="grid gap-4">
           {recipes.length > 0 ? recipes.map(re => (
-            <div key={re.id_receta} className="bg-[#0d0d0d] p-4 border border-white/5 rounded-xl flex justify-between items-center">
-              <div>
-                <span className="font-bold">{re.titulo}</span>
-                <span className="text-red-500 font-bold ml-4">{re.calorias} kcal</span>
+            <div key={re.id_receta} className="bg-[#0d0d0d] p-5 border border-white/5 rounded-xl flex justify-between items-center hover:bg-white/5 transition-colors">
+              <div className="flex flex-col gap-1">
+                <span className="font-bold text-lg">{re.titulo}</span>
+                <div className="flex gap-4 text-xs font-medium">
+                  <span className="text-red-500">{re.calorias} kcal</span>
+                  <span className="text-white/40">{re.tiempo_preparacion || re.tiempo} min</span>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <button onClick={() => handleEdit(re)} className="text-blue-500">Editar</button>
-                <button onClick={() => handleDelete(re.id_receta)} className="text-red-500">Borrar</button>
+              <div className="flex gap-3">
+                <button onClick={() => handleEdit(re)} className="text-blue-400 hover:text-blue-300 transition-colors uppercase text-xs font-bold tracking-wider">Editar</button>
+                <button onClick={() => handleDelete(re.id_receta)} className="text-red-500 hover:text-red-400 transition-colors uppercase text-xs font-bold tracking-wider">Borrar</button>
               </div>
             </div>
           )) : <p className="text-white/20 italic">No hay recetas añadidas</p>}
         </div>
 
         {showModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-            <div className="bg-[#0d0d0d] p-6 rounded-2xl w-96 max-h-96 overflow-y-auto">
-              <h2 className="text-xl font-bold mb-4">{editingRecipe ? 'Editar Receta' : 'Nueva Receta'}</h2>
-              <form onSubmit={handleSubmit}>
-                <input 
-                  type="text" 
-                  placeholder="Título" 
-                  value={formData.titulo} 
-                  onChange={(e) => setFormData({...formData, titulo: e.target.value})} 
-                  className="w-full p-2 mb-2 bg-white/10 rounded" 
-                  required 
-                />
-                <textarea 
-                  placeholder="Descripción" 
-                  value={formData.descripcion} 
-                  onChange={(e) => setFormData({...formData, descripcion: e.target.value})} 
-                  className="w-full p-2 mb-2 bg-white/10 rounded" 
-                />
-                <textarea 
-                  placeholder="Instrucciones" 
-                  value={formData.instrucciones} 
-                  onChange={(e) => setFormData({...formData, instrucciones: e.target.value})} 
-                  className="w-full p-2 mb-2 bg-white/10 rounded" 
-                />
-                <input 
-                  type="number" 
-                  placeholder="Tiempo Preparación (min)" 
-                  value={formData.tiempo_preparacion} 
-                  onChange={(e) => setFormData({...formData, tiempo_preparacion: e.target.value})} 
-                  className="w-full p-2 mb-2 bg-white/10 rounded" 
-                />
-                <select 
-                  value={formData.dificultad} 
-                  onChange={(e) => setFormData({...formData, dificultad: e.target.value})} 
-                  className="w-full p-2 mb-2 bg-white/10 rounded" 
-                >
-                  <option value="">Dificultad</option>
-                  <option value="facil">Fácil</option>
-                  <option value="medio">Medio</option>
-                  <option value="dificil">Difícil</option>
-                </select>
-                <input 
-                  type="number" 
-                  placeholder="Calorías" 
-                  value={formData.calorias} 
-                  onChange={(e) => setFormData({...formData, calorias: e.target.value})} 
-                  className="w-full p-2 mb-2 bg-white/10 rounded" 
-                />
-                <input 
-                  type="number" 
-                  placeholder="Proteínas (g)" 
-                  value={formData.proteinas} 
-                  onChange={(e) => setFormData({...formData, proteinas: e.target.value})} 
-                  className="w-full p-2 mb-2 bg-white/10 rounded" 
-                />
-                <input 
-                  type="number" 
-                  placeholder="Carbohidratos (g)" 
-                  value={formData.carbohidratos} 
-                  onChange={(e) => setFormData({...formData, carbohidratos: e.target.value})} 
-                  className="w-full p-2 mb-2 bg-white/10 rounded" 
-                />
-                <input 
-                  type="number" 
-                  placeholder="Grasas (g)" 
-                  value={formData.grasas} 
-                  onChange={(e) => setFormData({...formData, grasas: e.target.value})} 
-                  className="w-full p-2 mb-2 bg-white/10 rounded" 
-                />
-                <input 
-                  type="text" 
-                  placeholder="URL Imagen" 
-                  value={formData.imagen} 
-                  onChange={(e) => setFormData({...formData, imagen: e.target.value})} 
-                  className="w-full p-2 mb-2 bg-white/10 rounded" 
-                />
-                <div className="flex gap-2 mt-4">
-                  <button type="submit" className="bg-red-600 text-white px-4 py-2 rounded">Guardar</button>
-                  <button type="button" onClick={() => setShowModal(false)} className="bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+              onClick={() => setShowModal(false)}
+            />
+            <div className="relative bg-[#121212] border border-white/10 p-8 rounded-3xl w-full max-w-lg shadow-2xl transform transition-all max-h-[90vh] overflow-y-auto custom-scrollbar">
+              
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 h-1 w-20 bg-red-600 rounded-b-full shadow-[0_0_15px_rgba(220,38,38,0.5)]" />
+
+              <h2 className="text-2xl font-black italic text-white mb-6 uppercase tracking-wider">
+                {editingRecipe ? 'Editar' : 'Crear'} <span className="text-red-600">Receta</span>
+              </h2>
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase font-bold text-gray-500 ml-1">Información General</label>
+                  <input 
+                    type="text" 
+                    placeholder="Título de la receta" 
+                    value={formData.titulo} 
+                    onChange={(e) => setFormData({...formData, titulo: e.target.value})} 
+                    className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all" 
+                    required 
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <input 
+                    type="number" 
+                    placeholder="Tiempo Preparación (min)" 
+                    value={formData.tiempo} 
+                    onChange={(e) => setFormData({...formData, tiempo: e.target.value})} 
+                    className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white focus:outline-none focus:border-red-600 transition-all" 
+                    required
+                  />
+                  <select 
+                    value={formData.tipo} 
+                    onChange={(e) => setFormData({...formData, tipo: e.target.value})} 
+                    className="w-full bg-[#1a1a1a] border border-white/10 p-3 rounded-xl text-white focus:outline-none focus:border-red-600 transition-all" 
+                    required
+                  >
+                    <option value="" className="text-gray-500">Tipo</option>
+                    <option value="Desayuno">Desayuno</option>
+                    <option value="Almuerzo">Almuerzo</option>
+                    <option value="Cena">Cena</option>
+                    <option value="Snack">Snack</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] uppercase font-bold text-gray-500 ml-1">Macros</label>
+                  <div className="grid grid-cols-4 gap-2">
+                    <input 
+                      type="number" 
+                      placeholder="Kcal" 
+                      value={formData.calorias} 
+                      onChange={(e) => setFormData({...formData, calorias: e.target.value})} 
+                      className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white focus:outline-none focus:border-red-600 transition-all text-sm" 
+                      required
+                    />
+                    <input 
+                      type="number" 
+                      placeholder="Prot (g)" 
+                      value={formData.proteina} 
+                      onChange={(e) => setFormData({...formData, proteina: e.target.value})} 
+                      className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white focus:outline-none focus:border-red-600 transition-all text-sm" 
+                      required
+                    />
+                    <input 
+                      type="number" 
+                      placeholder="Carb (g)" 
+                      value={formData.carbohidratos} 
+                      onChange={(e) => setFormData({...formData, carbohidratos: e.target.value})} 
+                      className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white focus:outline-none focus:border-red-600 transition-all text-sm" 
+                    />
+                    <input 
+                      type="number" 
+                      placeholder="Gras (g)" 
+                      value={formData.grasas} 
+                      onChange={(e) => setFormData({...formData, grasas: e.target.value})} 
+                      className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white focus:outline-none focus:border-red-600 transition-all text-sm" 
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <textarea 
+                    placeholder="Ingredientes (separados por coma)" 
+                    value={formData.ingredientes} 
+                    onChange={(e) => setFormData({...formData, ingredientes: e.target.value})} 
+                    className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white h-20 resize-none focus:outline-none focus:border-red-600 transition-all" 
+                  />
+                  <textarea 
+                    placeholder="Instrucciones paso a paso" 
+                    value={formData.instrucciones} 
+                    onChange={(e) => setFormData({...formData, instrucciones: e.target.value})} 
+                    className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white h-24 resize-none focus:outline-none focus:border-red-600 transition-all" 
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="URL Imagen" 
+                    value={formData.imagen} 
+                    onChange={(e) => setFormData({...formData, imagen: e.target.value})} 
+                    className="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-white focus:outline-none focus:border-red-600 transition-all" 
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowModal(false)} 
+                    className="flex-1 bg-white/5 text-white font-bold py-3 rounded-xl hover:bg-white/10 transition-colors border border-white/5"
+                  >
+                    CANCELAR
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-black py-3 rounded-xl transition-all shadow-lg shadow-red-600/20 active:scale-95"
+                  >
+                    GUARDAR
+                  </button>
                 </div>
               </form>
             </div>

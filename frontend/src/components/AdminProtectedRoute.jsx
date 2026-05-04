@@ -9,7 +9,10 @@ export default function AdminProtectedRoute({ children }) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (!user || user.id_rol !== 1) {
+  const userRole = Number(user.id_rol) || Number(user.rol);
+  
+  if (!user || userRole !== 1) {
+    console.log("AdminProtectedRoute bloqueando acceso. Usuario:", user);
     return <Navigate to="/" replace />;
   }
 

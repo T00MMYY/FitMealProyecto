@@ -4,9 +4,11 @@ const User = require('../models/User');
 const Recipe = require('../models/Recipe');
 const Exercise = require('../models/Exercise');
 const { verifyToken } = require('../middleware/auth');
-const { logAction } = require('../middleware/log');
+const db = require('../config/database');
 
-// Middleware para verificar rol de administrador
+// --- MIDDLEWARES ---3
+
+// Verificar que el usuario sea administrador (id_rol === 1)
 const requireAdmin = (req, res, next) => {
   if (!req.user || req.user.id_rol !== 1) {
     return res.status(403).json({ error: 'Acceso denegado. Se requiere rol de administrador.' });
@@ -14,14 +16,16 @@ const requireAdmin = (req, res, next) => {
   next();
 };
 
-// Aplicar middleware de autenticación y admin a todas las rutas
+// Aplicar seguridad a todas las rutas del archivo
 router.use(verifyToken);
-// router.use(requireAdmin);
+router.use(requireAdmin);
 
-// DASHBOARD - Estadísticas
+// --- DASHBOARD & ESTADÍSTICAS ---
+
 router.get('/stats', async (req, res) => {
   try {
-    const [userStats] = await req.db.query(`
+    // Estadísticas generales de usuarios
+    const [userStats] = await db.query(`
       SELECT 
         COUNT(*) as total_users,
         SUM(CASE WHEN objetivo = 'perder_grasa' THEN 1 ELSE 0 END) as perder_grasa,
@@ -30,25 +34,21 @@ router.get('/stats', async (req, res) => {
       FROM usuarios
     `);
 
-    const [userGrowth] = await req.db.query(`
-      SELECT DATE_FORMAT(fecha_registro, '%Y-%m') as mes, COUNT(*) as registros 
+    // Crecimiento mensual
+    const [userGrowth] = await db.query(`
+      SELECT DATE_FORMAT(created_at, '%Y-%m') as mes, COUNT(*) as registros 
       FROM usuarios 
       GROUP BY mes 
       ORDER BY mes
     `);
 
-    const [topRecipes] = await req.db.query(`
-      SELECT titulo, id_receta 
-      FROM recetas 
-      ORDER BY id_receta DESC 
-      LIMIT 5
+    // Últimos registros para vista rápida
+    const [topRecipes] = await db.query(`
+      SELECT titulo, id_receta FROM recetas ORDER BY id_receta DESC LIMIT 5
     `);
 
-    const [topExercises] = await req.db.query(`
-      SELECT titulo, id 
-      FROM ejercicios 
-      ORDER BY id DESC 
-      LIMIT 5
+    const [topExercises] = await db.query(`
+      SELECT titulo, id FROM ejercicios ORDER BY id DESC LIMIT 5
     `);
 
     const totalRecipes = await Recipe.count();
@@ -59,111 +59,22 @@ router.get('/stats', async (req, res) => {
       totalRecipes,
       totalExercises,
       objetivos: {
-        perderGrasa: userStats[0].perder_grasa,
-        ganarMusculo: userStats[0].ganar_musculo,
-        mantener: userStats[0].mantener
+        perderGrasa: userStats[0].perder_grasa || 0,
+        ganarMusculo: userStats[0].ganar_musculo || 0,
+        mantener: userStats[0].mantener || 0
       },
       userGrowth,
       topRecipes,
       topExercises
     });
   } catch (error) {
-    console.error('Error obteniendo estadísticas:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    console.error('Error en DASHBOARD:', error);
+    res.status(500).json({ error: 'Error al cargar estadísticas' });
   }
 });
 
-// EJERCICIOS
-router.get('/exercises', async (req, res) => {
-  try {
-    const exercises = await Exercise.findAll();
-    res.json(exercises);
-  } catch (error) {
-    console.error('Error obteniendo ejercicios:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-});
+// --- GESTIÓN DE USUARIOS ---
 
-router.post('/exercises', async (req, res) => {
-  try {
-    const exerciseData = req.body;
-    const id = await Exercise.create(exerciseData);
-    res.json({ id, message: 'Ejercicio creado correctamente' });
-  } catch (error) {
-    console.error('Error creando ejercicio:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-});
-
-router.put('/exercises/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const exerciseData = req.body;
-    await Exercise.update(id, exerciseData);
-    res.json({ message: 'Ejercicio actualizado correctamente' });
-  } catch (error) {
-    console.error('Error actualizando ejercicio:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-});
-
-router.delete('/exercises/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    await Exercise.delete(id);
-    res.json({ message: 'Ejercicio eliminado correctamente' });
-  } catch (error) {
-    console.error('Error eliminando ejercicio:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-});
-
-// RECETAS
-router.get('/recipes', async (req, res) => {
-  try {
-    const recipes = await Recipe.findAll();
-    res.json(recipes);
-  } catch (error) {
-    console.error('Error obteniendo recetas:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-});
-
-router.post('/recipes', async (req, res) => {
-  try {
-    const recipeData = req.body;
-    const id = await Recipe.create(recipeData);
-    res.json({ id, message: 'Receta creada correctamente' });
-  } catch (error) {
-    console.error('Error creando receta:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-});
-
-router.put('/recipes/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const recipeData = req.body;
-    await Recipe.update(id, recipeData);
-    res.json({ message: 'Receta actualizada correctamente' });
-  } catch (error) {
-    console.error('Error actualizando receta:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-});
-
-router.delete('/recipes/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    await Recipe.delete(id);
-    res.json({ message: 'Receta eliminada correctamente' });
-  } catch (error) {
-    console.error('Error eliminando receta:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-});
-
-// USUARIOS
 router.get('/users', async (req, res) => {
   try {
     const offset = parseInt(req.query.offset) || 0;
@@ -171,8 +82,7 @@ router.get('/users', async (req, res) => {
     const users = await User.findAll(offset, limit);
     res.json(users);
   } catch (error) {
-    console.error('Error obteniendo usuarios:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(500).json({ error: 'Error al obtener usuarios' });
   }
 });
 
@@ -180,41 +90,26 @@ router.put('/users/:id/role', async (req, res) => {
   try {
     const { id } = req.params;
     const { id_rol } = req.body;
-    
-    await req.db.query('UPDATE usuarios SET id_rol = ? WHERE id_usuario = ?', [id_rol, id]);
+    await db.query('UPDATE usuarios SET id_rol = ? WHERE id_usuario = ?', [id_rol, id]);
     res.json({ message: 'Rol actualizado correctamente' });
   } catch (error) {
-    console.error('Error actualizando rol:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-});
-
-router.put('/users/:id/ban', async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    await req.db.query('UPDATE usuarios SET estado_cuenta = ? WHERE id_usuario = ?', ['baneado', id]);
-    res.json({ message: 'Usuario baneado correctamente' });
-  } catch (error) {
-    console.error('Error baneando usuario:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(500).json({ error: 'Error al actualizar rol' });
   }
 });
 
 router.put('/users/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
-    const { estado_cuenta } = req.body;
-    
-    await req.db.query('UPDATE usuarios SET estado_cuenta = ? WHERE id_usuario = ?', [estado_cuenta, id]);
-    res.json({ message: 'Estado actualizado correctamente' });
+    const { estado_cuenta } = req.body; // 'activo', 'baneado', etc.
+    await db.query('UPDATE usuarios SET estado_cuenta = ? WHERE id_usuario = ?', [estado_cuenta, id]);
+    res.json({ message: 'Estado de cuenta actualizado' });
   } catch (error) {
-    console.error('Error actualizando estado:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(500).json({ error: 'Error al actualizar estado' });
   }
 });
 
-// RECETAS
+// --- GESTIÓN DE RECETAS ---
+
 router.get('/recipes', async (req, res) => {
   try {
     const offset = parseInt(req.query.offset) || 0;
@@ -222,8 +117,7 @@ router.get('/recipes', async (req, res) => {
     const recipes = await Recipe.findAll(offset, limit);
     res.json(recipes);
   } catch (error) {
-    console.error('Error obteniendo recetas:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(500).json({ error: 'Error al obtener recetas' });
   }
 });
 
@@ -233,34 +127,30 @@ router.post('/recipes', async (req, res) => {
     const id = await Recipe.create(recipeData);
     res.status(201).json({ id, message: 'Receta creada correctamente' });
   } catch (error) {
-    console.error('Error creando receta:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(500).json({ error: 'Error al crear receta' });
   }
 });
 
 router.put('/recipes/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    await Recipe.update(id, req.body);
+    await Recipe.update(req.params.id, req.body);
     res.json({ message: 'Receta actualizada correctamente' });
   } catch (error) {
-    console.error('Error actualizando receta:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(500).json({ error: 'Error al actualizar receta' });
   }
 });
 
 router.delete('/recipes/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    await Recipe.delete(id);
+    await Recipe.delete(req.params.id);
     res.json({ message: 'Receta eliminada correctamente' });
   } catch (error) {
-    console.error('Error eliminando receta:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(500).json({ error: 'Error al eliminar receta' });
   }
 });
 
-// EJERCICIOS
+// --- GESTIÓN DE EJERCICIOS ---
+
 router.get('/exercises', async (req, res) => {
   try {
     const offset = parseInt(req.query.offset) || 0;
@@ -268,8 +158,7 @@ router.get('/exercises', async (req, res) => {
     const exercises = await Exercise.findAll(offset, limit);
     res.json(exercises);
   } catch (error) {
-    console.error('Error obteniendo ejercicios:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(500).json({ error: 'Error al obtener ejercicios' });
   }
 });
 
@@ -278,30 +167,25 @@ router.post('/exercises', async (req, res) => {
     const id = await Exercise.create(req.body);
     res.status(201).json({ id, message: 'Ejercicio creado correctamente' });
   } catch (error) {
-    console.error('Error creando ejercicio:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(500).json({ error: 'Error al crear ejercicio' });
   }
 });
 
 router.put('/exercises/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    await Exercise.update(id, req.body);
+    await Exercise.update(req.params.id, req.body);
     res.json({ message: 'Ejercicio actualizado correctamente' });
   } catch (error) {
-    console.error('Error actualizando ejercicio:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(500).json({ error: 'Error al actualizar ejercicio' });
   }
 });
 
 router.delete('/exercises/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    await Exercise.delete(id);
+    await Exercise.delete(req.params.id);
     res.json({ message: 'Ejercicio eliminado correctamente' });
   } catch (error) {
-    console.error('Error eliminando ejercicio:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(500).json({ error: 'Error al eliminar ejercicio' });
   }
 });
 

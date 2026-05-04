@@ -3,6 +3,7 @@ const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const { verifyToken, COOKIE_CONFIG } = require('../middleware/auth');
 const AuthController = require('../controllers/authController');
+const User = require('../models/User');
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -20,11 +21,25 @@ router.post('/logout', (req, res) => {
   res.json({ message: 'Sesión cerrada correctamente' });
 });
 
-router.get('/verify', verifyToken, (req, res) => {
-  res.json({
-    message: 'Token válido',
-    user: req.user
-  });
+router.get('/verify', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id_usuario || req.user.id;
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(401).json({ error: 'Usuario no encontrado' });
+    }
+    
+    delete user.password_hash;
+    
+    res.json({
+      message: 'Token válido',
+      user: user
+    });
+  } catch (error) {
+    console.error('Error al verificar sesión:', error);
+    res.status(500).json({ error: 'Error del servidor al verificar sesión' });
+  }
 });
 
 module.exports = router;

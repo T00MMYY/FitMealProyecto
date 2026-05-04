@@ -13,7 +13,7 @@ class Exercise {
    * Obtener ejercicio por ID
    */
   static async findById(id) {
-    const [rows] = await db.query('SELECT * FROM ejercicios WHERE id_ejercicio = ?', [id]);
+    const [rows] = await db.query('SELECT * FROM ejercicios WHERE id = ?', [id]);
     return rows[0];
   }
 
@@ -22,16 +22,17 @@ class Exercise {
    */
   static async create(exerciseData) {
     const query = `INSERT INTO ejercicios 
-      (titulo, grupo_muscular, dificultad, descripcion, imagen, video_url) 
-      VALUES (?, ?, ?, ?, ?, ?)`;
+      (titulo, musculo_id, dificultad, descripcion, imagen, tipo, puntos_clave) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)`;
     
     const values = [
       exerciseData.titulo,
-      exerciseData.grupo_muscular,
-      exerciseData.dificultad,
+      exerciseData.musculo_id || 1,
+      exerciseData.dificultad || 'Media',
       exerciseData.descripcion,
       exerciseData.imagen,
-      exerciseData.video_url
+      exerciseData.tipo || 'Fuerza / Hipertrofia',
+      exerciseData.puntos_clave || null
     ];
 
     const [result] = await db.query(query, values);
@@ -43,16 +44,17 @@ class Exercise {
    */
   static async update(id, exerciseData) {
     const query = `UPDATE ejercicios SET 
-      titulo = ?, grupo_muscular = ?, dificultad = ?, descripcion = ?, imagen = ?, video_url = ? 
-      WHERE id_ejercicio = ?`;
+      titulo = ?, musculo_id = ?, dificultad = ?, descripcion = ?, imagen = ?, tipo = ?, puntos_clave = ? 
+      WHERE id = ?`;
     
     const values = [
       exerciseData.titulo,
-      exerciseData.grupo_muscular,
-      exerciseData.dificultad,
-      exerciseData.descripcion,
-      exerciseData.imagen,
-      exerciseData.video_url,
+      exerciseData.musculo_id || 1,
+      exerciseData.dificultad || 'Media',
+      exerciseData.descripcion || null,
+      exerciseData.imagen || null,
+      exerciseData.tipo || 'Fuerza / Hipertrofia',
+      exerciseData.puntos_clave || null,
       id
     ];
 
@@ -64,7 +66,7 @@ class Exercise {
    * Eliminar ejercicio
    */
   static async delete(id) {
-    await db.query('DELETE FROM ejercicios WHERE id_ejercicio = ?', [id]);
+    await db.query('DELETE FROM ejercicios WHERE id = ?', [id]);
     return true;
   }
 
