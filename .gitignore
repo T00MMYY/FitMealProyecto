@@ -23,3 +23,7 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+# Archivos solo locales (no subir al repo)
+check-admin-password.js
+PENDIENTE.md
+*.local.md
