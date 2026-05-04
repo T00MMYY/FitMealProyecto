@@ -164,3 +164,5 @@ Ver `.env.example` para la configuración completa.
 ## 📄 Licencia
 
 Proyecto académico - 2DAW - Centre d'Estudis Monlau
+
+//hola
