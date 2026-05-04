@@ -16,7 +16,8 @@ export default function Navbar() {
   const navLinks = [
     { to: '/workouts', label: 'Workouts' },
     { to: '/recetas', label: 'Recetas' },
-    { to: '/products', label: 'Productos' }
+    { to: '/products', label: 'Productos' },
+    { to: '/contacto', label: 'Contacto' },
   ];
   if (isAuthenticated && user && (Number(user.id_rol) === 1 || Number(user.rol) === 1)) {
     navLinks.push({ to: '/admin', label: 'Admin' });

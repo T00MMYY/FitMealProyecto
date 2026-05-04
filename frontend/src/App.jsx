@@ -21,6 +21,8 @@ import AdminRecipes from "./pages/admin/AdminRecipes";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminExercises from "./pages/admin/AdminExercises";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import Contact from "./pages/Contact";
+
 
 function App() {
   return (
@@ -44,6 +46,7 @@ function App() {
               <Route path="/recetas/:id" element={<RecetaDetalle />} />
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/perfil" element={<Perfil />} />
+              <Route path="/contacto" element={<Contact />} />
               <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />
               <Route path="/admin/recipes" element={<AdminProtectedRoute><AdminRecipes /></AdminProtectedRoute>} />
               <Route path="/admin/users" element={<AdminProtectedRoute><AdminUsers /></AdminProtectedRoute>} />
