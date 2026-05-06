@@ -31,7 +31,7 @@ const AdminUsers = () => {
   const handleBan = async (id) => {
     if (window.confirm('¿Banear usuario?')) {
       try {
-        await api.put(`/api/admin/users/${id}/ban`);
+        await api.put(`/api/admin/users/${id}/status`, { estado_cuenta: 'baneado' });
         fetchUsers();
         toast.success('Usuario baneado correctamente');
       } catch (error) { 

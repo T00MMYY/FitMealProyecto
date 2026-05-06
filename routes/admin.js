@@ -10,7 +10,8 @@ const db = require('../config/database');
 
 // Verificar que el usuario sea administrador (id_rol === 1)
 const requireAdmin = (req, res, next) => {
-  if (!req.user || req.user.id_rol !== 1) {
+  const userRole = req.user?.id_rol || req.user?.rol;
+  if (!userRole || Number(userRole) !== 1) {
     return res.status(403).json({ error: 'Acceso denegado. Se requiere rol de administrador.' });
   }
   next();
