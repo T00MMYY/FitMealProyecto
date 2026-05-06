@@ -11,10 +11,14 @@ const Onboarding = () => {
 
   const manejarCompletado = async (datos) => {
     try {
+      const anioNacimiento = new Date().getFullYear() - parseInt(datos.edad || 25);
+      const fechaNacimiento = `${anioNacimiento}-01-01`;
+
       const datosAEnviar = {
         peso: datos.peso,
         altura: datos.altura,
         genero: datos.genero,
+        fecha_nacimiento: fechaNacimiento,
         nivel_actividad: datos.nivelActividad,
         experiencia: datos.experiencia,
         lugar_entrenamiento: datos.lugarEntrenamiento,

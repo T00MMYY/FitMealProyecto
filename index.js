@@ -40,8 +40,9 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: false })); // Permite cargar imágenes desde otro origen en desarrollo
 app.use(cookieParser());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const webhookRouter = require("./routes/webhook");
 app.use("/api/webhook", webhookRouter);
 
@@ -89,12 +90,14 @@ const productsRouter = require('./routes/products');
 const plansRouter = require('./routes/plans');
 const exercisesRouter = require('./routes/exercises');
 const recipesRouter = require('./routes/recipes');
+const favoritesRouter = require('./routes/favorites');
 
 app.use('/api/users', usersRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/plans', plansRouter);
 app.use('/api/exercises', exercisesRouter);
 app.use('/api/recipes', recipesRouter);
+app.use('/api/favorites', favoritesRouter);
 
 // Rutas de administración
 const adminRouter = require('./routes/admin');

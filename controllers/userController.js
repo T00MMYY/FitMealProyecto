@@ -114,16 +114,17 @@ class UserController {
    */
   static async updateUser(req, res) {
     try {
-      const requestingUserId = req.user.id;
+      const requestingUserId = req.user.id_usuario || req.user.id;
       const targetUserId = parseInt(req.params.id);
+      const userRole = req.user.id_rol || req.user.rol;
 
       // Only allow users to update their own profile, admins (rol=1) can update anyone
-      if (requestingUserId !== targetUserId && req.user.rol !== 1) {
+      if (requestingUserId !== targetUserId && userRole !== 1) {
         return res.status(403).json({ error: 'No tienes permisos para modificar este usuario' });
       }
 
       // Prevent non-admins from changing their own role
-      if (req.body.id_rol !== undefined && req.user.rol !== 1) {
+      if (req.body.id_rol !== undefined && userRole !== 1) {
         return res.status(403).json({ error: 'No puedes cambiar tu propio rol' });
       }
 
@@ -179,6 +180,37 @@ class UserController {
         error: 'Error al eliminar el usuario',
         ...(process.env.NODE_ENV !== 'production' && { details: error.message })
       });
+    }
+  }
+
+  /**
+   * Subir foto de perfil de un usuario
+   * POST /api/users/:id/photo
+   */
+  static async uploadPhoto(req, res) {
+    try {
+      const requestingUserId = req.user.id_usuario || req.user.id;
+      const targetUserId = parseInt(req.params.id);
+
+      if (requestingUserId !== targetUserId && (req.user.id_rol || req.user.rol) !== 1) {
+        return res.status(403).json({ error: 'No tienes permisos' });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ error: 'No se subió ninguna imagen' });
+      }
+
+      const foto_url = `${req.protocol}://${req.get('host')}/uploads/profiles/${req.file.filename}`;
+
+      await User.update(targetUserId, { foto_url });
+
+      res.json({
+        message: 'Foto subida correctamente',
+        foto_url
+      });
+    } catch (error) {
+      console.error('Error al subir foto:', error);
+      res.status(500).json({ error: 'Error al subir la foto' });
     }
   }
 }

@@ -6,13 +6,18 @@ export default function RecetaDetalle() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [receta, setReceta] = useState(null);
+  const [isFav, setIsFav] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    api.get(`/api/recipes/${id}`)
-      .then(res => {
-        setReceta(res.data);
+    Promise.all([
+      api.get(`/api/recipes/${id}`),
+      api.get('/api/favorites').catch(() => ({ data: [] }))
+    ])
+      .then(([recetaRes, favRes]) => {
+        setReceta(recetaRes.data);
+        setIsFav(favRes.data.some(f => f.id_receta === parseInt(id)));
         setLoading(false);
       })
       .catch(err => {
@@ -20,6 +25,20 @@ export default function RecetaDetalle() {
         setLoading(false);
       });
   }, [id]);
+
+  const toggleFavorite = async () => {
+    try {
+      if (isFav) {
+        await api.delete(`/api/favorites/${id}`);
+        setIsFav(false);
+      } else {
+        await api.post('/api/favorites', { id_receta: id });
+        setIsFav(true);
+      }
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
+    }
+  };
 
   if (loading) return <div className="h-screen bg-[#0a0a0a] flex items-center justify-center text-primary font-black uppercase text-2xl tracking-widest animate-pulse">CARGANDO...</div>;
   if (!receta) return <div className="h-screen bg-[#0a0a0a] flex flex-col items-center justify-center text-white text-4xl font-black italic uppercase">Receta no encontrada <button onClick={() => navigate(-1)} className="mt-8 text-[12px] bg-primary text-black px-6 py-2 rounded-full not-italic">Volver</button></div>;
@@ -41,6 +60,17 @@ export default function RecetaDetalle() {
                className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-700 hover:scale-105" 
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-80"></div>
+            
+            <button 
+              onClick={toggleFavorite}
+              className="absolute top-6 left-6 w-14 h-14 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center hover:scale-110 transition-transform z-10"
+              title={isFav ? "Quitar de favoritos" : "Añadir a favoritos"}
+            >
+              <span className={`text-2xl transition-colors duration-300 ${isFav ? 'text-primary' : 'text-white/50 grayscale'}`}>
+                {isFav ? '❤️' : '🤍'}
+              </span>
+            </button>
+
             <span className="absolute top-6 right-6 bg-black/80 backdrop-blur-md px-5 py-2.5 rounded-full text-primary font-black uppercase tracking-widest text-[10px] shadow-lg border border-white/10">
               {receta.tiempo} MINUTOS
             </span>

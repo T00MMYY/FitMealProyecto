@@ -2,7 +2,7 @@ import React, { Suspense, useState, useLayoutEffect, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Stage } from "@react-three/drei";
 import { Link } from "react-router-dom";
-import api from "../api/axios";
+import api from "../../api/axios";
 
 const CONFIG_CALIBRACION = {
   masculino: {
@@ -27,13 +27,22 @@ function Model({ url, onSelect, genero }) {
   const limites = CONFIG_CALIBRACION[genero];
 
   useLayoutEffect(() => {
-    scene.traverse((obj) => {
-      if (obj.isMesh) {
-        obj.material.color.set("#E8BEAC");
+    if (scene) {
+      scene.traverse((obj) => {
+        if (obj.isMesh && obj.material) {
+          const applyMaterial = (mat) => {
+            if (mat.color) mat.color.set("#E8BEAC");
+            mat.roughness = 0.6;
+          };
 
-        obj.material.roughness = 0.6;
-      }
-    });
+          if (Array.isArray(obj.material)) {
+            obj.material.forEach(applyMaterial);
+          } else {
+            applyMaterial(obj.material);
+          }
+        }
+      });
+    }
   }, [scene, url]);
 
   return (
@@ -110,7 +119,7 @@ export default function Workouts() {
   }, [seleccionado]);
 
   return (
-    <div className="flex h-screen w-full bg-[#0a0a0a] text-white font-sans overflow-hidden relative">
+    <div className="flex h-[calc(100vh-80px)] w-full bg-[#0a0a0a] text-white font-sans overflow-hidden relative">
       <div className="absolute top-6 left-6 z-50 flex gap-2 bg-black/40 backdrop-blur-md p-1.5 rounded-full border border-white/10 shadow-xl">
         <button
           onClick={() => {

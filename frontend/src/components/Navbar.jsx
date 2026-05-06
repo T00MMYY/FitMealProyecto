@@ -77,9 +77,9 @@ export default function Navbar() {
             >
               Carrito ({cartCount})
             </Link>
-            <span className="text-white/80 text-sm italic">
+            <Link to="/perfil" className="text-white/80 text-sm italic">
               {user?.nombre || user?.email}
-            </span>
+            </Link>
             <button
               onClick={logout}
               className="border border-white text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-colors cursor-pointer"

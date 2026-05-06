@@ -4,7 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-import Workouts from "./pages/workouts";
+import Workouts from "./pages/ejercicios/workouts";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Products from "./pages/products";

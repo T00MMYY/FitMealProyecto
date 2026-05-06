@@ -5,25 +5,51 @@ import api from '../api/axios';
 export default function Recetas() {
   const [filtroActivo, setFiltroActivo] = useState('Todas');
   const [recetasDB, setRecetasDB] = useState([]);
+  const [favoritos, setFavoritos] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/api/recipes')
-      .then(res => {
-        setRecetasDB(res.data);
+    const fetchData = async () => {
+      try {
+        const [recetasRes, favRes] = await Promise.all([
+          api.get('/api/recipes'),
+          api.get('/api/favorites').catch(() => ({ data: [] })) // Captura error si no está logueado
+        ]);
+        setRecetasDB(recetasRes.data);
+        setFavoritos(favRes.data.map(f => f.id_receta));
         setLoading(false);
-      })
-      .catch(err => {
-        console.error("Error cargando recetas:", err);
+      } catch (err) {
+        console.error("Error cargando datos:", err);
         setLoading(false);
-      });
+      }
+    };
+    fetchData();
   }, []);
 
-  const filtros = ['Todas', 'Vegano', 'Volumen', 'Definición', 'Keto', 'Alta Proteína', 'Snack'];
+  const toggleFavorite = async (e, id_receta) => {
+    e.preventDefault(); // Evita navegar al detalle de la receta
+    try {
+      const isFav = favoritos.includes(id_receta);
+      if (isFav) {
+        await api.delete(`/api/favorites/${id_receta}`);
+        setFavoritos(prev => prev.filter(id => id !== id_receta));
+      } else {
+        await api.post('/api/favorites', { id_receta });
+        setFavoritos(prev => [...prev, id_receta]);
+      }
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
+      // Podría mostrarse un mensaje de error si no está autenticado
+    }
+  };
 
-  const recetasFiltradas = recetasDB.filter(r => 
-    filtroActivo === 'Todas' || r.tipo === filtroActivo
-  );
+  const filtros = ['Todas', 'Favoritas', 'Vegano', 'Volumen', 'Definición', 'Keto', 'Alta Proteína', 'Snack'];
+
+  const recetasFiltradas = recetasDB.filter(r => {
+    if (filtroActivo === 'Todas') return true;
+    if (filtroActivo === 'Favoritas') return favoritos.includes(r.id_receta);
+    return r.tipo === filtroActivo;
+  });
 
   if (loading) {
     return (
@@ -68,50 +94,65 @@ export default function Recetas() {
 
         {/* GRID DE RECETAS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {recetasFiltradas.map(receta => (
-            <Link 
-              to={`/recetas/${receta.id_receta}`} 
-              key={receta.id_receta}             
-              className="group block bg-[#121212] rounded-[30px] overflow-hidden border border-white/5 hover:border-primary/50 transition-all duration-500 hover:-translate-y-2 relative"
-            >
-              <div className="aspect-[4/3] bg-zinc-900 relative overflow-hidden">
-                <img 
-                  src={receta.imagen_url} 
-                  alt={receta.titulo} 
-                  className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent opacity-80"></div>
-                
-                <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
-                  <span className="text-primary font-black uppercase tracking-widest text-[9px]">
-                    {receta.tiempo} MIN
-                  </span>
-                </div>
-              </div>
+          {recetasFiltradas.map(receta => {
+            const isFav = favoritos.includes(receta.id_receta);
+            return (
+              <Link 
+                to={`/recetas/${receta.id_receta}`} 
+                key={receta.id_receta}             
+                className="group block bg-[#121212] rounded-[30px] overflow-hidden border border-white/5 hover:border-primary/50 transition-all duration-500 hover:-translate-y-2 relative"
+              >
+                <div className="aspect-[4/3] bg-zinc-900 relative overflow-hidden">
+                  <img 
+                    src={receta.imagen_url} 
+                    alt={receta.titulo} 
+                    className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent opacity-80"></div>
+                  
+                  {/* Etiqueta Tiempo */}
+                  <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+                    <span className="text-primary font-black uppercase tracking-widest text-[9px]">
+                      {receta.tiempo} MIN
+                    </span>
+                  </div>
 
-              <div className="p-8">
-                <h3 className="text-2xl font-black italic uppercase leading-tight mb-4 group-hover:text-primary transition-colors">
-                  {receta.titulo}
-                </h3>
-                
-                <div className="flex items-center gap-4 border-t border-white/10 pt-4">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-white/60">
-                      {receta.calorias} Kcal
+                  {/* Botón Favorito */}
+                  <button 
+                    onClick={(e) => toggleFavorite(e, receta.id_receta)}
+                    className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center hover:scale-110 transition-transform z-10"
+                    title={isFav ? "Quitar de favoritos" : "Añadir a favoritos"}
+                  >
+                    <span className={`text-xl transition-colors duration-300 ${isFav ? 'text-primary' : 'text-white/50 grayscale'}`}>
+                      {isFav ? '❤️' : '🤍'}
                     </span>
-                  </div>
-                  <div className="w-px h-4 bg-white/10"></div>
-                  <div className="flex items-center gap-2 relative">
-                    <span className="w-2 h-2 rounded-full bg-primary"></span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-white">
-                      {receta.proteina}g Proteína
-                    </span>
+                  </button>
+                </div>
+
+                <div className="p-8">
+                  <h3 className="text-2xl font-black italic uppercase leading-tight mb-4 group-hover:text-primary transition-colors">
+                    {receta.titulo}
+                  </h3>
+                  
+                  <div className="flex items-center gap-4 border-t border-white/10 pt-4">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-white/60">
+                        {receta.calorias} Kcal
+                      </span>
+                    </div>
+                    <div className="w-px h-4 bg-white/10"></div>
+                    <div className="flex items-center gap-2 relative">
+                      <span className="w-2 h-2 rounded-full bg-primary"></span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-white">
+                        {receta.proteina}g Proteína
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
 
         {recetasFiltradas.length === 0 && (
