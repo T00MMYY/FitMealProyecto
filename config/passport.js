@@ -46,7 +46,7 @@ async function findOrCreateOAuthUser(profile, provider) {
   });
 
   // Obtener el usuario completo con su id_usuario real
-  const createdUser = await User.findById(newUser.id);
+  const createdUser = await User.findById(newUser.id_usuario);
   return { user: createdUser, isNew: true };
 }
 
