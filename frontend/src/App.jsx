@@ -8,7 +8,6 @@ import Workouts from "./pages/ejercicios/workouts";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Products from "./pages/products";
-import OAuthSuccess from "./pages/OAuthSuccess";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Ejercicios from "./pages/ejercicios/Ejercicios";
@@ -36,7 +35,6 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/auth/success" element={<OAuthSuccess />} />
               <Route path="/products" element={<Products />} />
               <Route path="/products/:id" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />

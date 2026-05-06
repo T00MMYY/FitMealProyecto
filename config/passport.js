@@ -28,7 +28,7 @@ async function findOrCreateOAuthUser(profile, provider) {
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
       await User.updateLastAccess(existingUser.id_usuario);
-      return existingUser;
+      return { user: existingUser, isNew: false };
     }
   }
 
@@ -47,7 +47,7 @@ async function findOrCreateOAuthUser(profile, provider) {
 
   // Obtener el usuario completo con su id_usuario real
   const createdUser = await User.findById(newUser.id);
-  return createdUser;
+  return { user: createdUser, isNew: true };
 }
 
 const hasGitHubOAuth = Boolean(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET);
@@ -62,7 +62,8 @@ if (hasGitHubOAuth) {
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const user = await findOrCreateOAuthUser(profile, 'github');
+        const { user, isNew } = await findOrCreateOAuthUser(profile, 'github');
+        user._isNew = isNew;
         return done(null, user);
       } catch (error) {
         return done(error, null);
@@ -80,7 +81,8 @@ if (hasGoogleOAuth) {
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const user = await findOrCreateOAuthUser(profile, 'google');
+        const { user, isNew } = await findOrCreateOAuthUser(profile, 'google');
+        user._isNew = isNew;
         return done(null, user);
       } catch (error) {
         return done(error, null);

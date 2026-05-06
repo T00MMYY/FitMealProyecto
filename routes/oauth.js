@@ -38,7 +38,8 @@ if (passport.oauthProviders?.github) {
       });
 
       res.cookie('fitmeal_token', token, COOKIE_CONFIG);
-      res.redirect(`${FRONTEND_URL}/auth/success?provider=github`);
+      const dest = req.user._isNew ? `${FRONTEND_URL}/onboarding` : `${FRONTEND_URL}/`;
+      res.redirect(dest);
     }
   );
 } else {
@@ -70,7 +71,8 @@ if (passport.oauthProviders?.google) {
       });
 
       res.cookie('fitmeal_token', token, COOKIE_CONFIG);
-      res.redirect(`${FRONTEND_URL}/auth/success?provider=google`);
+      const dest = req.user._isNew ? `${FRONTEND_URL}/onboarding` : `${FRONTEND_URL}/`;
+      res.redirect(dest);
     }
   );
 } else {

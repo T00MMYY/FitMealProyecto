@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
@@ -10,6 +10,7 @@ export default function Login() {
 
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -25,11 +26,8 @@ export default function Login() {
 
     try {
       const response = await login(email, password);
-      if (response?.user?.id_rol === 1) {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
+      const from = location.state?.from?.pathname || (response?.user?.id_rol === 1 ? '/admin' : '/');
+      navigate(from, { replace: true });
     } catch (err) {
       setError(err.response?.data?.error || 'Error al iniciar sesion');
     } finally {
@@ -153,7 +151,7 @@ export default function Login() {
           {/* OAuth Buttons */}
           <div className="space-y-3">
             <a
-              href={`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/auth/google`}
+              href={`${import.meta.env.VITE_API_URL || 'https://fitmeal.website'}/auth/google`}
               className="flex items-center justify-center gap-3 w-full bg-gray-800/80 hover:bg-gray-700/80 border border-gray-700 text-white py-3 rounded-xl font-medium transition-colors"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -165,7 +163,7 @@ export default function Login() {
               Continuar con Google
             </a>
             <a
-              href={`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/auth/github`}
+              href={`${import.meta.env.VITE_API_URL || 'https://fitmeal.website'}/auth/github`}
               className="flex items-center justify-center gap-3 w-full bg-gray-800/80 hover:bg-gray-700/80 border border-gray-700 text-white py-3 rounded-xl font-medium transition-colors"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

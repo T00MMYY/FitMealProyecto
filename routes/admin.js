@@ -109,6 +109,37 @@ router.put('/users/:id/status', async (req, res) => {
   }
 });
 
+
+router.put('/users/:id/ban', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (parseInt(id) === req.user.id_usuario) {
+      return res.status(400).json({ error: 'No puedes banearte a ti mismo' });
+    }
+    const [rows] = await db.query('SELECT estado_cuenta FROM usuarios WHERE id_usuario = ?', [id]);
+    if (!rows.length) return res.status(404).json({ error: 'Usuario no encontrado' });
+    const nuevoEstado = rows[0].estado_cuenta === 'baneado' ? 'activo' : 'baneado';
+    await db.query('UPDATE usuarios SET estado_cuenta = ? WHERE id_usuario = ?', [nuevoEstado, id]);
+    res.json({ message: nuevoEstado === 'baneado' ? 'Usuario baneado' : 'Usuario desbaneado', estado: nuevoEstado });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al cambiar estado del usuario' });
+  }
+});
+
+router.delete('/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (parseInt(id) === req.user.id_usuario) {
+      return res.status(400).json({ error: 'No puedes eliminarte a ti mismo' });
+    }
+    const deleted = await User.delete(id);
+    if (!deleted) return res.status(404).json({ error: 'Usuario no encontrado' });
+    res.json({ message: 'Usuario eliminado correctamente' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar usuario' });
+  }
+});
+
 // --- GESTIÓN DE RECETAS ---
 
 router.get('/recipes', async (req, res) => {
