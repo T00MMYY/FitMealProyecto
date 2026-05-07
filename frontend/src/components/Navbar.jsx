@@ -77,7 +77,7 @@ export default function Navbar() {
             >
               Carrito ({cartCount})
             </Link>
-            <Link to="/perfil" className="text-white/80 text-sm italic">
+            <Link to="/perfil" className="text-white/80 hover:text-white text-sm italic font-bold">
               {user?.nombre || user?.email}
             </Link>
             <button
