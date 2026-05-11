@@ -72,7 +72,7 @@ export function AuthProvider({ children }) {
   };
 
   // Usado por OAuthSuccess para inyectar user tras el callback externo
-  const setTokenExternal = (_, userData) => {
+  const setUserFromOAuth = (_, userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
   };
@@ -85,7 +85,7 @@ export function AuthProvider({ children }) {
   login,
   register,
   logout,
-  setTokenExternal,
+  setUserFromOAuth,
 };
 
   return (

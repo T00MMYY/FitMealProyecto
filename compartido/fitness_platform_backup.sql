@@ -1,4 +1,4 @@
-﻿-- phpMyAdmin SQL Dump
+-- phpMyAdmin SQL Dump
 -- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
@@ -509,6 +509,50 @@ ALTER TABLE `suscripciones_usuarios`
 --
 ALTER TABLE `usuarios`
   ADD CONSTRAINT `fk_user_rol` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`) ON DELETE SET NULL;
+
+--
+-- Estructura de tabla para la tabla `favoritos_ejercicios`
+--
+
+CREATE TABLE `favoritos_ejercicios` (
+  `id_usuario` int NOT NULL,
+  `id_ejercicio` int NOT NULL,
+  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `favoritos_ejercicios`
+  ADD PRIMARY KEY (`id_usuario`,`id_ejercicio`),
+  ADD KEY `fk_favej_ejercicio` (`id_ejercicio`);
+
+ALTER TABLE `favoritos_ejercicios`
+  ADD CONSTRAINT `fk_favej_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_favej_ejercicio` FOREIGN KEY (`id_ejercicio`) REFERENCES `ejercicios` (`id`) ON DELETE CASCADE;
+
+--
+-- Estructura de tabla para la tabla `progreso_ejercicios`
+--
+
+CREATE TABLE `progreso_ejercicios` (
+  `id_progreso` int NOT NULL,
+  `id_usuario` int NOT NULL,
+  `id_ejercicio` int NOT NULL,
+  `peso` decimal(5,2) NOT NULL,
+  `repeticiones` int DEFAULT NULL,
+  `fecha` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `progreso_ejercicios`
+  ADD PRIMARY KEY (`id_progreso`),
+  ADD KEY `fk_progej_usuario` (`id_usuario`),
+  ADD KEY `fk_progej_ejercicio` (`id_ejercicio`);
+
+ALTER TABLE `progreso_ejercicios`
+  MODIFY `id_progreso` int NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `progreso_ejercicios`
+  ADD CONSTRAINT `fk_progej_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_progej_ejercicio` FOREIGN KEY (`id_ejercicio`) REFERENCES `ejercicios` (`id`) ON DELETE CASCADE;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -92,17 +92,36 @@ export default function Workouts() {
 
   const [ejercicios, setEjercicios] = useState([]);
   const [cargando, setCargando] = useState(false);
+  const [verFavoritos, setVerFavoritos] = useState(false);
 
   const rutaModelo =
     genero === "masculino" ? "/glbs/hombre3D.glb" : "/glbs/mujer3D.glb";
 
   const handleSelect = (parte) => {
+    setVerFavoritos(false);
     setCargando(true);
     setSeleccionado(parte);
   };
 
+  const handleShowFavorites = () => {
+    setSeleccionado("TUS FAVORITOS");
+    setVerFavoritos(true);
+    setCargando(true);
+    api.get("/api/favorites-exercises")
+      .then((res) => {
+        setEjercicios(res.data);
+      })
+      .catch((err) => {
+        console.error("Error en el fetch de favoritos:", err);
+        setEjercicios([]);
+      })
+      .finally(() => {
+        setCargando(false);
+      });
+  };
+
   useEffect(() => {
-    if (seleccionado) {
+    if (seleccionado && !verFavoritos && seleccionado !== "TUS FAVORITOS") {
       setCargando(true);
       api.get(`/api/exercises/${seleccionado}`)
         .then((res) => {
@@ -116,7 +135,7 @@ export default function Workouts() {
           setCargando(false);
         });
     }
-  }, [seleccionado]);
+  }, [seleccionado, verFavoritos]);
 
   return (
     <div className="flex h-[calc(100vh-80px)] w-full bg-[#0a0a0a] text-white font-sans overflow-hidden relative">
@@ -127,9 +146,10 @@ export default function Workouts() {
             setCargando(false);
             setEjercicios([]);
             setSeleccionado(null);
+            setVerFavoritos(false);
           }}
           className={`px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-            genero === "masculino"
+            genero === "masculino" && !verFavoritos
               ? "bg-primary text-black shadow-lg shadow-primary/20"
               : "text-white/40 hover:text-white"
           }`}
@@ -143,14 +163,29 @@ export default function Workouts() {
             setCargando(false);
             setEjercicios([]);
             setSeleccionado(null);
+            setVerFavoritos(false);
           }}
           className={`px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-            genero === "femenino"
+            genero === "femenino" && !verFavoritos
               ? "bg-primary text-black shadow-lg shadow-primary/20"
               : "text-white/40 hover:text-white"
           }`}
         >
           FEMALE
+        </button>
+
+        <div className="w-px h-6 bg-white/20 mx-1 self-center"></div>
+
+        <button
+          onClick={handleShowFavorites}
+          className={`px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+            verFavoritos
+              ? "bg-primary text-black shadow-lg shadow-primary/20"
+              : "text-white/40 hover:text-white"
+          }`}
+        >
+          <svg className={`w-3 h-3 ${verFavoritos ? "fill-black" : "fill-none"} stroke-current`} viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+          FAVORITOS
         </button>
       </div>
 

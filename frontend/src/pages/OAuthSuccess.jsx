@@ -1,19 +1,20 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 
 export default function OAuthSuccess() {
   const navigate = useNavigate();
+  const { setUserFromOAuth } = useAuth();
 
   useEffect(() => {
     const verifyOAuthLogin = async () => {
       try {
         const response = await api.get('/auth/verify');
-        // Cookie was set by the backend, verify confirms it's valid
-        if (response.data.user) {
-          // Store user in localStorage so AuthContext picks it up on next mount
-          localStorage.setItem('user', JSON.stringify(response.data.user));
-          if (response.data.user.id_rol === 1) {
+        const user = response.data.user;
+        if (user) {
+          setUserFromOAuth(null, user);
+          if (user.id_rol === 1) {
             navigate('/admin', { replace: true });
           } else {
             navigate('/', { replace: true });
@@ -26,11 +27,8 @@ export default function OAuthSuccess() {
       }
     };
 
-
-    
-
     verifyOAuthLogin();
-  }, [navigate]);
+  }, [navigate, setUserFromOAuth]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-950">
