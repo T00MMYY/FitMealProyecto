@@ -32,18 +32,21 @@ const OPCIONES_CATEGORIA = {
     tieneSabor: true,
     sabores: ['Chocolate', 'Vainilla', 'Fresa', 'Cookies & Cream', 'Natural', 'Caramelo'],
     tallas: ['500g', '1kg', '2kg', '5kg'],
+    precios: { '500g': 24.99, '1kg': null, '2kg': 41.99, '5kg': 89.99 },
     labelTallas: 'Cantidad',
   },
   6: {
     tieneSabor: false,
     sabores: [],
     tallas: ['30 caps', '60 caps', '90 caps', '180 caps'],
+    precios: { '30 caps': 9.99, '60 caps': 17.99, '90 caps': 24.99, '180 caps': 44.99 },
     labelTallas: 'Unidades',
   },
   7: {
     tieneSabor: true,
     sabores: ['Chocolate', 'Vainilla', 'Caramelo', 'Stracciatella', 'Coco'],
     tallas: ['1 ud', 'Caja 6', 'Caja 12', 'Caja 24'],
+    precios: { '1 ud': 2.49, 'Caja 6': 13.99, 'Caja 12': 25.99, 'Caja 24': 47.99 },
     labelTallas: 'Formato',
   },
 };
@@ -59,6 +62,7 @@ export default function ProductDetail() {
   const [hoverStar, setHoverStar] = useState(0);
   const [talla, setTalla] = useState('');
   const [cantidad, setCantidad] = useState(1);
+  const [precioActual, setPrecioActual] = useState(null);
 
   useEffect(() => {
     api.get(`/api/products/${id}`)
@@ -66,7 +70,10 @@ export default function ProductDetail() {
         const p = res.data.product;
         setProducto(p);
         const opciones = OPCIONES_CATEGORIA[p.id_categoria] || OPCIONES_CATEGORIA[5];
-        setTalla(opciones.tallas[1] || opciones.tallas[0]);
+        const tallaPorDefecto = opciones.tallas[1] || opciones.tallas[0];
+        setTalla(tallaPorDefecto);
+        const precioPorDefecto = opciones.precios[tallaPorDefecto] ?? parseFloat(p.precio);
+        setPrecioActual(precioPorDefecto);
       })
       .finally(() => setCargando(false));
   }, [id]);
@@ -95,7 +102,6 @@ export default function ProductDetail() {
 
   const opciones = OPCIONES_CATEGORIA[producto.id_categoria] || OPCIONES_CATEGORIA[5];
   const imagen = producto.imagen_url || IMAGENES[producto.nombre_producto];
-  const precio = parseFloat(producto.precio).toFixed(2);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-primary selection:text-black relative overflow-hidden">
@@ -222,7 +228,11 @@ export default function ProductDetail() {
               {opciones.tallas.map((t) => (
                 <button
                   key={t}
-                  onClick={() => setTalla(t)}
+                  onClick={() => {
+                    setTalla(t);
+                    const nuevoPrecio = opciones.precios[t] ?? parseFloat(producto.precio);
+                    setPrecioActual(nuevoPrecio);
+                  }}
                   className="py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 cursor-pointer"
                   style={{
                     background: talla === t ? '#D30F15' : 'rgba(255,255,255,0.03)',
@@ -273,7 +283,7 @@ export default function ProductDetail() {
             <div>
               <p className="text-[9px] uppercase tracking-[0.4em] text-white/15 font-bold mb-1">Precio total</p>
               <p className="text-5xl font-black tracking-tight">
-                {(precio * cantidad).toFixed(2)}
+                {((precioActual ?? parseFloat(producto.precio)) * cantidad).toFixed(2)}
                 <span className="text-2xl text-white/40 ml-1">EUR</span>
               </p>
             </div>
@@ -283,7 +293,7 @@ export default function ProductDetail() {
                 addToCart({
                   id: producto.id_producto,
                   nombre: producto.nombre_producto,
-                  precio: Number(producto.precio),
+                  precio: precioActual ?? Number(producto.precio),
                   talla,
                   cantidad,
                   imagen,

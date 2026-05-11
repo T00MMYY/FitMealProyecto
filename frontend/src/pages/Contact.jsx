@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import api from '../api/axios';
+import toast from 'react-hot-toast';
 
 const infoCards = [
   { icon: 'phone', label: 'Teléfono', value: '+688 493 491', sub: 'Lun–Vie, 9:00–18:00' },
@@ -11,19 +13,28 @@ const infoCards = [
 export default function Contact() {
   const [form, setForm] = useState({ nombre: '', email: '', telefono: '', mensaje: '' });
   const [sent, setSent] = useState(false);
+  const [enviando, setEnviando] = useState(false);
 
   function handleChange(e) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    setSent(true);
+    setEnviando(true);
+    try {
+      await api.post('/api/contact', form);
+      setSent(true);
+    } catch {
+      toast.error('Error al enviar el mensaje. Inténtalo de nuevo.');
+    } finally {
+      setEnviando(false);
+    }
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-primary selection:text-black pt-32 pb-20">
-      <div className="max-w-[1300px] mx-auto px-6">
+    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-primary selection:text-black pt-28 pb-20">
+      <div className="max-w-[1350px] mx-auto px-6">
 
         {/* HEADER */}
         <div className="mb-20 relative">
@@ -32,7 +43,7 @@ export default function Contact() {
             initial={{ opacity: 0, y: 40, filter: 'blur(10px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="text-8xl md:text-[10rem] font-black italic uppercase leading-[0.85] tracking-tighter mb-5"
+            className="text-8xl md:text-[9rem] font-black italic uppercase leading-[0.85] tracking-tighter mb-5"
           >
             CON<span className="text-primary">TACTO</span>
           </motion.h1>
@@ -132,13 +143,16 @@ export default function Contact() {
 
                   <motion.button
                     type="submit"
-                    whileHover={{ scale: 1.02, boxShadow: '0 0 30px rgba(211,15,21,0.4)' }}
-                    whileTap={{ scale: 0.97 }}
-                    className="w-full py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 group"
+                    disabled={enviando}
+                    whileHover={enviando ? {} : { scale: 1.02, boxShadow: '0 0 30px rgba(211,15,21,0.4)' }}
+                    whileTap={enviando ? {} : { scale: 0.97 }}
+                    className="w-full py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 group disabled:opacity-60 disabled:cursor-not-allowed"
                     style={{ background: '#D30F15', color: '#fff' }}
                   >
-                    Enviar mensaje
-                    <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">send</span>
+                    {enviando ? 'Enviando...' : 'Enviar mensaje'}
+                    {!enviando && (
+                      <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">send</span>
+                    )}
                   </motion.button>
                 </form>
               </>

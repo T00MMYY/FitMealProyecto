@@ -103,6 +103,10 @@ app.use('/api/favorites', favoritesRouter);
 const adminRouter = require('./routes/admin');
 app.use('/api/admin', adminRouter);
 
+// Ruta de contacto (envío de emails)
+const contactRouter = require('./routes/contact');
+app.use('/api/contact', contactRouter);
+
 // ============================================
 // MANEJO DE ERRORES
 // ============================================
