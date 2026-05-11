@@ -63,6 +63,10 @@ export default function ProductDetail() {
   const [talla, setTalla] = useState('');
   const [cantidad, setCantidad] = useState(1);
   const [precioActual, setPrecioActual] = useState(null);
+  const [esFavorito, setEsFavorito] = useState(() => {
+    const favs = JSON.parse(localStorage.getItem('fitmeal_productos_favoritos') || '[]');
+    return favs.includes(Number(id));
+  });
 
   useEffect(() => {
     api.get(`/api/products/${id}`)
@@ -77,6 +81,14 @@ export default function ProductDetail() {
       })
       .finally(() => setCargando(false));
   }, [id]);
+
+  function toggleFavorito() {
+    const favs = JSON.parse(localStorage.getItem('fitmeal_productos_favoritos') || '[]');
+    const idNum = Number(id);
+    const nuevos = favs.includes(idNum) ? favs.filter((x) => x !== idNum) : [...favs, idNum];
+    localStorage.setItem('fitmeal_productos_favoritos', JSON.stringify(nuevos));
+    setEsFavorito(!esFavorito);
+  }
 
   if (cargando) {
     return (
@@ -129,7 +141,7 @@ export default function ProductDetail() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="lg:col-span-3 relative"
         >
-          <div className="rounded-3xl overflow-hidden group relative bg-gradient-to-br from-zinc-900 to-zinc-950" style={{ height: '600px' }}>
+          <div className="rounded-3xl overflow-hidden group relative bg-gradient-to-br from-zinc-900 to-zinc-950" style={{ height: '780px' }}>
             {imagen ? (
               <img
                 src={imagen}
@@ -144,6 +156,29 @@ export default function ProductDetail() {
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/60 via-transparent to-transparent pointer-events-none" />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#0a0a0a]/20 pointer-events-none" />
             <div className="absolute inset-0 rounded-3xl pointer-events-none" style={{ boxShadow: 'inset 0 0 60px rgba(0,0,0,0.3)' }} />
+
+            <motion.button
+              onClick={toggleFavorito}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              aria-label={esFavorito ? 'Quitar de favoritos' : 'Anadir a favoritos'}
+              className="absolute top-5 right-5 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-colors duration-300 cursor-pointer group/heart"
+              style={{
+                background: esFavorito ? 'rgba(211,15,21,0.9)' : 'rgba(10,10,10,0.55)',
+                border: `1px solid ${esFavorito ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.12)'}`,
+                boxShadow: esFavorito ? '0 0 25px rgba(211,15,21,0.45)' : '0 4px 20px rgba(0,0,0,0.35)',
+              }}
+            >
+              <span
+                className="material-symbols-outlined text-2xl transition-all duration-300"
+                style={{
+                  color: esFavorito ? '#ffffff' : 'rgba(255,255,255,0.85)',
+                  fontVariationSettings: esFavorito ? '"FILL" 1, "wght" 600' : '"FILL" 0, "wght" 400',
+                }}
+              >
+                favorite
+              </span>
+            </motion.button>
           </div>
           <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-primary/10 blur-2xl rounded-full" />
         </motion.div>
@@ -187,7 +222,39 @@ export default function ProductDetail() {
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04]"
+          >
+            <span className="relative flex w-2 h-2">
+              <span className="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+              <span className="relative inline-flex w-2 h-2 rounded-full bg-emerald-400" />
+            </span>
+            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-300/90">
+              En stock · Envío en 24h laborables
+            </span>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.55 }}
+            className="relative overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-r from-primary/15 via-primary/8 to-transparent px-4 py-3.5"
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_left,rgba(211,15,21,0.18)_0%,transparent_60%)] pointer-events-none" />
+            <div className="relative flex flex-col gap-1">
+              <p className="text-[12px] font-black uppercase italic tracking-[0.2em] text-primary">
+                Hasta 60% de descuento
+              </p>
+              <p className="text-[9px] uppercase tracking-[0.3em] text-white/40 font-bold">
+                + 5% extra con código FITMEAL
+              </p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.6 }}
             className="flex gap-1.5 items-center"
           >
             {[1, 2, 3, 4, 5].map((n) => {
@@ -282,9 +349,9 @@ export default function ProductDetail() {
           >
             <div>
               <p className="text-[9px] uppercase tracking-[0.4em] text-white/15 font-bold mb-1">Precio total</p>
-              <p className="text-5xl font-black tracking-tight">
+              <p className="text-5xl font-medium tracking-tight">
                 {((precioActual ?? parseFloat(producto.precio)) * cantidad).toFixed(2)}
-                <span className="text-2xl text-white/40 ml-1">EUR</span>
+                <span className="text-2xl text-white/40 ml-1 font-medium">EUR</span>
               </p>
             </div>
 
