@@ -55,10 +55,10 @@ export default function RecetaDetalle() {
           {/* COLUMNA IZQUIERDA: IMAGEN */}
           <div className="sticky top-32 rounded-[40px] overflow-hidden border border-white/10 bg-[#121212] aspect-square relative group">
             <img 
-               src={receta.imagen_url || 'https://via.placeholder.com/800'} 
-               alt={receta.titulo} 
-               className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-700 hover:scale-105" 
-            />
+                    src={receta.imagen} 
+                    alt={receta.titulo} 
+                    className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                  />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-80"></div>
             
             <button 

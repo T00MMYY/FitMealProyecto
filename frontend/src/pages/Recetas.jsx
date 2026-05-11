@@ -54,7 +54,7 @@ export default function Recetas() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-primary font-black italic text-4xl">
-        CARGANDO FITMEALS...
+        Cargando...
       </div>
     );
   }
@@ -63,7 +63,6 @@ export default function Recetas() {
     <div className="min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-primary selection:text-black pt-32 pb-20">
       <div className="max-w-[1400px] mx-auto px-6">
         
-        {/* HEADER */}
         <div className="mb-16">
           <h1 className="text-8xl md:text-9xl font-black italic uppercase leading-[0.8] tracking-tighter mb-6">
             FIT<span className="text-primary">MEALS</span>
@@ -73,7 +72,6 @@ export default function Recetas() {
               Alcanza tus macros sin sacrificar el sabor. Filtra por tu objetivo y descubre tu nueva comida favorita.
             </p>
             
-            {/* FILTROS */}
             <div className="flex flex-wrap gap-2">
               {filtros.map(filtro => (
                 <button
@@ -92,7 +90,6 @@ export default function Recetas() {
           </div>
         </div>
 
-        {/* GRID DE RECETAS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {recetasFiltradas.map(receta => {
             const isFav = favoritos.includes(receta.id_receta);
@@ -104,20 +101,18 @@ export default function Recetas() {
               >
                 <div className="aspect-[4/3] bg-zinc-900 relative overflow-hidden">
                   <img 
-                    src={receta.imagen_url} 
+                    src={receta.imagen} 
                     alt={receta.titulo} 
                     className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent opacity-80"></div>
                   
-                  {/* Etiqueta Tiempo */}
                   <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
                     <span className="text-primary font-black uppercase tracking-widest text-[9px]">
                       {receta.tiempo} MIN
                     </span>
                   </div>
 
-                  {/* Botón Favorito */}
                   <button 
                     onClick={(e) => toggleFavorite(e, receta.id_receta)}
                     className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/10 flex items-center justify-center hover:scale-110 transition-transform z-10"
