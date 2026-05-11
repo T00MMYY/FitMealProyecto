@@ -1,4 +1,5 @@
 const FavoriteRecipe = require('../models/FavoriteRecipe');
+const User = require('../models/User');
 
 class FavoritesController {
   static async getUserFavorites(req, res) {
@@ -19,6 +20,15 @@ class FavoritesController {
       
       if (!id_receta) {
         return res.status(400).json({ error: 'id_receta es requerido' });
+      }
+
+      // Chequear límite de favoritos para plan básico
+      const user = await User.findById(id_usuario);
+      if (user.plan === 'basic') {
+        const favoritesCount = await FavoriteRecipe.getUserFavoritesCount(id_usuario);
+        if (favoritesCount >= 5) {
+          return res.status(403).json({ error: 'Límite de 5 favoritos alcanzado. Actualiza a premium para más.' });
+        }
       }
 
       await FavoriteRecipe.addFavorite(id_usuario, id_receta);

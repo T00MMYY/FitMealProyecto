@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
 // Middleware para verificar JWT
 const verifyToken = (req, res, next) => {
@@ -26,7 +27,8 @@ const generateToken = (user) => {
     { 
       id_usuario: user.id_usuario || user.id,
       email: user.email,
-      id_rol: user.id_rol || user.rol
+      id_rol: user.id_rol || user.rol,
+      plan: user.plan || 'basic'
     },
     process.env.JWT_SECRET,
     { expiresIn: '24h' } // Token expira en 24 horas
@@ -49,6 +51,23 @@ const requireRole = (...roles) => {
   };
 };
 
+// Middleware para verificar plan premium
+const requirePremium = async (req, res, next) => {
+  if (!req.user) {
+    return res.status(403).json({ error: 'Token no proporcionado' });
+  }
+
+  try {
+    const user = await User.findById(req.user.id_usuario);
+    if (!user || user.plan !== 'premium') {
+      return res.status(403).json({ error: 'Esta función requiere un plan premium' });
+    }
+    next();
+  } catch (error) {
+    return res.status(500).json({ error: 'Error al verificar plan' });
+  }
+};
+
 const COOKIE_CONFIG = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
@@ -56,4 +75,4 @@ const COOKIE_CONFIG = {
   maxAge: 24 * 60 * 60 * 1000
 };
 
-module.exports = { verifyToken, generateToken, requireRole, COOKIE_CONFIG };
+module.exports = { verifyToken, generateToken, requireRole, requirePremium, COOKIE_CONFIG };

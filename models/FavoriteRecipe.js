@@ -15,6 +15,17 @@ class FavoriteRecipe {
   }
 
   /**
+   * Obtener el conteo de favoritos de un usuario
+   */
+  static async getUserFavoritesCount(id_usuario) {
+    const [rows] = await db.query(
+      'SELECT COUNT(*) as count FROM favoritos_recetas WHERE id_usuario = ?',
+      [id_usuario]
+    );
+    return rows[0].count;
+  }
+
+  /**
    * Añadir una receta a favoritos
    */
   static async addFavorite(id_usuario, id_receta) {

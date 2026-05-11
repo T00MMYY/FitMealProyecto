@@ -1,4 +1,4 @@
--- phpMyAdmin SQL Dump
+﻿-- phpMyAdmin SQL Dump
 -- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
@@ -552,6 +552,8 @@ ALTER TABLE `progreso_ejercicios`
 ALTER TABLE `progreso_ejercicios`
   ADD CONSTRAINT `fk_progej_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_progej_ejercicio` FOREIGN KEY (`id_ejercicio`) REFERENCES `ejercicios` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `usuarios` ADD COLUMN `plan` ENUM('basic', 'premium') DEFAULT 'basic' AFTER `estado_cuenta`;
 
 COMMIT;
 

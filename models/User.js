@@ -36,8 +36,8 @@ class User {
    */
   static async create(userData) {
     const query = `INSERT INTO usuarios 
-      (email, password_hash, nombre, apellidos, telefono, fecha_nacimiento, id_rol, estado_cuenta) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+      (email, password_hash, nombre, apellidos, telefono, fecha_nacimiento, id_rol, estado_cuenta, plan) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     
     const values = [
       userData.email,
@@ -47,7 +47,8 @@ class User {
       userData.telefono || null,
       userData.fecha_nacimiento || null,
       userData.id_rol || 2, // Por defecto rol 2 (usuario normal)
-      userData.estado_cuenta || 'activo'
+      userData.estado_cuenta || 'activo',
+      userData.plan || 'basic' // Por defecto plan básico
     ];
 
     const [result] = await db.query(query, values);
@@ -63,7 +64,7 @@ class User {
       'id_rol', 'estado_cuenta', 'ultimo_acceso', 'password_hash',
       'peso', 'altura', 'genero', 'nivel_actividad', 'experiencia',
       'lugar_entrenamiento', 'objetivo', 'preferencia_alimentaria', 
-      'tiempo_cocinar', 'onboarding_completado', 'foto_url'
+      'tiempo_cocinar', 'onboarding_completado', 'foto_url', 'plan'
     ];
     const fields = [];
     const values = [];
