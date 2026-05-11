@@ -156,10 +156,15 @@ git push origin feature/nombre-feature
 
 Ver `.env.example` para la configuración completa.
 
-## 🔐 Usuario Admin por Defecto
+## 🔐 Usuarios por Defecto
 
+**Admin:**
 - Email: `admin@fitmeal.com`
-- Password: `admin123!`
+- Password: `admin123`
+
+**Usuario normal:**
+- Email: `usuario@fitmeal.com`
+- Password: `usuario123`
 
 ## 📄 Licencia
 
