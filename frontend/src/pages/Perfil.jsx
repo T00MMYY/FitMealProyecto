@@ -80,13 +80,10 @@ export default function Perfil() {
     <div className="min-h-screen bg-[#050505] py-12 px-6 pt-28 text-white font-sans selection:bg-red-600">
       <div className="max-w-6xl mx-auto space-y-6">
 
-        {/* HEADER: Perfil & Rank */}
         <div className="bg-[#111] rounded-[2.5rem] p-8 border border-white/5 relative overflow-hidden group shadow-2xl">
           <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-3xl group-hover:bg-red-600/10 transition-colors duration-700"></div>
 
           <div className="flex flex-col md:flex-row gap-8 items-center relative z-10">
-            {/* AVATAR CON CAMBIO DE FOTO */}
-            {/* AVATAR CON CAMBIO DE FOTO */}
             <div
               className="relative group/avatar cursor-pointer active:scale-95 transition-transform"
               onClick={() => !uploading && fileInputRef.current.click()} // Clicable en todo el recuadro
@@ -101,7 +98,6 @@ export default function Perfil() {
                   </>
                 )}
 
-                {/* Overlay que se oscurece al pasar el ratón */}
                 <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity text-center p-2">
                   <span className="text-xl mb-1">{uploading ? '⏳' : '📷'}</span>
                   <span className="text-[8px] font-black uppercase tracking-tighter leading-none">
@@ -109,8 +105,6 @@ export default function Perfil() {
                   </span>
                 </div>
               </div>
-
-              {/* Input oculto (se mantiene igual) */}
               <input
                 type="file"
                 ref={fileInputRef}
@@ -149,6 +143,22 @@ export default function Perfil() {
                   <span className="text-red-600 opacity-50">🎯</span> {displayUser?.objetivo?.replace('_', ' ') || 'Definir objetivo'}
                 </div>
               </div>
+
+              <div className="mt-6 p-4 bg-white/5 rounded-2xl border border-white/10">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-black uppercase tracking-tighter text-white/80">Plan Actual</h3>
+                    <p className={`text-lg font-bold ${displayUser?.plan === 'premium' ? 'text-yellow-400' : 'text-green-400'}`}>
+                      {displayUser?.plan === 'premium' ? 'Premium ' : 'Básico '}
+                    </p>
+                  </div>
+                  {displayUser?.plan === 'basic' && (
+                    <button className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-black font-bold rounded-lg transition-colors">
+                      Upgrade a Premium
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -171,7 +181,6 @@ export default function Perfil() {
           </div>
         </div>
 
-        {/* NUTRITION PLAN */}
         <div className="bg-[#111] rounded-[2.5rem] p-8 border border-white/5 relative overflow-hidden group shadow-xl text-center md:text-left">
           <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-3xl group-hover:bg-red-600/10 transition-colors"></div>
           <h2 className="text-xs font-black italic uppercase tracking-[0.2em] text-white/20 mb-8 flex items-center gap-3 relative z-10">
@@ -206,7 +215,6 @@ export default function Perfil() {
           )}
         </div>
 
-        {/* CONTENT BLOCKS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
           <ActivityBlock title="Entrenamiento" action="Explorar" onClick={() => navigate('/workouts')} item={{ title: "Protocolo de Pecho", desc: "45 min • Hipertrofia", tag: "Fuerza", img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400" }} />
           <ActivityBlock title="Nutrición" action="Recetario" onClick={() => navigate('/recetas')} item={{ title: "Cena Pro-Metabólica", desc: "20 min • Alta Proteína", tag: "Gourmet", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400" }} />
@@ -216,7 +224,6 @@ export default function Perfil() {
   );
 }
 
-// COMPONENTE STAT ITEM (Con validación de rangos)
 function StatItem({ label, value, unit, color, onUpdate }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value || '');

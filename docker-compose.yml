@@ -8,7 +8,7 @@ services:
     container_name: FitMeal
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: 
+      MYSQL_ROOT_PASSWORD: FitMealRoot123
       MYSQL_DATABASE: fitness_platform
       MYSQL_USER: fitmeal_user
       MYSQL_PASSWORD: 
@@ -67,7 +67,7 @@ services:
       PMA_HOST: fitmeal-db
       PMA_PORT: 3306
       PMA_USER: root
-      PMA_PASSWORD: 
+      PMA_PASSWORD: FitMealRoot123
     ports:
       - "8081:80"
     depends_on:

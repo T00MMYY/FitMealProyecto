@@ -45,7 +45,8 @@ class AuthController {
         telefono,
         fecha_nacimiento,
         id_rol: 2, // Usuario normal por defecto
-        estado_cuenta: 'activo'
+        estado_cuenta: 'activo',
+        plan: 'basic' // Plan básico por defecto
       });
 
       console.log('✅ Usuario creado:', newUser.id_usuario);
