@@ -71,6 +71,9 @@ export default function Navbar() {
         {/* Right side */}
         {isAuthenticated ? (
           <div className="flex items-center gap-4">
+            <Link to="/perfil" className="text-white/80 hover:text-white text-sm italic font-bold">
+              {user?.nombre || user?.email}
+            </Link>
             <Link
               to="/cart"
               className="relative border border-white/25 text-white p-2 rounded-full hover:bg-white/10 transition-colors flex items-center justify-center"
@@ -83,9 +86,6 @@ export default function Navbar() {
                   {cartCount}
                 </span>
               )}
-            </Link>
-            <Link to="/perfil" className="text-white/80 hover:text-white text-sm italic font-bold">
-              {user?.nombre || user?.email}
             </Link>
             <button
               onClick={logout}

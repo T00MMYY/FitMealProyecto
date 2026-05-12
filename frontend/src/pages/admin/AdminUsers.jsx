@@ -37,6 +37,7 @@ const AdminUsers = () => {
     try {
       await api.post('/api/trainers/assign', { id_cliente, id_entrenador });
       toast.success('Entrenador asignado con éxito');
+      fetchUsers(); // Actualizar la lista para que refleje el cambio
     } catch (error) {
       toast.error('Error al asignar entrenador');
     }
@@ -128,7 +129,7 @@ const AdminUsers = () => {
                     {(u.id_rol === 2 || u.id_rol === 3) ? (
                       <select
                         onChange={(e) => handleAssignTrainer(u.id_usuario, e.target.value)}
-                        defaultValue=""
+                        value={u.id_entrenador || ""}
                         className="bg-[#1a1a1a] border border-white/10 text-white text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-red-600 transition-all cursor-pointer"
                       >
                         <option value="" disabled>Asignar...</option>

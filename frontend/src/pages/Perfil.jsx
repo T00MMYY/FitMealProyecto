@@ -9,8 +9,9 @@ export default function Perfil() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null); // Referencia para el input de archivo oculto
   const [userData, setUserData] = useState(null);
+  const [trainer, setTrainer] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false); // Estado para la carga de imagen
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -19,6 +20,13 @@ export default function Perfil() {
         if (!id) return;
         const response = await api.get(`/api/users/${id}`);
         setUserData(response.data.user || response.data);
+
+        try {
+          const trainerRes = await api.get('/api/trainers/my-trainer');
+          setTrainer(trainerRes.data);
+        } catch (err) {
+          // Si da 404, es normal (no tiene entrenador asignado)
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
@@ -159,6 +167,23 @@ export default function Perfil() {
                   )}
                 </div>
               </div>
+
+              {trainer && (
+                <div className="mt-4 p-4 bg-white/5 rounded-2xl border border-red-600/30 flex items-center gap-4 hover:border-red-600/60 transition-colors">
+                  <div className="w-14 h-14 rounded-full bg-black/50 overflow-hidden border-2 border-red-600/50 flex-shrink-0">
+                    {trainer.foto_url ? (
+                      <img src={trainer.foto_url} alt="Entrenador" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xl font-black">{trainer.nombre.charAt(0)}</div>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-red-500 mb-1">Tu Entrenador Asignado</h3>
+                    <p className="text-xl font-black italic tracking-tighter text-white">{trainer.nombre} {trainer.apellidos}</p>
+                    <p className="text-[10px] text-white/40">{trainer.email}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
