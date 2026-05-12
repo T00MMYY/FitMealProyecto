@@ -94,7 +94,8 @@ router.put('/users/:id/role', async (req, res) => {
     await db.query('UPDATE usuarios SET id_rol = ? WHERE id_usuario = ?', [id_rol, id]);
     res.json({ message: 'Rol actualizado correctamente' });
   } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar rol' });
+    console.error("DEBUG ROLE ERROR:", error);
+    res.status(500).json({ error: 'Error al actualizar rol', details: error.message });
   }
 });
 

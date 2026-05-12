@@ -52,6 +52,7 @@ services:
       - ./.env
     environment:
       DB_HOST: fitmeal-db
+      DB_PORT: 3306
       NODE_ENV: production
     depends_on:
       fitmeal-db:

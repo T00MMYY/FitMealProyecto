@@ -137,12 +137,22 @@ export default function Ejercicios() {
           {/* COLUMNA IZQUIERDA: VISUAL */}
           <div className="sticky top-40 space-y-6">
             <div className="rounded-[40px] overflow-hidden border border-white/10 bg-[#121212] aspect-video relative group">
-              <img 
-                src={exercise.imagen || 'https://via.placeholder.com/800x600/121212/ffffff?text=Sin+Imagen'} 
-                alt={exercise.titulo} 
-                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent"></div>
+              {exercise.video ? (
+                <video 
+                  src={exercise.video}
+                  controls
+                  className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-700"
+                />
+              ) : (
+                <>
+                  <img 
+                    src={exercise.imagen || 'https://via.placeholder.com/800x600/121212/ffffff?text=Sin+Imagen'} 
+                    alt={exercise.titulo} 
+                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent pointer-events-none"></div>
+                </>
+              )}
               
               {/* Botón de Favorito */}
               <button
