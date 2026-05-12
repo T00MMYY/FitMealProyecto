@@ -16,7 +16,6 @@ services:
       - "3307:3306"
     volumes:
       - fitmeal-data:/var/lib/mysql
-      - ./compartido/fitness_platform_backup.sql:/docker-entrypoint-initdb.d/01-schema.sql
     networks:
       - fitmeal-network
     healthcheck:

@@ -23,7 +23,7 @@ cp .env.example .env
 
 ### 4. Levantar contenedores Docker
 ```bash
-docker-compose up -d
+docker compose up -d --build
 ```
 
 ### 5. Verificar que todo funciona
@@ -104,7 +104,7 @@ curl http://localhost:3000/api/users \
 
 ```bash
 # Iniciar contenedores
-docker-compose up -d
+docker compose up -d --build
 
 # Ver logs
 docker-compose logs -f
