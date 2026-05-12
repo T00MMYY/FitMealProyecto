@@ -93,6 +93,7 @@ const recipesRouter = require('./routes/recipes');
 const favoritesRouter = require('./routes/favorites');
 const favoritesExercisesRouter = require('./routes/favoritesExercises');
 const progressExercisesRouter = require('./routes/progressExercises');
+const trainersRouter = require('./routes/trainers');
 
 app.use('/api/users', usersRouter);
 app.use('/api/products', productsRouter);
@@ -102,6 +103,7 @@ app.use('/api/recipes', recipesRouter);
 app.use('/api/favorites', favoritesRouter);
 app.use('/api/favorites-exercises', favoritesExercisesRouter);
 app.use('/api/progress-exercises', progressExercisesRouter);
+app.use('/api/trainers', trainersRouter);
 
 // Rutas de administración
 const adminRouter = require('./routes/admin');
@@ -118,10 +120,7 @@ app.use('/api/contact', contactRouter);
 // Manejo de errores global
 app.use((err, req, res, next) => {
   console.error('Error:', err);
-  const response = { error: 'Error interno del servidor' };
-  if (process.env.NODE_ENV !== 'production') {
-    response.details = err.message;
-  }
+  const response = { error: 'Error interno del servidor', stack: err.stack, details: err.message };
   res.status(err.status || 500).json(response);
 });
 

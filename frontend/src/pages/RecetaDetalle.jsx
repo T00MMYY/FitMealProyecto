@@ -54,12 +54,33 @@ export default function RecetaDetalle() {
           
           {/* COLUMNA IZQUIERDA: IMAGEN */}
           <div className="sticky top-32 rounded-[40px] overflow-hidden border border-white/10 bg-[#121212] aspect-square relative group">
-            <img 
-               src={receta.imagen_url || 'https://via.placeholder.com/800'} 
-               alt={receta.titulo} 
-               className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-700 hover:scale-105" 
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-80"></div>
+            {receta.video ? (
+              <a href={receta.video} target="_blank" rel="noopener noreferrer" className="block w-full h-full relative">
+                <img 
+                  src={receta.imagen} 
+                  alt={receta.titulo} 
+                  className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-110 transition-all duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-80"></div>
+                {/* YouTube Icon Centered */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg shadow-red-600/50 hover:scale-110 transition-transform">
+                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              </a>
+            ) : (
+              <>
+                <img 
+                  src={receta.imagen} 
+                  alt={receta.titulo} 
+                  className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-80"></div>
+              </>
+            )}
             
             <button 
               onClick={toggleFavorite}

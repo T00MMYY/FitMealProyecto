@@ -6,10 +6,12 @@ import { useAuth } from '../../context/AuthContext';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
+  const [trainers, setTrainers] = useState([]);
   const { user: currentUser } = useAuth();
 
   useEffect(() => {
     fetchUsers();
+    fetchTrainers();
   }, []);
 
   const fetchUsers = async () => {
@@ -18,6 +20,25 @@ const AdminUsers = () => {
       setUsers(response.data);
     } catch (error) {
       toast.error('Error al cargar usuarios');
+    }
+  };
+
+  const fetchTrainers = async () => {
+    try {
+      const response = await api.get('/api/trainers');
+      setTrainers(response.data);
+    } catch (error) {
+      console.error('Error fetching trainers', error);
+    }
+  };
+
+  const handleAssignTrainer = async (id_cliente, id_entrenador) => {
+    if (!id_entrenador) return;
+    try {
+      await api.post('/api/trainers/assign', { id_cliente, id_entrenador });
+      toast.success('Entrenador asignado con éxito');
+    } catch (error) {
+      toast.error('Error al asignar entrenador');
     }
   };
 
@@ -69,6 +90,7 @@ const AdminUsers = () => {
                 <th className="p-5 font-bold border-b border-white/5">Email</th>
                 <th className="p-5 font-bold border-b border-white/5">Estado</th>
                 <th className="p-5 font-bold border-b border-white/5">Rol</th>
+                <th className="p-5 font-bold border-b border-white/5">Entrenador</th>
                 <th className="p-5 font-bold border-b border-white/5 text-right">Acciones</th>
               </tr>
             </thead>
@@ -99,7 +121,26 @@ const AdminUsers = () => {
                       <option value={1}>Admin</option>
                       <option value={2}>Usuario</option>
                       <option value={3}>Premium</option>
+                      <option value={4}>Entrenador</option>
                     </select>
+                  </td>
+                  <td className="p-5">
+                    {(u.id_rol === 2 || u.id_rol === 3) ? (
+                      <select
+                        onChange={(e) => handleAssignTrainer(u.id_usuario, e.target.value)}
+                        defaultValue=""
+                        className="bg-[#1a1a1a] border border-white/10 text-white text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-red-600 transition-all cursor-pointer"
+                      >
+                        <option value="" disabled>Asignar...</option>
+                        {trainers.map(t => (
+                          <option key={t.id_usuario} value={t.id_usuario}>
+                            {t.nombre} {t.apellidos}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span className="text-white/20 text-xs italic">-</span>
+                    )}
                   </td>
                   <td className="p-5 text-right">
                     <div className="flex items-center justify-end gap-2">

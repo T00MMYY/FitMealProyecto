@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: fitmeal-db:3306
--- Tiempo de generación: 29-04-2026 a las 17:07:44
+-- Tiempo de generación: 11-05-2026 a las 15:19:07
 -- Versión del servidor: 8.0.44
 -- Versión de PHP: 8.3.30
 
@@ -29,8 +29,8 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `categorias_productos` (
   `id_categoria` int NOT NULL,
-  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -67,12 +67,12 @@ CREATE TABLE `detalle_pedidos` (
 CREATE TABLE `ejercicios` (
   `id` int NOT NULL,
   `musculo_id` int DEFAULT NULL,
-  `titulo` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `dificultad` enum('Baja','Media','Alta','No disponible') COLLATE utf8mb4_unicode_ci DEFAULT 'Media',
-  `imagen` text COLLATE utf8mb4_unicode_ci,
-  `descripcion` text COLLATE utf8mb4_unicode_ci,
-  `tipo` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'Fuerza / Hipertrofia',
-  `puntos_clave` text COLLATE utf8mb4_unicode_ci
+  `titulo` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `dificultad` enum('Baja','Media','Alta','No disponible') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'Media',
+  `imagen` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `tipo` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'Fuerza / Hipertrofia',
+  `puntos_clave` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -106,13 +106,48 @@ INSERT INTO `ejercicios` (`id`, `musculo_id`, `titulo`, `dificultad`, `imagen`, 
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `entrenador_cliente`
+--
+
+CREATE TABLE `entrenador_cliente` (
+  `id_entrenador` int NOT NULL,
+  `id_cliente` int NOT NULL,
+  `estado` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'activo',
+  `fecha_asignacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `favoritos_ejercicios`
+--
+
+CREATE TABLE `favoritos_ejercicios` (
+  `id_usuario` int NOT NULL,
+  `id_ejercicio` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `favoritos_recetas`
+--
+
+CREATE TABLE `favoritos_recetas` (
+  `id_usuario` int NOT NULL,
+  `id_receta` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `musculos`
 --
 
 CREATE TABLE `musculos` (
   `id` int NOT NULL,
-  `nombre_key` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `grupo_muscular` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `nombre_key` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `grupo_muscular` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -143,9 +178,9 @@ CREATE TABLE `pedidos` (
   `id_usuario` int NOT NULL,
   `fecha_pedido` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `total` decimal(10,2) NOT NULL,
-  `estado` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'pendiente',
-  `direccion_envio` text COLLATE utf8mb4_unicode_ci,
-  `metodo_pago` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `estado` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'pendiente',
+  `direccion_envio` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `metodo_pago` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -156,14 +191,22 @@ CREATE TABLE `pedidos` (
 
 CREATE TABLE `planes_suscripcion` (
   `id_plan` int NOT NULL,
-  `nombre_plan` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `nombre_plan` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `precio_mensual` decimal(10,2) NOT NULL,
   `duracion_dias` int DEFAULT '30',
-  `caracteristicas` text COLLATE utf8mb4_unicode_ci,
-  `estado` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'activo',
+  `caracteristicas` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `estado` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'activo',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `planes_suscripcion`
+--
+
+INSERT INTO `planes_suscripcion` (`id_plan`, `nombre_plan`, `descripcion`, `precio_mensual`, `duracion_dias`, `caracteristicas`, `estado`, `created_at`) VALUES
+(1, 'Plan Básico', 'Acceso básico a la plataforma', 9.99, 30, 'Acceso a recetas básicas, Plan nutricional simple', 'activo', '2026-05-11 14:18:31'),
+(2, 'Plan Premium', 'Acceso completo con seguimiento personalizado', 29.99, 30, 'Todas las recetas, Plan personalizado, Seguimiento por nutricionista, Descuentos en productos', 'activo', '2026-05-11 14:18:31');
 
 -- --------------------------------------------------------
 
@@ -173,13 +216,13 @@ CREATE TABLE `planes_suscripcion` (
 
 CREATE TABLE `productos` (
   `id_producto` int NOT NULL,
-  `nombre_producto` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `nombre_producto` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `precio` decimal(10,2) NOT NULL,
   `stock` int DEFAULT '0',
   `id_categoria` int DEFAULT NULL,
-  `imagen_url` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `estado` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'disponible',
+  `imagen_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `estado` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'disponible',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -213,21 +256,36 @@ INSERT INTO `productos` (`id_producto`, `nombre_producto`, `descripcion`, `preci
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `progreso_ejercicios`
+--
+
+CREATE TABLE `progreso_ejercicios` (
+  `id_progreso` int NOT NULL,
+  `id_usuario` int NOT NULL,
+  `id_ejercicio` int NOT NULL,
+  `peso` decimal(8,2) DEFAULT NULL,
+  `repeticiones` int DEFAULT NULL,
+  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `recetas`
 --
 
 CREATE TABLE `recetas` (
   `id_receta` int NOT NULL,
-  `titulo` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `titulo` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `calorias` int NOT NULL,
   `proteina` int NOT NULL,
   `tiempo` int NOT NULL,
-  `tipo` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `imagen` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tipo` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `imagen` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `carbohidratos` int DEFAULT '0',
   `grasas` int DEFAULT '0',
-  `ingredientes` text COLLATE utf8mb4_unicode_ci,
-  `instrucciones` text COLLATE utf8mb4_unicode_ci
+  `ingredientes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `instrucciones` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -248,8 +306,8 @@ INSERT INTO `recetas` (`id_receta`, `titulo`, `calorias`, `proteina`, `tiempo`, 
 
 CREATE TABLE `roles` (
   `id_rol` int NOT NULL,
-  `nombre` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `nombre` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -260,7 +318,8 @@ CREATE TABLE `roles` (
 INSERT INTO `roles` (`id_rol`, `nombre`, `descripcion`, `created_at`) VALUES
 (1, 'admin', 'Administrador del sistema', '2026-04-29 16:50:08'),
 (2, 'usuario', 'Usuario normal', '2026-04-29 16:50:08'),
-(3, 'premium', 'Usuario premium', '2026-04-29 16:50:08');
+(3, 'premium', 'Usuario premium', '2026-04-29 16:50:08'),
+(4, 'entrenador', 'Entrenador con acceso a funciones avanzadas', '2026-05-11 14:18:31');
 
 -- --------------------------------------------------------
 
@@ -274,7 +333,7 @@ CREATE TABLE `suscripciones_usuarios` (
   `id_plan` int NOT NULL,
   `fecha_inicio` date NOT NULL,
   `fecha_fin` date NOT NULL,
-  `estado` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'activa'
+  `estado` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'activa'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -285,24 +344,24 @@ CREATE TABLE `suscripciones_usuarios` (
 
 CREATE TABLE `usuarios` (
   `id_usuario` int NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `apellidos` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `telefono` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password_hash` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `apellidos` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `telefono` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fecha_nacimiento` date DEFAULT NULL,
   `peso` decimal(5,2) DEFAULT NULL,
   `altura` decimal(5,2) DEFAULT NULL,
-  `genero` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `nivel_actividad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `experiencia` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `lugar_entrenamiento` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `objetivo` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `preferencia_alimentaria` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `tiempo_cocinar` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `genero` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nivel_actividad` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `experiencia` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `lugar_entrenamiento` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objetivo` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `preferencia_alimentaria` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tiempo_cocinar` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `onboarding_completado` tinyint(1) NOT NULL DEFAULT '0',
   `id_rol` int DEFAULT '2',
-  `estado_cuenta` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT 'activo',
+  `estado_cuenta` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'activo',
   `ultimo_acceso` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -313,7 +372,10 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `email`, `password_hash`, `nombre`, `apellidos`, `telefono`, `fecha_nacimiento`, `peso`, `altura`, `genero`, `nivel_actividad`, `experiencia`, `lugar_entrenamiento`, `objetivo`, `preferencia_alimentaria`, `tiempo_cocinar`, `onboarding_completado`, `id_rol`, `estado_cuenta`, `ultimo_acceso`, `created_at`, `updated_at`) VALUES
-(1, 'admin@fitmeal.com', '$2b$10$vDLWug0/FwEIRzVIqPlKk.p79GxBjoPAVP7WuGbUt05dcRx299iuq', 'Admin', 'FitMeal', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, 'activo', NULL, '2026-04-29 16:50:09', '2026-04-29 16:50:09');
+(1, 'admin@fitmeal.com', '$2b$10$vDLWug0/FwEIRzVIqPlKk.p79GxBjoPAVP7WuGbUt05dcRx299iuq', 'Admin', 'FitMeal', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 1, 'activo', NULL, '2026-04-29 16:50:09', '2026-04-29 16:50:09'),
+(3, 'tommy@gmail.com', '$2b$10$jkNWAuSp7qzfEQtPZHwDBOkMwHHrb/eeeJMtgfB276lWx8us9GSl6', 'Tommy', NULL, NULL, '2004-01-01', 79.00, 160.00, 'masculino', '1.55', 'Intermedio', 'Gimnasio', 'ganar_musculo', 'Sin preferencia', 'menos_20', 1, 1, 'activo', '2026-05-11 14:07:46', '2026-05-04 14:09:36', '2026-05-11 14:09:18'),
+(4, 'tommy2@gmail.com', '$2b$10$np8LRYnco/DATYuBOnAaY.WEiy.ByjgBIda6gHaaTdnEhfCYW3xAW', 'Tommy', NULL, NULL, '2007-01-01', 103.00, 188.00, 'masculino', '1.55', 'Intermedio', 'Gimnasio', 'perder_grasa', 'Sin preferencia', 'menos_20', 1, 2, 'activo', '2026-05-06 15:48:01', '2026-05-04 15:10:36', '2026-05-06 15:54:41'),
+(5, 'tommy5@gmail.com', '$2b$10$ve8yJmpWuh2e09d2cZHt8eS/NJgMwehSbuVu7uB3oUNztjC.giGNi', 'Tommy', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2, 'activo', '2026-05-11 13:51:51', '2026-05-06 16:53:01', '2026-05-11 13:51:51');
 
 --
 -- Índices para tablas volcadas
@@ -342,6 +404,27 @@ ALTER TABLE `ejercicios`
   ADD KEY `fk_ejercicio_musculo` (`musculo_id`);
 
 --
+-- Indices de la tabla `entrenador_cliente`
+--
+ALTER TABLE `entrenador_cliente`
+  ADD PRIMARY KEY (`id_entrenador`,`id_cliente`),
+  ADD KEY `id_cliente` (`id_cliente`);
+
+--
+-- Indices de la tabla `favoritos_ejercicios`
+--
+ALTER TABLE `favoritos_ejercicios`
+  ADD PRIMARY KEY (`id_usuario`,`id_ejercicio`),
+  ADD KEY `id_ejercicio` (`id_ejercicio`);
+
+--
+-- Indices de la tabla `favoritos_recetas`
+--
+ALTER TABLE `favoritos_recetas`
+  ADD PRIMARY KEY (`id_usuario`,`id_receta`),
+  ADD KEY `id_receta` (`id_receta`);
+
+--
 -- Indices de la tabla `musculos`
 --
 ALTER TABLE `musculos`
@@ -368,6 +451,14 @@ ALTER TABLE `planes_suscripcion`
 ALTER TABLE `productos`
   ADD PRIMARY KEY (`id_producto`),
   ADD KEY `fk_prod_cat` (`id_categoria`);
+
+--
+-- Indices de la tabla `progreso_ejercicios`
+--
+ALTER TABLE `progreso_ejercicios`
+  ADD PRIMARY KEY (`id_progreso`),
+  ADD KEY `id_usuario` (`id_usuario`),
+  ADD KEY `id_ejercicio` (`id_ejercicio`);
 
 --
 -- Indices de la tabla `recetas`
@@ -436,13 +527,19 @@ ALTER TABLE `pedidos`
 -- AUTO_INCREMENT de la tabla `planes_suscripcion`
 --
 ALTER TABLE `planes_suscripcion`
-  MODIFY `id_plan` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id_plan` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
   MODIFY `id_producto` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT de la tabla `progreso_ejercicios`
+--
+ALTER TABLE `progreso_ejercicios`
+  MODIFY `id_progreso` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `recetas`
@@ -454,7 +551,7 @@ ALTER TABLE `recetas`
 -- AUTO_INCREMENT de la tabla `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id_rol` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_rol` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `suscripciones_usuarios`
@@ -466,7 +563,7 @@ ALTER TABLE `suscripciones_usuarios`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_usuario` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Restricciones para tablas volcadas
@@ -486,6 +583,27 @@ ALTER TABLE `ejercicios`
   ADD CONSTRAINT `fk_ejercicio_musculo` FOREIGN KEY (`musculo_id`) REFERENCES `musculos` (`id`);
 
 --
+-- Filtros para la tabla `entrenador_cliente`
+--
+ALTER TABLE `entrenador_cliente`
+  ADD CONSTRAINT `entrenador_cliente_ibfk_1` FOREIGN KEY (`id_entrenador`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
+  ADD CONSTRAINT `entrenador_cliente_ibfk_2` FOREIGN KEY (`id_cliente`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `favoritos_ejercicios`
+--
+ALTER TABLE `favoritos_ejercicios`
+  ADD CONSTRAINT `favoritos_ejercicios_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
+  ADD CONSTRAINT `favoritos_ejercicios_ibfk_2` FOREIGN KEY (`id_ejercicio`) REFERENCES `ejercicios` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `favoritos_recetas`
+--
+ALTER TABLE `favoritos_recetas`
+  ADD CONSTRAINT `favoritos_recetas_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
+  ADD CONSTRAINT `favoritos_recetas_ibfk_2` FOREIGN KEY (`id_receta`) REFERENCES `recetas` (`id_receta`) ON DELETE CASCADE;
+
+--
 -- Filtros para la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
@@ -496,6 +614,13 @@ ALTER TABLE `pedidos`
 --
 ALTER TABLE `productos`
   ADD CONSTRAINT `fk_prod_cat` FOREIGN KEY (`id_categoria`) REFERENCES `categorias_productos` (`id_categoria`) ON DELETE SET NULL;
+
+--
+-- Filtros para la tabla `progreso_ejercicios`
+--
+ALTER TABLE `progreso_ejercicios`
+  ADD CONSTRAINT `progreso_ejercicios_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
+  ADD CONSTRAINT `progreso_ejercicios_ibfk_2` FOREIGN KEY (`id_ejercicio`) REFERENCES `ejercicios` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `suscripciones_usuarios`
@@ -509,52 +634,6 @@ ALTER TABLE `suscripciones_usuarios`
 --
 ALTER TABLE `usuarios`
   ADD CONSTRAINT `fk_user_rol` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`) ON DELETE SET NULL;
-
---
--- Estructura de tabla para la tabla `favoritos_ejercicios`
---
-
-CREATE TABLE `favoritos_ejercicios` (
-  `id_usuario` int NOT NULL,
-  `id_ejercicio` int NOT NULL,
-  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-ALTER TABLE `favoritos_ejercicios`
-  ADD PRIMARY KEY (`id_usuario`,`id_ejercicio`),
-  ADD KEY `fk_favej_ejercicio` (`id_ejercicio`);
-
-ALTER TABLE `favoritos_ejercicios`
-  ADD CONSTRAINT `fk_favej_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_favej_ejercicio` FOREIGN KEY (`id_ejercicio`) REFERENCES `ejercicios` (`id`) ON DELETE CASCADE;
-
---
--- Estructura de tabla para la tabla `progreso_ejercicios`
---
-
-CREATE TABLE `progreso_ejercicios` (
-  `id_progreso` int NOT NULL,
-  `id_usuario` int NOT NULL,
-  `id_ejercicio` int NOT NULL,
-  `peso` decimal(5,2) NOT NULL,
-  `repeticiones` int DEFAULT NULL,
-  `fecha` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-ALTER TABLE `progreso_ejercicios`
-  ADD PRIMARY KEY (`id_progreso`),
-  ADD KEY `fk_progej_usuario` (`id_usuario`),
-  ADD KEY `fk_progej_ejercicio` (`id_ejercicio`);
-
-ALTER TABLE `progreso_ejercicios`
-  MODIFY `id_progreso` int NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `progreso_ejercicios`
-  ADD CONSTRAINT `fk_progej_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_progej_ejercicio` FOREIGN KEY (`id_ejercicio`) REFERENCES `ejercicios` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `usuarios` ADD COLUMN `plan` ENUM('basic', 'premium') DEFAULT 'basic' AFTER `estado_cuenta`;
-
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
