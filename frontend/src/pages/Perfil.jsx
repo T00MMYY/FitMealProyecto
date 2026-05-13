@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import toast from 'react-hot-toast';
 import { calculateMacros } from '../utils/macrosCalculator';
 
 export default function Perfil() {
@@ -12,6 +13,7 @@ export default function Perfil() {
   const [trainer, setTrainer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [assignedExercises, setAssignedExercises] = useState([]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -24,6 +26,14 @@ export default function Perfil() {
         try {
           const trainerRes = await api.get('/api/trainers/my-trainer');
           setTrainer(trainerRes.data);
+
+          // Cargar ejercicios asignados por el entrenador
+          try {
+            const exercisesRes = await api.get(`/api/trainers/clients/${id}/routine`);
+            setAssignedExercises(exercisesRes.data || []);
+          } catch (err) {
+            // Si falla, simplemente no mostramos ejercicios
+          }
         } catch (err) {
           // Si da 404, es normal (no tiene entrenador asignado)
         }
@@ -239,6 +249,51 @@ export default function Perfil() {
             </div>
           )}
         </div>
+
+        {assignedExercises.length > 0 && (
+          <div className="bg-[#111] rounded-[2.5rem] p-8 border border-white/5 relative overflow-hidden group shadow-xl">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-3xl group-hover:bg-red-600/10 transition-colors"></div>
+            <h2 className="text-xs font-black italic uppercase tracking-[0.2em] text-white/20 mb-8 flex items-center gap-3 relative z-10">
+              <span className="w-8 h-[1px] bg-white/10 hidden md:block"></span>
+              Rutina Asignada por tu Entrenador
+            </h2>
+            <div className="grid gap-4 relative z-10">
+              {assignedExercises.map((exercise) => (
+                <div key={exercise.id_rutina} className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-red-600/30 transition-colors">
+                  <div className="flex items-start gap-6">
+                    {exercise.imagen && (
+                      <div className="w-24 h-24 rounded-xl bg-black/50 overflow-hidden flex-shrink-0 border border-white/10">
+                        <img src={`http://localhost:3000${exercise.imagen}`} alt={exercise.titulo} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-lg font-black italic uppercase tracking-tighter">{exercise.titulo}</h3>
+                        <span className={`text-[8px] font-black px-2 py-1 rounded-lg uppercase tracking-widest ${
+                          exercise.dificultad === 'Fácil' ? 'bg-green-600/20 text-green-400' :
+                          exercise.dificultad === 'Intermedio' ? 'bg-yellow-600/20 text-yellow-400' :
+                          'bg-red-600/20 text-red-400'
+                        }`}>{exercise.dificultad || 'Moderado'}</span>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-4 text-[10px] text-white/60 uppercase font-bold tracking-widest">
+                          <span>📊 {exercise.series} series</span>
+                          <span>🔄 {exercise.repeticiones} reps</span>
+                          <span>📅 {new Date(exercise.fecha_asignacion).toLocaleDateString('es-ES')}</span>
+                        </div>
+                        {exercise.notas && (
+                          <p className="text-[11px] text-white/50 italic mt-3 p-3 bg-black/30 rounded-lg border-l-2 border-red-600/50">
+                            📝 {exercise.notas}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
           <ActivityBlock title="Entrenamiento" action="Explorar" onClick={() => navigate('/workouts')} item={{ title: "Protocolo de Pecho", desc: "45 min • Hipertrofia", tag: "Fuerza", img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400" }} />

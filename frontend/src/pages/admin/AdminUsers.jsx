@@ -28,6 +28,7 @@ const AdminUsers = () => {
       const response = await api.get('/api/trainers');
       setTrainers(response.data);
     } catch (error) {
+      toast.error('Error al cargar entrenadores');
       console.error('Error fetching trainers', error);
     }
   };
@@ -130,9 +131,12 @@ const AdminUsers = () => {
                       <select
                         onChange={(e) => handleAssignTrainer(u.id_usuario, e.target.value)}
                         value={u.id_entrenador || ""}
-                        className="bg-[#1a1a1a] border border-white/10 text-white text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-red-600 transition-all cursor-pointer"
+                        disabled={!trainers.length}
+                        className="bg-[#1a1a1a] border border-white/10 text-white text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-red-600 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                       >
-                        <option value="" disabled>Asignar...</option>
+                        <option value="" disabled>
+                          {trainers.length ? 'Asignar...' : 'No hay entrenadores disponibles'}
+                        </option>
                         {trainers.map(t => (
                           <option key={t.id_usuario} value={t.id_usuario}>
                             {t.nombre} {t.apellidos}

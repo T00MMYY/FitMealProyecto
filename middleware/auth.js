@@ -71,7 +71,7 @@ const requirePremium = async (req, res, next) => {
 const COOKIE_CONFIG = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+  sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'none',
   maxAge: 24 * 60 * 60 * 1000
 };
 

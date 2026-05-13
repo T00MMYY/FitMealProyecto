@@ -2,6 +2,15 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
 
+router.get('/', async (req, res, next) => {
+  try {
+    const query = 'SELECT * FROM ejercicios ORDER BY titulo ASC';
+    const [rows] = await db.execute(query);
+    res.json(rows);
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.get('/detail/:id', async (req, res, next) => {
   try {
