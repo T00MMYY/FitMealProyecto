@@ -34,7 +34,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.PI_SSH_KEY }}" > ~/.ssh/pi_key
           chmod 600 ~/.ssh/pi_key
-          ssh-keyscan -H 100.111.64.92 >> ~/.ssh/known_hosts
+          printf "Host 100.111.64.92\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null\n" >> ~/.ssh/config
 
       - name: Create deploy bundle
         run: |
@@ -51,11 +51,11 @@ jobs:
             .
 
       - name: Upload to Pi
-        run: scp -i ~/.ssh/pi_key /tmp/fitmeal-deploy.tar.gz pi@100.111.64.92:/tmp/
+        run: scp -i ~/.ssh/pi_key -o StrictHostKeyChecking=no /tmp/fitmeal-deploy.tar.gz pi@100.111.64.92:/tmp/
 
       - name: Deploy on Pi
         run: |
-          ssh -i ~/.ssh/pi_key pi@100.111.64.92 << 'ENDSSH'
+          ssh -i ~/.ssh/pi_key -o StrictHostKeyChecking=no pi@100.111.64.92 << 'ENDSSH'
           set -e
           cd ~/projects/fitmeal
 
