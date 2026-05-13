@@ -21,6 +21,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminExercises from "./pages/admin/AdminExercises";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import Contact from "./pages/Contact";
+import EntrenadorDashboard from "./pages/entrenador/EntrenadorDashboard";
 
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
               <Route path="/admin/recipes" element={<AdminProtectedRoute><AdminRecipes /></AdminProtectedRoute>} />
               <Route path="/admin/users" element={<AdminProtectedRoute><AdminUsers /></AdminProtectedRoute>} />
               <Route path="/admin/exercises" element={<AdminProtectedRoute><AdminExercises /></AdminProtectedRoute>} />
+              <Route path="/entrenador" element={<EntrenadorDashboard />} />
               <Route
                 path="*"
                 element={

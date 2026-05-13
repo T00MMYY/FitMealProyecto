@@ -126,7 +126,7 @@ const AdminUsers = () => {
                     </select>
                   </td>
                   <td className="p-5">
-                    {(u.id_rol === 2 || u.id_rol === 3) ? (
+                    {(Number(u.id_rol) === 2 || Number(u.id_rol) === 3) ? (
                       <select
                         onChange={(e) => handleAssignTrainer(u.id_usuario, e.target.value)}
                         value={u.id_entrenador || ""}

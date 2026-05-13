@@ -22,6 +22,9 @@ export default function Navbar() {
   if (isAuthenticated && user && (Number(user.id_rol) === 1 || Number(user.rol) === 1)) {
     navLinks.push({ to: '/admin', label: 'Admin' });
   }
+  if (isAuthenticated && user && (Number(user.id_rol) === 4 || Number(user.rol) === 4)) {
+    navLinks.push({ to: '/entrenador', label: 'Entrenador' });
+  }
   return (
     <nav
       className={`${isHome
