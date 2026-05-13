@@ -7,15 +7,74 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Trigger deploy webhook
-        env:
-          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build frontend
         run: |
-          PAYLOAD='{"ref":"refs/heads/main"}'
-          SIG="sha256=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$WEBHOOK_SECRET" -binary | xxd -p -c 256)"
-          curl -sf -X POST https://fitmeal.website/api/webhook/deploy \
-            -H "Content-Type: application/json" \
-            -H "X-Hub-Signature-256: $SIG" \
-            -d "$PAYLOAD"
-          echo "Deploy webhook enviado correctamente"
+          cd frontend
+          npm ci
+          npm run build
+
+      - name: Install backend dependencies
+        run: npm ci --only=production
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: ${{ secrets.TS_AUTHKEY }}
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PI_SSH_KEY }}" > ~/.ssh/pi_key
+          chmod 600 ~/.ssh/pi_key
+          ssh-keyscan -H 100.111.64.92 >> ~/.ssh/known_hosts
+
+      - name: Create deploy bundle
+        run: |
+          tar czf /tmp/fitmeal-deploy.tar.gz \
+            --exclude='.git' \
+            --exclude='frontend/node_modules' \
+            --exclude='frontend/src' \
+            --exclude='frontend/public' \
+            --exclude='frontend/index.html' \
+            --exclude='frontend/vite.config.*' \
+            --exclude='frontend/package*' \
+            --exclude='frontend/.gitignore' \
+            --exclude='compartido' \
+            .
+
+      - name: Upload to Pi
+        run: scp -i ~/.ssh/pi_key /tmp/fitmeal-deploy.tar.gz pi@100.111.64.92:/tmp/
+
+      - name: Deploy on Pi
+        run: |
+          ssh -i ~/.ssh/pi_key pi@100.111.64.92 << 'ENDSSH'
+          set -e
+          cd ~/projects/fitmeal
+
+          echo "=== Extrayendo archivos ==="
+          tar xzf /tmp/fitmeal-deploy.tar.gz
+
+          echo "=== Actualizando API container ==="
+          docker stop fitmeal-api || true
+          docker cp index.js fitmeal-api:/app/
+          docker cp node_modules/. fitmeal-api:/app/node_modules/
+          docker cp routes/. fitmeal-api:/app/routes/
+          docker cp controllers/. fitmeal-api:/app/controllers/
+          docker cp middleware/. fitmeal-api:/app/middleware/
+          docker cp models/. fitmeal-api:/app/models/
+          docker start fitmeal-api
+
+          echo "=== Reiniciando Nginx (recarga frontend) ==="
+          docker compose restart fitmeal-nginx
+
+          echo "=== Estado final ==="
+          docker compose ps
+          ENDSSH
