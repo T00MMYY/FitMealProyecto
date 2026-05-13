@@ -27,3 +27,6 @@ Thumbs.db
 check-admin-password.js
 PENDIENTE.md
 *.local.md
+
+
+.env.production

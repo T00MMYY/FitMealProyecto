@@ -263,7 +263,7 @@ export default function Perfil() {
                   <div className="flex items-start gap-6">
                     {exercise.imagen && (
                       <div className="w-24 h-24 rounded-xl bg-black/50 overflow-hidden flex-shrink-0 border border-white/10">
-                        <img src={`http://localhost:3000${exercise.imagen}`} alt={exercise.titulo} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
+                        <img src={`${exercise.imagen}`} alt={exercise.titulo} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
                       </div>
                     )}
                     <div className="flex-1">
