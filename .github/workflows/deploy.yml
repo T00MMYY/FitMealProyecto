@@ -21,25 +21,11 @@ jobs:
           npm ci
           npm run build
 
-      - name: Install backend dependencies
-        run: npm ci --only=production
-
-      - name: Connect to Tailscale
-        uses: tailscale/github-action@v2
-        with:
-          authkey: ${{ secrets.TS_AUTHKEY }}
-
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.PI_SSH_KEY }}" > ~/.ssh/pi_key
-          chmod 600 ~/.ssh/pi_key
-          printf "Host 100.111.64.92\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null\n" >> ~/.ssh/config
-
       - name: Create deploy bundle
         run: |
           tar czf /tmp/fitmeal-deploy.tar.gz \
             --exclude='.git' \
+            --exclude='node_modules' \
             --exclude='frontend/node_modules' \
             --exclude='frontend/src' \
             --exclude='frontend/public' \
@@ -50,31 +36,13 @@ jobs:
             --exclude='compartido' \
             .
 
-      - name: Upload to Pi
-        run: scp -i ~/.ssh/pi_key -o StrictHostKeyChecking=no /tmp/fitmeal-deploy.tar.gz pi@100.111.64.92:/tmp/
-
-      - name: Deploy on Pi
+      - name: Deploy via HTTPS
+        env:
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
         run: |
-          ssh -i ~/.ssh/pi_key -o StrictHostKeyChecking=no pi@100.111.64.92 << 'ENDSSH'
-          set -e
-          cd ~/projects/fitmeal
-
-          echo "=== Extrayendo archivos ==="
-          tar xzf /tmp/fitmeal-deploy.tar.gz
-
-          echo "=== Actualizando API container ==="
-          docker stop fitmeal-api || true
-          docker cp index.js fitmeal-api:/app/
-          docker cp node_modules/. fitmeal-api:/app/node_modules/
-          docker cp routes/. fitmeal-api:/app/routes/
-          docker cp controllers/. fitmeal-api:/app/controllers/
-          docker cp middleware/. fitmeal-api:/app/middleware/
-          docker cp models/. fitmeal-api:/app/models/
-          docker start fitmeal-api
-
-          echo "=== Reiniciando Nginx (recarga frontend) ==="
-          docker compose restart fitmeal-nginx
-
-          echo "=== Estado final ==="
-          docker compose ps
-          ENDSSH
+          SIG="sha256=$(openssl dgst -sha256 -hmac "$WEBHOOK_SECRET" -binary /tmp/fitmeal-deploy.tar.gz | xxd -p -c 256)"
+          curl -sf -X POST https://fitmeal.website/api/webhook/deploy-bundle \
+            -H "Content-Type: application/octet-stream" \
+            -H "X-Deploy-Signature: $SIG" \
+            --data-binary @/tmp/fitmeal-deploy.tar.gz
+          echo "✅ Bundle enviado correctamente"
