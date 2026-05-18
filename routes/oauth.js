@@ -14,39 +14,6 @@ function oauthNotConfigured(provider) {
 }
 
 // ============================================
-// OAUTH GITHUB
-// ============================================
-
-// Ruta para iniciar autenticación con GitHub
-if (passport.oauthProviders?.github) {
-  router.get('/github',
-    passport.authenticate('github', { scope: ['user:email'] })
-  );
-} else {
-  router.get('/github', oauthNotConfigured('GitHub'));
-}
-
-// Callback de GitHub
-if (passport.oauthProviders?.github) {
-  router.get('/github/callback',
-    passport.authenticate('github', { failureRedirect: '/auth/login-error', session: false }),
-    (req, res) => {
-      const token = generateToken({
-        id_usuario: req.user.id_usuario,
-        email: req.user.email,
-        id_rol: req.user.id_rol
-      });
-
-      res.cookie('fitmeal_token', token, COOKIE_CONFIG);
-      const dest = req.user._isNew ? `${FRONTEND_URL}/onboarding` : `${FRONTEND_URL}/`;
-      res.redirect(dest);
-    }
-  );
-} else {
-  router.get('/github/callback', oauthNotConfigured('GitHub'));
-}
-
-// ============================================
 // OAUTH GOOGLE
 // ============================================
 

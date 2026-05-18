@@ -1,5 +1,4 @@
 const passport = require('passport');
-const GitHubStrategy = require('passport-github2').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
@@ -50,27 +49,7 @@ async function findOrCreateOAuthUser(profile, provider) {
   return { user: createdUser, isNew: true };
 }
 
-const hasGitHubOAuth = Boolean(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET);
 const hasGoogleOAuth = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
-
-// Estrategia de GitHub (solo si hay credenciales configuradas)
-if (hasGitHubOAuth) {
-  passport.use(new GitHubStrategy({
-      clientID: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: process.env.GITHUB_CALLBACK_URL
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        const { user, isNew } = await findOrCreateOAuthUser(profile, 'github');
-        user._isNew = isNew;
-        return done(null, user);
-      } catch (error) {
-        return done(error, null);
-      }
-    }
-  ));
-}
 
 // Estrategia de Google (solo si hay credenciales configuradas)
 if (hasGoogleOAuth) {
@@ -92,7 +71,6 @@ if (hasGoogleOAuth) {
 }
 
 passport.oauthProviders = {
-  github: hasGitHubOAuth,
   google: hasGoogleOAuth
 };
 
