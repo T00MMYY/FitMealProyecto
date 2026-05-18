@@ -1,4 +1,21 @@
-# React + Vite
+# Frontend FitMeal (React + Vite)
+
+## ⚠️ IMPORTANTE — después de cada `git pull`
+
+Si la web no carga o el carrito / cualquier página aparece en blanco,
+es porque hay **dependencias nuevas sin instalar**. Solución:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Siempre que `package.json` cambie (alguien añade una librería como
+`react-hot-toast`), hay que hacer `npm install` o la app entera se rompe
+aunque el código esté bien.
+
+---
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
