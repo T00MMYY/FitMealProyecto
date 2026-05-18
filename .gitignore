@@ -1,11 +1,9 @@
 # Dependencias
 node_modules/
 
-# Environment files (all variants)
-.env
+# Environment files (el .env SI se sube para que funcione a todo el equipo)
 .env.local
 .env.*.local
-frontend/.env
 frontend/.env.local
 
 
@@ -19,7 +17,8 @@ npm-debug.log*
 Thumbs.db
 
 # IDE
-.vscode/
+.vscode/*
+!.vscode/settings.json
 .idea/
 *.swp
 *.swo
