@@ -8,6 +8,10 @@ export default function MiRutina() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [assignedWorkouts, setAssignedWorkouts] = useState([]);
+  const [myRoutines, setMyRoutines] = useState([]);
+  const [selectedMyRoutine, setSelectedMyRoutine] = useState(null);
+  const [viewMode, setViewMode] = useState('assigned'); // 'my' or 'assigned'
+  const [allExercises, setAllExercises] = useState([]);
   const [loading, setLoading] = useState(true);
   const [trainer, setTrainer] = useState(null);
   
@@ -56,6 +60,23 @@ export default function MiRutina() {
             setCompletedExercises(progressMap);
           } catch (e) {
             console.error("Error cargando progreso:", e);
+          }
+          // Cargar mis rutinas
+          try {
+            const myRes = await api.get('/api/routines');
+            setMyRoutines(myRes.data || []);
+            if ((myRes.data || []).length > 0) {
+              setSelectedMyRoutine(myRes.data[0]);
+            }
+          } catch (e) {
+            console.error('Error cargando mis rutinas', e);
+          }
+          // Cargar ejercicios para añadir a rutinas
+          try {
+            const exRes = await api.get('/api/exercises');
+            setAllExercises(exRes.data || []);
+          } catch (e) {
+            console.error('Error cargando ejercicios', e);
           }
         } else {
           // SEGURO: La redirección ahora ocurre de forma segura en el flujo de efectos
@@ -117,6 +138,39 @@ export default function MiRutina() {
     }
   };
 
+  const createRoutine = async () => {
+    const nombre = window.prompt('Nombre para tu nueva rutina:');
+    if (!nombre) return;
+    try {
+      const res = await api.post('/api/routines', { nombre });
+      setMyRoutines(prev => [res.data, ...prev]);
+      setSelectedMyRoutine(res.data);
+      setViewMode('my');
+      toast.success('Rutina creada');
+    } catch (e) {
+      console.error('Error creando rutina', e);
+      toast.error('No se pudo crear la rutina');
+    }
+  };
+
+  const addExerciseToSelectedRoutine = async () => {
+    if (!selectedMyRoutine) return toast.error('Selecciona una rutina');
+    const id_ej = window.prompt('Introduce el id del ejercicio o deja vacío para seleccionar:');
+    let id_ejercicio = id_ej;
+    if (!id_ejercicio) return;
+    try {
+      const res = await api.post(`/api/routines/${selectedMyRoutine.id}/exercises`, { id_ejercicio });
+      // refresh routines
+      const myRes = await api.get('/api/routines');
+      setMyRoutines(myRes.data || []);
+      setSelectedMyRoutine(myRes.data.find(r => r.id === selectedMyRoutine.id));
+      toast.success('Ejercicio añadido a la rutina');
+    } catch (e) {
+      console.error('Error añadiendo ejercicio', e);
+      toast.error('Error al añadir ejercicio');
+    }
+  };
+
   // Filtrar los ejercicios por la pestaña actual
   const currentWorkouts = useMemo(() => {
     return assignedWorkouts.filter(w => (w.dia_semana || 'General') === activeTab);
@@ -173,7 +227,18 @@ export default function MiRutina() {
           )}
         </div>
 
-        {assignedWorkouts.length > 0 ? (
+        <div className="flex gap-4 items-center">
+          <button onClick={() => setViewMode('assigned')} className={`px-4 py-2 rounded-xl font-black ${viewMode === 'assigned' ? 'bg-red-600' : 'bg-white/5'}`}>Rutina Asignada</button>
+          <button onClick={() => setViewMode('my')} className={`px-4 py-2 rounded-xl font-black ${viewMode === 'my' ? 'bg-red-600' : 'bg-white/5'}`}>Mi Rutina</button>
+          {viewMode === 'my' && (
+            <div className="ml-auto flex items-center gap-3">
+              <button onClick={createRoutine} className="bg-green-600 px-4 py-2 rounded-full text-xs font-black">Crear Rutina</button>
+              <button onClick={addExerciseToSelectedRoutine} className="bg-blue-600 px-4 py-2 rounded-full text-xs font-black">Añadir Ejercicio</button>
+            </div>
+          )}
+        </div>
+
+        {viewMode === 'assigned' && assignedWorkouts.length > 0 ? (
           <>
             {/* TABS DE DÍAS DE LA SEMANA */}
             {diasDisponibles.length > 1 && (
@@ -355,6 +420,46 @@ export default function MiRutina() {
                   </div>
                 );
               })}
+            </div>
+          </>
+        ) : viewMode === 'my' ? (
+          <>
+            <div className="bg-[#111] rounded-[2rem] p-6 border border-white/5 flex flex-col gap-6 shadow-xl">
+              <div className="flex gap-4 items-center">
+                <div className="flex-1">
+                  <label className="text-xs text-white/40">Selecciona rutina</label>
+                  <select value={selectedMyRoutine?.id || ''} onChange={(e) => setSelectedMyRoutine(myRoutines.find(r => r.id === Number(e.target.value)) || null)} className="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white">
+                    {myRoutines.map(r => <option key={r.id} value={r.id}>{r.nombre}</option>)}
+                  </select>
+                </div>
+                <div className="w-48 text-right">
+                  <div className="text-[10px] text-white/30 uppercase font-black">Ejercicios</div>
+                  <div className="text-xl font-black">{selectedMyRoutine?.ejercicios?.length || 0}</div>
+                </div>
+              </div>
+
+              <div className="grid gap-6">
+                {selectedMyRoutine && selectedMyRoutine.ejercicios && selectedMyRoutine.ejercicios.length > 0 ? (
+                  selectedMyRoutine.ejercicios.map((ex) => (
+                    <div key={ex.id} className="bg-[#111] p-4 rounded-xl border border-white/10 flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-20 h-20 bg-black/50 rounded-lg overflow-hidden">
+                          <img src={ex.imagen?.startsWith('http') ? ex.imagen : `${SERVER_URL}${ex.imagen}`} alt={ex.titulo} className="w-full h-full object-cover" />
+                        </div>
+                        <div>
+                          <div className="font-black text-lg">{ex.titulo}</div>
+                          <div className="text-white/40 text-sm">Series: {ex.series} • Reps: {ex.repeticiones}</div>
+                        </div>
+                      </div>
+                      <div>
+                        <button onClick={() => handleCardClick(ex.id_ejercicio || ex.id)} className="bg-red-600 px-4 py-2 rounded-full font-black">Ver</button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12 text-white/40 italic">Aún no has añadido ejercicios a esta rutina.</div>
+                )}
+              </div>
             </div>
           </>
         ) : (

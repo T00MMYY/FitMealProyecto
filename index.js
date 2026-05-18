@@ -94,6 +94,7 @@ const favoritesRouter = require('./routes/favorites');
 const favoritesExercisesRouter = require('./routes/favoritesExercises');
 const progressExercisesRouter = require('./routes/progressExercises');
 const trainersRouter = require('./routes/trainers');
+const routinesRouter = require('./routes/routines');
 
 app.use('/api/users', usersRouter);
 app.use('/api/products', productsRouter);
@@ -104,6 +105,7 @@ app.use('/api/favorites', favoritesRouter);
 app.use('/api/favorites-exercises', favoritesExercisesRouter);
 app.use('/api/progress-exercises', progressExercisesRouter);
 app.use('/api/trainers', trainersRouter);
+app.use('/api/routines', routinesRouter);
 
 // Rutas de administración
 const adminRouter = require('./routes/admin');
