@@ -64,6 +64,15 @@ function ProductCard({ product, index }) {
   const rating = RATINGS[product.nombre_producto] || 0;
   const navigate = useNavigate();
 
+  const goToProduct = () => {
+    navigate(`/products/${product.id_producto}`);
+  };
+
+  const handleComprarClick = (e) => {
+    e.stopPropagation();
+    goToProduct();
+  };
+
   return (
     <motion.div
       layout
@@ -71,7 +80,7 @@ function ProductCard({ product, index }) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -20, scale: 0.95 }}
       transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-      onClick={() => navigate(`/products/${product.id_producto}`)}
+      onClick={goToProduct}
       className="rounded-2xl overflow-hidden cursor-pointer group bg-zinc-950 flex flex-col hover:shadow-[0_0_30px_rgba(211,15,21,0.15)] transition-shadow duration-500"
       style={{ border: '1px solid #222' }}
     >
@@ -107,7 +116,7 @@ function ProductCard({ product, index }) {
         <div className="flex items-center justify-between mt-auto pt-3" style={{ borderTop: '1px solid #1a1a1a' }}>
           <p className="text-white font-black text-xl">{precio}&euro;</p>
           <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/products/${product.id_producto}`); }}
+            onClick={handleComprarClick}
             className="text-[10px] font-black uppercase tracking-widest px-5 py-2 rounded-full transition-all duration-300 cursor-pointer hover:shadow-[0_0_15px_rgba(211,15,21,0.5)] hover:scale-105"
             style={{ background: '#D30F15', color: '#fff' }}
           >

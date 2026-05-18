@@ -356,7 +356,7 @@ export default function ProductDetail() {
             </div>
 
             <button
-              onClick={() =>
+              onClick={() => {
                 addToCart({
                   id: producto.id_producto,
                   nombre: producto.nombre_producto,
@@ -364,8 +364,8 @@ export default function ProductDetail() {
                   talla,
                   cantidad,
                   imagen,
-                })
-              }
+                });
+              }}
               className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.25em] text-[12px] cursor-pointer transition-all duration-400 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(211,15,21,0.4)] active:scale-[0.98]"
               style={{ background: 'linear-gradient(135deg, #D30F15 0%, #a00b10 100%)', color: '#fff' }}
             >

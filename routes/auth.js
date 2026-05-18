@@ -17,7 +17,22 @@ router.post('/register', authLimiter, AuthController.register);
 router.post('/login', authLimiter, AuthController.login);
 
 router.post('/logout', (req, res) => {
-  res.clearCookie('fitmeal_token');
+  const clearCookieOptions = {
+    httpOnly: COOKIE_CONFIG.httpOnly,
+    secure: COOKIE_CONFIG.secure,
+    sameSite: COOKIE_CONFIG.sameSite,
+    path: '/'
+  };
+
+  res.clearCookie('fitmeal_token', clearCookieOptions);
+
+  if (req.session) {
+    req.session.destroy(() => {
+      res.json({ message: 'Sesión cerrada correctamente' });
+    });
+    return;
+  }
+
   res.json({ message: 'Sesión cerrada correctamente' });
 });
 

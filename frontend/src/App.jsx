@@ -10,11 +10,13 @@ import Register from "./pages/Register";
 import Products from "./pages/products";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import Ejercicios from "./pages/ejercicios/Ejercicios";
 import Recetas from "./pages/Recetas";
 import RecetaDetalle from "./pages/RecetaDetalle";
 import Onboarding from "./pages/Onboarding";
 import Perfil from "./pages/Perfil";
+import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminRecipes from "./pages/admin/AdminRecipes";
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -38,6 +40,7 @@ function App() {
               <Route path="/products" element={<Products />} />
               <Route path="/products/:id" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
               <Route path="/workouts" element={<Workouts />} />
               <Route path="/ejercicios/:id" element={<Ejercicios />} />
               <Route path="/recetas" element={<Recetas />} />

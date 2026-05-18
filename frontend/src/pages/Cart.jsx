@@ -126,12 +126,13 @@ export default function Cart() {
               <span className="text-2xl font-black">{currency(total)} EUR</span>
             </div>
 
-            <button
-              className="w-full py-3 rounded-xl font-black uppercase tracking-widest text-sm"
+            <Link
+              to="/checkout"
+              className="block w-full cursor-pointer py-3 rounded-xl text-center font-black uppercase tracking-widest text-sm hover:brightness-110 transition"
               style={{ backgroundColor: '#D30F15' }}
             >
               Finalizar compra
-            </button>
+            </Link>
 
             <Link
               to="/products"

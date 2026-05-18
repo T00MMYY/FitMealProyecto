@@ -70,6 +70,36 @@ API/
 - `PUT /api/plans/:id` - Actualizar plan
 - `DELETE /api/plans/:id` - Eliminar plan
 
+### Contacto (público, sin JWT)
+- `POST /api/contact` - Enviar mensaje del formulario de contacto
+
+## 🛒 Cómo funcionan los productos (compra)
+
+1. El usuario añade productos al **carrito** (se guarda en el navegador, sin BD).
+2. En **Checkout** rellena los datos de la tarjeta (número, caducidad, CVV) y la dirección.
+3. El pago es **simulado/demo**: no hay cobro real ni pasarela. Se valida la
+   tarjeta en el frontend y se muestra un "Pedido confirmado" con un número
+   tipo `FM-123456-789`.
+
+> No hay backend de pedidos: el flujo de compra es solo demostración visual.
+
+## 📧 Cómo funciona el contacto (email real)
+
+El formulario `/contacto` **sí envía emails reales** con Nodemailer + Gmail:
+
+- `POST /api/contact` con `{ nombre, email, telefono, mensaje }`.
+- Se mandan 2 correos: uno al equipo (`GMAIL_USER`) y otro de confirmación al usuario.
+
+Para que funcione, en el `.env`:
+
+```bash
+GMAIL_USER=tu_correo@gmail.com
+GMAIL_APP_PASSWORD=app_password_de_16_caracteres   # App Password de Gmail, NO la contraseña normal
+```
+
+> El App Password se genera en https://myaccount.google.com/apppasswords
+> (requiere verificación en 2 pasos activada). Sin estas variables el envío falla.
+
 ## 🧪 Probar la API
 
 ### 1. Registrar usuario
@@ -160,7 +190,7 @@ Ver `.env.example` para la configuración completa.
 
 **Admin:**
 - Email: `admin@fitmeal.com`
-- Password: `admin123`
+- Password: `alex123`
 
 **Usuario normal:**
 - Email: `usuario@fitmeal.com`
