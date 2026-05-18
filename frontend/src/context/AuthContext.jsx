@@ -89,15 +89,16 @@ export function AuthProvider({ children }) {
   };
 
   const value = {
-  user,
-  loading,
-  isAuthenticated: !!user,
-  isOnboardingCompleted: user?.onboarding_completado === 1, // <--- Útil para ProtectedRoutes
-  login,
-  register,
-  logout,
-  setUserFromOAuth,
-};
+    user,
+    token,
+    loading,
+    isAuthenticated: !!user,
+    isOnboardingCompleted: user?.onboarding_completado === 1, // <--- Útil para ProtectedRoutes
+    login,
+    register,
+    logout,
+    setUserFromOAuth,
+  };
 
   return (
     <AuthContext.Provider value={value}>

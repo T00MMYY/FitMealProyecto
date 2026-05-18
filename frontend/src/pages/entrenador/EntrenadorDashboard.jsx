@@ -5,6 +5,12 @@ import { useAuth } from '../../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
+const formatObjective = (texto = '') => {
+  return texto
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
 export default function EntrenadorDashboard() {
   const { user, isAuthenticated } = useAuth();
   const [clientes, setClientes] = useState([]);
@@ -16,6 +22,7 @@ export default function EntrenadorDashboard() {
   const [series, setSeries] = useState(3);
   const [repeticiones, setRepeticiones] = useState('10-12');
   const [notas, setNotas] = useState('');
+  const [diaSemana, setDiaSemana] = useState('General');
 
   // Redirigir si no es entrenador
   if (!isAuthenticated || (Number(user?.id_rol) !== 4 && Number(user?.rol) !== 4)) {
@@ -73,7 +80,8 @@ export default function EntrenadorDashboard() {
         id_ejercicio: selectedEjercicio,
         series,
         repeticiones,
-        notas
+        notas,
+        dia_semana: diaSemana
       });
       toast.success('Ejercicio asignado exitosamente');
       setIsAssigning(false);
@@ -128,9 +136,9 @@ export default function EntrenadorDashboard() {
                     <div className="font-bold text-lg">{cliente.nombre} {cliente.apellidos}</div>
                     <div className="text-sm text-white/50">{cliente.email}</div>
                     {(cliente.objetivo || cliente.peso) && (
-                      <div className="mt-2 text-xs text-white/40 flex gap-4">
+                      <div className="mt-2 text-xs text-white/40 flex flex-wrap gap-4">
                         {cliente.peso && <span>Peso: {cliente.peso}kg</span>}
-                        {cliente.objetivo && <span>Objetivo: {cliente.objetivo}</span>}
+                        {cliente.objetivo && <span>Objetivo: {formatObjective(cliente.objetivo)}</span>}
                       </div>
                     )}
                   </button>
@@ -180,6 +188,24 @@ export default function EntrenadorDashboard() {
                             {ejercicios.map(ej => (
                               <option key={ej.id} value={ej.id}>{ej.titulo} ({ej.musculo_principal})</option>
                             ))}
+                          </select>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-xs font-bold text-white/40 uppercase mb-2">Día de la semana</label>
+                          <select
+                            value={diaSemana}
+                            onChange={(e) => setDiaSemana(e.target.value)}
+                            className="w-full bg-[#050505] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-600 mb-4"
+                          >
+                            <option value="General">General (Sin día)</option>
+                            <option value="Lunes">Lunes</option>
+                            <option value="Martes">Martes</option>
+                            <option value="Miércoles">Miércoles</option>
+                            <option value="Jueves">Jueves</option>
+                            <option value="Viernes">Viernes</option>
+                            <option value="Sábado">Sábado</option>
+                            <option value="Domingo">Domingo</option>
                           </select>
                         </div>
                         
@@ -261,7 +287,9 @@ export default function EntrenadorDashboard() {
                                   <div className="flex gap-3 text-sm text-white/60 mt-1">
                                     <span className="bg-red-600/20 text-red-400 px-2 py-0.5 rounded text-xs font-bold">{ej.series} Series</span>
                                     <span className="bg-white/10 px-2 py-0.5 rounded text-xs">{ej.repeticiones} Reps</span>
-                                    {ej.dificultad && <span className="bg-white/10 px-2 py-0.5 rounded text-xs">{ej.dificultad}</span>}
+                                    {ej.dia_semana && ej.dia_semana !== 'General' && (
+                                      <span className="bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded text-xs font-bold border border-blue-600/30">{ej.dia_semana}</span>
+                                    )}
                                   </div>
                                   {ej.notas && <p className="text-white/40 text-xs mt-2 italic">"{ej.notas}"</p>}
                                 </div>

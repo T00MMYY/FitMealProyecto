@@ -12,11 +12,13 @@ exports.getMyTrainer = async (req, res) => {
       WHERE ec.id_cliente = ? AND ec.estado = 'activo'
     `, [id_cliente]);
 
+    // CORREGIDO: Si no hay filas, devolvemos un estado exitoso (200) pero informando que no tiene
     if (rows.length === 0) {
-      return res.status(404).json({ message: 'No tienes un entrenador asignado.' });
+      return res.status(200).json({ hasTrainer: false, trainer: null });
     }
 
-    res.json(rows[0]);
+    // Si tiene, devolvemos los datos estructurados
+    res.json({ hasTrainer: true, trainer: rows[0] });
   } catch (error) {
     console.error("Error en getMyTrainer:", error);
     res.status(500).json({ error: 'Error al obtener tu entrenador' });
@@ -61,7 +63,7 @@ exports.getMyClients = async (req, res) => {
 exports.assignExerciseToClient = async (req, res) => {
   try {
     const id_entrenador = req.user.id_usuario;
-    const { id_cliente, id_ejercicio, series, repeticiones, notas } = req.body;
+    const { id_cliente, id_ejercicio, series, repeticiones, notas, dia_semana } = req.body;
 
     // Verificar que el cliente pertenece a este entrenador
     const [check] = await db.query(`
@@ -74,9 +76,9 @@ exports.assignExerciseToClient = async (req, res) => {
     }
 
     await db.query(`
-      INSERT INTO rutinas_asignadas (id_entrenador, id_cliente, id_ejercicio, series, repeticiones, notas)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `, [id_entrenador, id_cliente, id_ejercicio, series || 3, repeticiones || '10-12', notas || '']);
+      INSERT INTO rutinas_asignadas (id_entrenador, id_cliente, id_ejercicio, series, repeticiones, notas, dia_semana)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `, [id_entrenador, id_cliente, id_ejercicio, series || 3, repeticiones || '10-12', notas || '', dia_semana || 'General']);
 
     res.json({ message: 'Ejercicio asignado a la rutina.' });
   } catch (error) {
@@ -91,7 +93,7 @@ exports.getClientRoutine = async (req, res) => {
     const id_cliente = req.params.id; // Puede ser el propio cliente o su entrenador
     
     const [rutina] = await db.query(`
-      SELECT ra.id_rutina, ra.series, ra.repeticiones, ra.notas, ra.fecha_asignacion,
+      SELECT ra.id_rutina, ra.series, ra.repeticiones, ra.notas, ra.fecha_asignacion, ra.dia_semana,
              e.id, e.titulo, e.imagen, e.dificultad, e.tipo
       FROM rutinas_asignadas ra
       JOIN ejercicios e ON ra.id_ejercicio = e.id
@@ -151,5 +153,47 @@ exports.assignTrainer = async (req, res) => {
   } catch (error) {
     console.error("Error en assignTrainer:", error);
     res.status(500).json({ error: 'Error al asignar el entrenador.' });
+  }
+};
+
+// Guardar progreso/peso de un ejercicio en el historial
+exports.logWorkout = async (req, res) => {
+  try {
+    const id_cliente = req.user.id_usuario;
+    const { id_rutina, completado, peso_kg, series_data, fecha } = req.body;
+    
+    // Si la fecha no viene, usar hoy local
+    const logDate = fecha || new Date().toISOString().split('T')[0];
+
+    // Upsert (Insert or Update)
+    await db.query(`
+      INSERT INTO historial_rutinas (id_cliente, id_rutina, fecha, peso_kg, series_data, completado)
+      VALUES (?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE peso_kg = VALUES(peso_kg), series_data = VALUES(series_data), completado = VALUES(completado)
+    `, [id_cliente, id_rutina, logDate, peso_kg || 0, JSON.stringify(series_data || []), completado]);
+
+    res.json({ message: 'Progreso guardado.' });
+  } catch (error) {
+    console.error("Error en logWorkout:", error);
+    res.status(500).json({ error: 'Error al guardar progreso' });
+  }
+};
+
+// Obtener los ejercicios completados en una fecha específica
+exports.getTodayProgress = async (req, res) => {
+  try {
+    const id_cliente = req.user.id_usuario;
+    const date = req.query.date || new Date().toISOString().split('T')[0];
+
+    const [logs] = await db.query(`
+      SELECT id_rutina, completado, peso_kg, series_data
+      FROM historial_rutinas
+      WHERE id_cliente = ? AND fecha = ?
+    `, [id_cliente, date]);
+
+    res.json(logs);
+  } catch (error) {
+    console.error("Error en getTodayProgress:", error);
+    res.status(500).json({ error: 'Error al obtener progreso' });
   }
 };

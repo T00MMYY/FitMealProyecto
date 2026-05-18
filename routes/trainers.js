@@ -24,4 +24,8 @@ router.get('/clients/:id/routine', verifyToken, trainerController.getClientRouti
 // Eliminar ejercicio asignado
 router.delete('/routine/:id', verifyToken, requireRole(4), trainerController.deleteAssignedExercise);
 
+// Rutas del historial de entrenamiento (Persistencia de progreso)
+router.post('/log-workout', verifyToken, trainerController.logWorkout);
+router.get('/today-progress', verifyToken, trainerController.getTodayProgress);
+
 module.exports = router;

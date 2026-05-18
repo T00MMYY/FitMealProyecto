@@ -15,6 +15,7 @@ import Recetas from "./pages/Recetas";
 import RecetaDetalle from "./pages/RecetaDetalle";
 import Onboarding from "./pages/Onboarding";
 import Perfil from "./pages/Perfil";
+import MiRutina from "./pages/MiRutina";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminRecipes from "./pages/admin/AdminRecipes";
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -44,6 +45,7 @@ function App() {
                 <Route path="/recetas/:id" element={<RecetaDetalle />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/perfil" element={<Perfil />} />
+                <Route path="/rutina" element={<MiRutina />} />
                 <Route path="/contacto" element={<Contact />} />
                 <Route
                   path="/admin"
