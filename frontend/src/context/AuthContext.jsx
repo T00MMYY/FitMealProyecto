@@ -11,6 +11,7 @@ export function AuthProvider({ children }) {
     return saved ? JSON.parse(saved) : null;
   });
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(() => localStorage.getItem('fitmeal_token'));
   const navigate = useNavigate();
 
   // Al montar, verificar sesión via cookie httpOnly
@@ -39,7 +40,9 @@ export function AuthProvider({ children }) {
       // Ignorar errores de red — limpiar estado igualmente
     } finally {
       localStorage.removeItem('user');
+      localStorage.removeItem('fitmeal_token');
       setUser(null);
+      setToken(null);
       navigate('/login');
     }
   }, [navigate]);
@@ -53,40 +56,49 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const response = await api.post('/auth/login', { email, password });
-    const { user: userData } = response.data;
+    const { user: userData, token } = response.data;
 
     localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('fitmeal_token', token);
     setUser(userData);
+    setToken(token);
 
     return response.data;
   };
 
   const register = async (userData) => {
     const response = await api.post('/auth/register', userData);
-    const { user: newUser } = response.data;
+    const { user: newUser, token } = response.data;
 
     localStorage.setItem('user', JSON.stringify(newUser));
+    localStorage.setItem('fitmeal_token', token);
     setUser(newUser);
+    setToken(token);
 
     return response.data;
   };
 
   // Usado por OAuthSuccess para inyectar user tras el callback externo
-  const setUserFromOAuth = (_, userData) => {
+  const setUserFromOAuth = (tokenValue, userData) => {
+    if (tokenValue) {
+      localStorage.setItem('fitmeal_token', tokenValue);
+      setToken(tokenValue);
+    }
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
   };
 
   const value = {
-  user,
-  loading,
-  isAuthenticated: !!user,
-  isOnboardingCompleted: user?.onboarding_completado === 1, // <--- Útil para ProtectedRoutes
-  login,
-  register,
-  logout,
-  setUserFromOAuth,
-};
+    user,
+    token,
+    loading,
+    isAuthenticated: !!user,
+    isOnboardingCompleted: user?.onboarding_completado === 1, // <--- Útil para ProtectedRoutes
+    login,
+    register,
+    logout,
+    setUserFromOAuth,
+  };
 
   return (
     <AuthContext.Provider value={value}>

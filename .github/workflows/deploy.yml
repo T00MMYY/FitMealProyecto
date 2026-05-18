@@ -7,15 +7,42 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Trigger deploy webhook
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
+      - name: Create deploy bundle
+        run: |
+          tar czf /tmp/fitmeal-deploy.tar.gz \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='frontend/node_modules' \
+            --exclude='frontend/src' \
+            --exclude='frontend/public' \
+            --exclude='frontend/index.html' \
+            --exclude='frontend/vite.config.*' \
+            --exclude='frontend/package*' \
+            --exclude='frontend/.gitignore' \
+            --exclude='compartido' \
+            .
+
+      - name: Deploy via HTTPS
         env:
           WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
         run: |
-          PAYLOAD='{"ref":"refs/heads/main"}'
-          SIG="sha256=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$WEBHOOK_SECRET" -binary | xxd -p -c 256)"
-          curl -sf -X POST https://fitmeal.website/api/webhook/deploy \
-            -H "Content-Type: application/json" \
-            -H "X-Hub-Signature-256: $SIG" \
-            -d "$PAYLOAD"
-          echo "Deploy webhook enviado correctamente"
+          SIG="sha256=$(openssl dgst -sha256 -hmac "$WEBHOOK_SECRET" -binary /tmp/fitmeal-deploy.tar.gz | xxd -p -c 256)"
+          curl -sf -X POST https://fitmeal.website/api/webhook/deploy-bundle \
+            -H "Content-Type: application/octet-stream" \
+            -H "X-Deploy-Signature: $SIG" \
+            --data-binary @/tmp/fitmeal-deploy.tar.gz
+          echo "✅ Bundle enviado correctamente"

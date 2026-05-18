@@ -2,23 +2,54 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import toast from 'react-hot-toast';
 import { calculateMacros } from '../utils/macrosCalculator';
 
 export default function Perfil() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const fileInputRef = useRef(null); // Referencia para el input de archivo oculto
+  const fileInputRef = useRef(null); 
   const [userData, setUserData] = useState(null);
+  const [trainer, setTrainer] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false); // Estado para la carga de imagen
+  const [uploading, setUploading] = useState(false);
+  const [assignedExercises, setAssignedExercises] = useState([]);
+
+  // URL base para prefigurar recursos estáticos locales como imágenes
+  const SERVER_URL = 'http://localhost:3000';
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const id = user?.id_usuario || user?.id;
         if (!id) return;
+        
         const response = await api.get(`/api/users/${id}`);
         setUserData(response.data.user || response.data);
+
+        try {
+          const trainerRes = await api.get('/api/trainers/my-trainer');
+          
+          // Soporte dual para formato nuevo y antiguo del backend
+          const isTrainerAssigned = trainerRes.data.hasTrainer === true || !!trainerRes.data.id_usuario;
+          
+          if (isTrainerAssigned) {
+            setTrainer(trainerRes.data.trainer || trainerRes.data);
+            
+            // Cargar ejercicios asignados por el entrenador usando la ID limpia
+            try {
+              const exercisesRes = await api.get(`/api/trainers/clients/${id}/routine`);
+              setAssignedExercises(exercisesRes.data || []);
+            } catch (err) {
+              console.error("Error al cargar la rutina del entrenador", err);
+            }
+          } else {
+            setTrainer(null);
+          }
+        } catch (err) {
+          // Captura errores reales de caída de servidor
+          console.error("Error al conectar con la sección de entrenadores", err);
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
@@ -33,7 +64,6 @@ export default function Perfil() {
   const displayUser = userData || user;
   const macros = calculateMacros(displayUser);
 
-  // FUNCIÓN PARA CARGAR LA IMAGEN AL SERVIDOR
   const handlePhotoChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -44,16 +74,15 @@ export default function Perfil() {
     try {
       setUploading(true);
       const id = user?.id_usuario || user?.id;
-      // Ajusta esta ruta según tu API (ej: /api/users/1/photo)
       const response = await api.post(`/api/users/${id}/photo`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
       setUserData(prev => ({ ...prev, foto_url: response.data.foto_url }));
-      alert("Foto actualizada correctamente");
+      toast.success("Foto actualizada correctamente");
     } catch (error) {
       console.error("Error al subir la foto:", error);
-      alert("No se pudo subir la imagen");
+      toast.error("No se pudo subir la imagen");
     } finally {
       setUploading(false);
     }
@@ -65,8 +94,10 @@ export default function Perfil() {
       if (!id) return;
       const response = await api.put(`/api/users/${id}`, { [field]: value });
       setUserData(response.data.user || response.data);
+      toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} actualizado`);
     } catch (error) {
       console.error(`Error updating ${field}:`, error);
+      toast.error("Error al guardar el dato");
     }
   };
 
@@ -80,17 +111,18 @@ export default function Perfil() {
     <div className="min-h-screen bg-[#050505] py-12 px-6 pt-28 text-white font-sans selection:bg-red-600">
       <div className="max-w-6xl mx-auto space-y-6">
 
+        {/* HERO CARD USUARIO */}
         <div className="bg-[#111] rounded-[2.5rem] p-8 border border-white/5 relative overflow-hidden group shadow-2xl">
           <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-3xl group-hover:bg-red-600/10 transition-colors duration-700"></div>
 
           <div className="flex flex-col md:flex-row gap-8 items-center relative z-10">
             <div
               className="relative group/avatar cursor-pointer active:scale-95 transition-transform"
-              onClick={() => !uploading && fileInputRef.current.click()} // Clicable en todo el recuadro
+              onClick={() => !uploading && fileInputRef.current.click()}
             >
               <div className="w-32 h-32 rounded-[2rem] bg-[#1a1a1a] flex items-center justify-center text-5xl font-black italic border border-white/10 shadow-2xl overflow-hidden relative">
                 {displayUser?.foto_url ? (
-                  <img src={displayUser.foto_url} alt="Profile" className="w-full h-full object-cover" />
+                  <img src={displayUser.foto_url.startsWith('http') ? displayUser.foto_url : `${SERVER_URL}${displayUser.foto_url}`} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
                   <>
                     <div className="absolute inset-0 bg-gradient-to-br from-red-600/20 to-red-900/40 opacity-50"></div>
@@ -112,12 +144,11 @@ export default function Perfil() {
                 accept="image/*"
                 onChange={handlePhotoChange}
               />
-
               <div className="absolute -bottom-2 -right-2 bg-green-500 w-6 h-6 rounded-full border-4 border-[#111] animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
             </div>
 
             <div className="flex-1 text-center md:text-left space-y-4">
-              <div className="flex justify-between items-start">
+              <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start gap-4">
                 <div>
                   <h1 className="text-4xl font-black italic uppercase tracking-tighter leading-none flex items-center gap-3 justify-center md:justify-start">
                     {displayUser?.nombre} {displayUser?.apellidos}
@@ -128,9 +159,12 @@ export default function Perfil() {
                   </div>
                 </div>
 
-                <div className="hidden md:flex gap-3">
+                <div className="flex gap-3">
                   <button onClick={() => navigate('/onboarding')} className="p-3 bg-white/5 rounded-2xl hover:bg-white/10 transition-all border border-white/5" title="Configuración Completa">
                     <span className="block text-lg">⚙️</span>
+                  </button>
+                  <button onClick={logout} className="p-3 bg-red-600/10 text-red-500 rounded-2xl hover:bg-red-600/20 transition-all border border-red-600/10" title="Cerrar Sesión">
+                    <span className="block text-sm font-black uppercase tracking-widest px-2">Salir</span>
                   </button>
                 </div>
               </div>
@@ -153,34 +187,41 @@ export default function Perfil() {
                     </p>
                   </div>
                   {displayUser?.plan === 'basic' && (
-                    <button className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-black font-bold rounded-lg transition-colors">
+                    <button className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-black font-bold rounded-lg transition-colors text-xs uppercase tracking-wider">
                       Upgrade a Premium
                     </button>
                   )}
                 </div>
               </div>
+
+              {/* TRAINER COMPONENT INTEGRADO */}
+              {trainer && (
+                <div className="mt-4 p-4 bg-white/5 rounded-2xl border border-red-600/30 flex items-center gap-4 hover:border-red-600/60 transition-colors">
+                  <div className="w-14 h-14 rounded-full bg-black/50 overflow-hidden border-2 border-red-600/50 flex-shrink-0">
+                    {trainer.foto_url ? (
+                      <img src={trainer.foto_url.startsWith('http') ? trainer.foto_url : `${SERVER_URL}${trainer.foto_url}`} alt="Entrenador" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xl font-black text-red-600 italic">{trainer.nombre.charAt(0)}</div>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-red-500 mb-1">Tu Entrenador Asignado</h3>
+                    <p className="text-xl font-black italic tracking-tighter text-white">{trainer.nombre} {trainer.apellidos}</p>
+                    <p className="text-[10px] text-white/40">{trainer.email}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-6 mt-10 pt-8 border-t border-white/5">
-            <StatItem
-              label="Masa Corporal"
-              value={displayUser?.peso}
-              unit="KG"
-              color="bg-red-600"
-              onUpdate={(val) => updateUserStat('peso', val)}
-            />
-            <StatItem
-              label="Estatura Total"
-              value={displayUser?.altura}
-              unit="CM"
-              color="bg-white"
-              onUpdate={(val) => updateUserStat('altura', val)}
-            />
+            <StatItem label="Masa Corporal" value={displayUser?.peso} unit="KG" color="bg-red-600" onUpdate={(val) => updateUserStat('peso', val)} />
+            <StatItem label="Estatura Total" value={displayUser?.altura} unit="CM" color="bg-white" onUpdate={(val) => updateUserStat('altura', val)} />
             <StatItem label="Gasto Basal" value={macros?.calories} unit="KCAL" color="bg-zinc-700" />
           </div>
         </div>
 
+        {/* PLAN NUTRICIONAL CARD */}
         <div className="bg-[#111] rounded-[2.5rem] p-8 border border-white/5 relative overflow-hidden group shadow-xl text-center md:text-left">
           <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-3xl group-hover:bg-red-600/10 transition-colors"></div>
           <h2 className="text-xs font-black italic uppercase tracking-[0.2em] text-white/20 mb-8 flex items-center gap-3 relative z-10">
@@ -215,6 +256,67 @@ export default function Perfil() {
           )}
         </div>
 
+        {/* RUTINA DEL ENTRENADOR CARD */}
+        {trainer && (
+          <div className="bg-[#111] rounded-[2.5rem] p-8 border border-white/5 relative overflow-hidden group shadow-xl">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-3xl group-hover:bg-red-600/10 transition-colors"></div>
+            <h2 className="text-xs font-black italic uppercase tracking-[0.2em] text-white/20 mb-8 flex items-center gap-3 relative z-10">
+              <span className="w-8 h-[1px] bg-white/10 hidden md:block"></span>
+              Rutina Asignada por tu Entrenador
+            </h2>
+            
+            {assignedExercises.length > 0 ? (
+              <div className="grid gap-4 relative z-10">
+                {assignedExercises.map((exercise) => (
+                  <div key={exercise.id_rutina} className="bg-white/5 rounded-2xl p-6 border border-white/10 hover:border-red-600/30 transition-colors">
+                    <div className="flex flex-col sm:flex-row items-start gap-6">
+                      {exercise.imagen && (
+                        <div className="w-24 h-24 rounded-xl bg-black/50 overflow-hidden flex-shrink-0 border border-white/10 mx-auto sm:mx-0">
+                          {/* CORRECCIÓN AQUÍ: Concatenar SERVER_URL para que no salgan rotas si son relativas */}
+                          <img 
+                            src={exercise.imagen.startsWith('http') ? exercise.imagen : `${SERVER_URL}${exercise.imagen}`} 
+                            alt={exercise.titulo} 
+                            className="w-full h-full object-cover" 
+                            onError={(e) => { e.target.style.display = 'none'; }} 
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 w-full">
+                        <div className="flex items-center justify-between mb-2 gap-4">
+                          <h3 className="text-lg font-black italic uppercase tracking-tighter">{exercise.titulo}</h3>
+                          <span className={`text-[8px] font-black px-2 py-1 rounded-lg uppercase tracking-widest ${
+                            exercise.dificultad === 'Fácil' ? 'bg-green-600/20 text-green-400' :
+                            exercise.dificultad === 'Intermedio' ? 'bg-yellow-600/20 text-yellow-400' :
+                            'bg-red-600/20 text-red-400'
+                          }`}>{exercise.dificultad || 'Moderado'}</span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex flex-wrap items-center gap-4 text-[10px] text-white/60 uppercase font-bold tracking-widest">
+                            <span>📊 {exercise.series} series</span>
+                            <span>🔄 {exercise.repeticiones} reps</span>
+                            <span>📅 {new Date(exercise.fecha_asignacion).toLocaleDateString('es-ES')}</span>
+                          </div>
+                          {exercise.notes || exercise.notas ? (
+                            <p className="text-[11px] text-white/50 italic mt-3 p-3 bg-black/30 rounded-lg border-l-2 border-red-600/50">
+                              📝 {exercise.notes || exercise.notas}
+                            </p>
+                          ) : null}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-12 text-center bg-black/20 rounded-[2rem] border border-dashed border-white/5 relative z-10">
+                <p className="text-white/40 font-black uppercase tracking-widest text-[10px] mb-2">Tu entrenador aún no ha asignado ejercicios</p>
+                <p className="text-white/20 text-[10px]">Contacta con tu entrenador para recibir tu plan de entrenamiento personalizado.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ACCESOS DIRECTOS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
           <ActivityBlock title="Entrenamiento" action="Explorar" onClick={() => navigate('/workouts')} item={{ title: "Protocolo de Pecho", desc: "45 min • Hipertrofia", tag: "Fuerza", img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400" }} />
           <ActivityBlock title="Nutrición" action="Recetario" onClick={() => navigate('/recetas')} item={{ title: "Cena Pro-Metabólica", desc: "20 min • Alta Proteína", tag: "Gourmet", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400" }} />
@@ -224,6 +326,7 @@ export default function Perfil() {
   );
 }
 
+// Sub-componentes auxiliares integrados limpios
 function StatItem({ label, value, unit, color, onUpdate }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value || '');
@@ -267,7 +370,7 @@ function StatItem({ label, value, unit, color, onUpdate }) {
         <div className="flex items-baseline justify-center md:justify-start gap-2 cursor-pointer group/value" onClick={() => onUpdate && setIsEditing(true)}>
           <p className="text-3xl font-black italic tabular-nums transition-colors group-hover/value:text-red-500">{value || '--'}</p>
           <span className="text-[10px] text-white/10 font-bold uppercase tracking-tighter">{unit}</span>
-          {onUpdate && <span className="opacity-0 group-hover/value:opacity-100 ml-2 text-xs transition-opacity grayscale hover:grayscale-0">✏️</span>}
+          {onUpdate && <span className="opacity-0 group-hover/value:opacity-100 ml-2 text-xs transition-opacity">✏️</span>}
         </div>
       )}
       <div className={`h-[2px] w-12 ${color} opacity-40 rounded-full mx-auto md:mx-0 transition-all group-hover:w-full group-hover:opacity-100`} />
@@ -302,7 +405,7 @@ function ActivityBlock({ title, action, onClick, item }) {
 
 function MacroBar({ label, grams, color, totalKcal, type }) {
   const kcalPerGram = type === 'fat' ? 9 : 4;
-  const percentage = Math.min(100, Math.round(((grams * kcalPerGram) / totalKcal) * 100));
+  const percentage = Math.min(100, Math.round(((grams * kcalPerGram) / totalKcal) * 100)) || 0;
   return (
     <div className="group/bar">
       <div className="flex justify-between items-end mb-2">

@@ -19,7 +19,7 @@ const promisePool = pool.promise();
 // Verificar conexión inicial
 pool.getConnection((err, connection) => {
   if (err) {
-    console.error('❌ Error conectando a la base de datos:', err.message);
+    console.error('❌ Error conectando a la base de datos:', err);
     return;
   }
   console.log('✅ Conectado a la base de datos MySQL (FitMeal)');

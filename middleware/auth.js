@@ -43,7 +43,7 @@ const requireRole = (...roles) => {
       return res.status(403).json({ error: 'Token no proporcionado' });
     }
 
-    if (!roles.includes(req.user.id_rol)) {
+    if (!roles.map(Number).includes(Number(req.user.id_rol))) {
       return res.status(403).json({ error: 'No tienes permisos para realizar esta acción' });
     }
 

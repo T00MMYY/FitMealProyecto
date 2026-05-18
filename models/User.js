@@ -5,7 +5,12 @@ class User {
    * Obtener todos los usuarios
    */
   static async findAll(offset = 0, limit = 20) {
-    const [rows] = await db.query('SELECT * FROM usuarios LIMIT ? OFFSET ?', [limit, offset]);
+    const [rows] = await db.query(`
+      SELECT u.*, ec.id_entrenador 
+      FROM usuarios u 
+      LEFT JOIN entrenador_cliente ec ON u.id_usuario = ec.id_cliente AND ec.estado = 'activo'
+      LIMIT ? OFFSET ?
+    `, [limit, offset]);
     return rows;
   }
 

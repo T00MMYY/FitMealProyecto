@@ -1,16 +1,44 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-
-
+import { useState, useEffect } from 'react';
+import api from '../api/axios';
 
 export default function Navbar() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, token, isAuthenticated, logout } = useAuth();
   const { cartCount } = useCart();
   const location = useLocation();
+  const [hasTrainer, setHasTrainer] = useState(false);
+  
   const isHome = location.pathname === '/';
   const hideNav = ['/login', '/register', '/auth/success'].includes(location.pathname);
 
+  // Obtener si el usuario tiene entrenador asignado
+  useEffect(() => {
+    const fetchTrainerStatus = async () => {
+      if (!isAuthenticated || !token) {
+        setHasTrainer(false);
+        return;
+      }
+      // Solo usuarios normales o premium necesitan este estado
+      const role = Number(user?.id_rol || user?.rol);
+      if (role === 1 || role === 4) {
+        setHasTrainer(false);
+        return;
+      }
+      try {
+        const res = await api.get('/api/trainers/my-trainer');
+        // Soporte para formato nuevo ({hasTrainer: true}) y antiguo ({id_usuario: 8})
+        const hasTrainerActive = res.data.hasTrainer === true || !!res.data.id_usuario;
+        
+        setHasTrainer(hasTrainerActive);
+      } catch (err) {
+        console.error("Error fetching trainer status en Navbar:", err);
+        setHasTrainer(false);
+      }
+    };
+    fetchTrainerStatus();
+  }, [isAuthenticated, token, user]);
   if (hideNav) return null;
 
   const navLinks = [
@@ -19,9 +47,19 @@ export default function Navbar() {
     { to: '/products', label: 'Productos' },
     { to: '/contacto', label: 'Contacto' },
   ];
+  
+  // CORREGIDO: Se elimina la propiedad 'special: true' para integrarlo al diseño estándar
+  if (isAuthenticated && hasTrainer) {
+    navLinks.push({ to: '/rutina', label: 'Mi Rutina' });
+  }
+  
   if (isAuthenticated && user && (Number(user.id_rol) === 1 || Number(user.rol) === 1)) {
     navLinks.push({ to: '/admin', label: 'Admin' });
   }
+  if (isAuthenticated && user && (Number(user.id_rol) === 4 || Number(user.rol) === 4)) {
+    navLinks.push({ to: '/entrenador', label: 'Entrenador' });
+  }
+
   return (
     <nav
       className={`${isHome
@@ -51,6 +89,7 @@ export default function Navbar() {
                 style={{ color: isActive ? '#fff' : 'rgba(255,255,255,0.7)' }}
               >
                 {label}
+                {/* Active Red underline style */}
                 <span
                   className="block h-[2px] rounded-full transition-all duration-300"
                   style={{
@@ -71,6 +110,9 @@ export default function Navbar() {
         {/* Right side */}
         {isAuthenticated ? (
           <div className="flex items-center gap-4">
+            <Link to="/perfil" className="text-white/80 hover:text-white text-sm italic font-bold">
+              {user?.nombre || user?.email}
+            </Link>
             <Link
               to="/cart"
               className="relative border border-white/25 text-white p-2 rounded-full hover:bg-white/10 transition-colors flex items-center justify-center"
@@ -83,9 +125,6 @@ export default function Navbar() {
                   {cartCount}
                 </span>
               )}
-            </Link>
-            <Link to="/perfil" className="text-white/80 hover:text-white text-sm italic font-bold">
-              {user?.nombre || user?.email}
             </Link>
             <button
               onClick={logout}

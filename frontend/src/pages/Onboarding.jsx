@@ -1,9 +1,9 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import OnboardingWizard from '../components/FormularioInicial';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import OnboardingWizard from "../components/FormularioInicial";
 
-import api from '../api/axios';
-import { useAuth } from '../context/AuthContext';
+import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -11,7 +11,8 @@ const Onboarding = () => {
 
   const manejarCompletado = async (datos) => {
     try {
-      const anioNacimiento = new Date().getFullYear() - parseInt(datos.edad || 25);
+      const anioNacimiento =
+        new Date().getFullYear() - parseInt(datos.edad || 25);
       const fechaNacimiento = `${anioNacimiento}-01-01`;
 
       const datosAEnviar = {
@@ -25,17 +26,23 @@ const Onboarding = () => {
         objetivo: datos.objetivo,
         preferencia_alimentaria: datos.preferenciaAlimentaria,
         tiempo_cocinar: datos.tiempoCocinar,
-        onboarding_completado: 1
+        onboarding_completado: 1,
       };
-      
+
       await api.put(`/api/users/${user.id_usuario || user.id}`, datosAEnviar);
-      
+
       alert("¡Perfil guardado! Redirigiendo...");
-      navigate('/');
+      navigate("/");
     } catch (error) {
       console.error("Error al guardar onboarding:", error);
-      const serverDetails = error.response?.data?.details || error.response?.data?.error || error.message;
-      alert("Hubo un error del servidor. Aquí está el fallo exacto:\n" + serverDetails);
+      const serverDetails =
+        error.response?.data?.details ||
+        error.response?.data?.error ||
+        error.message;
+      alert(
+        "Hubo un error del servidor. Aquí está el fallo exacto:\n" +
+          serverDetails,
+      );
     }
   };
 
@@ -45,8 +52,5 @@ const Onboarding = () => {
     </div>
   );
 };
-
-
-
 
 export default Onboarding;
