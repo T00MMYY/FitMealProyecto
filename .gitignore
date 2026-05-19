@@ -1,9 +1,11 @@
 # Dependencias
 node_modules/
 
-# Environment files (el .env SI se sube para que funcione a todo el equipo)
+# Environment files
+.env
 .env.local
 .env.*.local
+frontend/.env
 frontend/.env.local
 
 
