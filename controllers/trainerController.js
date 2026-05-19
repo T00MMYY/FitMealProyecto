@@ -90,8 +90,27 @@ exports.assignExerciseToClient = async (req, res) => {
 // Obtener la rutina de un cliente (Para el Entrenador o el Cliente)
 exports.getClientRoutine = async (req, res) => {
   try {
-    const id_cliente = req.params.id; // Puede ser el propio cliente o su entrenador
-    
+    const id_cliente = Number(req.params.id);
+    const requesterId = Number(req.user.id_usuario);
+    const requesterRole = Number(req.user.id_rol);
+
+    if (!id_cliente || Number.isNaN(id_cliente)) {
+      return res.status(400).json({ error: 'ID de cliente inválido' });
+    }
+
+    // El cliente puede ver su propia rutina
+    if (requesterId !== id_cliente && requesterRole !== 1) {
+      // Si no es admin, solo un entrenador asignado puede acceder
+      const [check] = await db.query(`
+        SELECT 1 FROM entrenador_cliente 
+        WHERE id_cliente = ? AND id_entrenador = ? AND estado = 'activo'
+      `, [id_cliente, requesterId]);
+
+      if (check.length === 0) {
+        return res.status(403).json({ error: 'No tienes permiso para ver esta rutina' });
+      }
+    }
+
     const [rutina] = await db.query(`
       SELECT ra.id_rutina, ra.series, ra.repeticiones, ra.notas, ra.fecha_asignacion, ra.dia_semana,
              e.id, e.titulo, e.imagen, e.dificultad, e.tipo
@@ -103,7 +122,7 @@ exports.getClientRoutine = async (req, res) => {
 
     res.json(rutina);
   } catch (error) {
-    console.error("Error en getClientRoutine:", error);
+    console.error('Error en getClientRoutine:', error);
     res.status(500).json({ error: 'Error al obtener rutina' });
   }
 };

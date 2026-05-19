@@ -22,6 +22,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminRecipes from "./pages/admin/AdminRecipes";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminExercises from "./pages/admin/AdminExercises";
+import AdminTrainers from "./pages/admin/AdminTrainers";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import Contact from "./pages/Contact";
 import EntrenadorDashboard from "./pages/entrenador/EntrenadorDashboard";
@@ -79,6 +80,14 @@ function App() {
                   element={
                     <AdminProtectedRoute>
                       <AdminExercises />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/trainers"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminTrainers />
                     </AdminProtectedRoute>
                   }
                 />

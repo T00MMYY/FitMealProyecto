@@ -11,7 +11,7 @@ services:
       MYSQL_ROOT_PASSWORD: FitMealRoot123
       MYSQL_DATABASE: fitness_platform
       MYSQL_USER: fitmeal_user
-      MYSQL_PASSWORD: 
+      MYSQL_PASSWORD: FitMeal123
     ports:
       - "3307:3306"
     volumes:

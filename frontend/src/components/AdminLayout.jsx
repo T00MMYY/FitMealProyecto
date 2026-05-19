@@ -6,6 +6,7 @@ const AdminLayout = ({ children }) => {
 
   const menuItems = [
     { path: '/admin', label: 'Dashboard' },
+    { path: '/admin/trainers', label: 'Entrenadores' },
     { path: '/admin/recipes', label: 'Recetas'  },
     { path: '/admin/exercises', label: 'Ejercicios'  },
     { path: '/admin/users', label: 'Usuarios' },

@@ -9,6 +9,7 @@ export default function Navbar() {
   const { cartCount } = useCart();
   const location = useLocation();
   const [hasTrainer, setHasTrainer] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const isHome = location.pathname === '/';
   const hideNav = ['/login', '/register', '/auth/success'].includes(location.pathname);
@@ -28,7 +29,6 @@ export default function Navbar() {
       }
       try {
         const res = await api.get('/api/trainers/my-trainer');
-        // Soporte para formato nuevo ({hasTrainer: true}) y antiguo ({id_usuario: 8})
         const hasTrainerActive = res.data.hasTrainer === true || !!res.data.id_usuario;
         
         setHasTrainer(hasTrainerActive);
@@ -39,6 +39,11 @@ export default function Navbar() {
     };
     fetchTrainerStatus();
   }, [isAuthenticated, token, user]);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
   if (hideNav) return null;
 
   const navLinks = [
@@ -48,7 +53,6 @@ export default function Navbar() {
     { to: '/contacto', label: 'Contacto' },
   ];
   
-  // CORREGIDO: Se elimina la propiedad 'special: true' para integrarlo al diseño estándar
   if (isAuthenticated && hasTrainer) {
     navLinks.push({ to: '/rutina', label: 'Mi Rutina' });
   }
@@ -60,24 +64,32 @@ export default function Navbar() {
     navLinks.push({ to: '/entrenador', label: 'Entrenador' });
   }
 
-  return (
-    <nav
-      className={`${isHome
-          ? 'absolute top-0 left-0 w-full z-20'
-          : 'relative bg-gray-900 border-b border-gray-800'
-        } px-8 py-5`}
+  // Componente interno del carrito para mantener estilos limpios
+  const CartButton = () => (
+    <Link
+      to="/cart"
+      className="relative border border-white/25 text-white p-2 rounded-full hover:bg-white/10 transition-colors flex items-center justify-center"
+      aria-label="Ir al carrito"
     >
-      <div className="flex items-center justify-between relative w-full">
-        {/* Logo */}
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+      {cartCount > 0 && (
+        <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+          {cartCount}
+        </span>
+      )}
+    </Link>
+  );
+
+  return (
+    <nav className={`${isHome ? 'absolute top-0 left-0 w-full z-20' : 'relative bg-gray-900 border-b border-gray-800'} px-4 py-4 md:px-8 md:py-5`}>
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2">
-          <img
-            src="/FitMeal_logoblanco.png"
-            alt="FitMeal"
-            className="h-12 w-12 object-contain"
-          />
+          <img src="/FitMeal_logoblanco.png" alt="FitMeal" className="h-10 w-10 object-contain md:h-12 md:w-12" />
         </Link>
 
-        {/* Navigation Links */}
+        {/* Links centrales de escritorio */}
         <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
           {navLinks.map(({ to, label }) => {
             const isActive = location.pathname === to;
@@ -89,74 +101,129 @@ export default function Navbar() {
                 style={{ color: isActive ? '#fff' : 'rgba(255,255,255,0.7)' }}
               >
                 {label}
-                {/* Active Red underline style */}
                 <span
-                  className="block h-[2px] rounded-full transition-all duration-300"
+                  className="block h-0.5 rounded-full transition-all duration-300"
                   style={{
                     width: isActive ? '100%' : '0%',
                     backgroundColor: '#d30f15',
                     boxShadow: isActive ? '0 0 8px rgba(211,15,21,0.7)' : 'none',
                   }}
                 />
-                {/* hover bar for non-active */}
                 {!isActive && (
-                  <span className="block h-[2px] w-0 group-hover:w-full rounded-full bg-white/40 transition-all duration-300 absolute bottom-0" />
+                  <span className="block h-0.5 w-0 group-hover:w-full rounded-full bg-white/40 transition-all duration-300 absolute bottom-0" />
                 )}
               </Link>
             );
           })}
         </div>
 
-        {/* Right side */}
-        {isAuthenticated ? (
-          <div className="flex items-center gap-4">
-            <Link to="/perfil" className="text-white/80 hover:text-white text-sm italic font-bold">
-              {user?.nombre || user?.email}
-            </Link>
-            <Link
-              to="/cart"
-              className="relative border border-white/25 text-white p-2 rounded-full hover:bg-white/10 transition-colors flex items-center justify-center"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
+        {/* Bloque de acciones derecha */}
+        <div className="flex items-center gap-3 md:gap-4">
+          
+          {/* Vista Escritorio con condiciones de extremo derecho */}
+          <div className="hidden md:flex items-center gap-4">
+            {isAuthenticated ? (
+              <>
+                {/* Usuario a la izquierda */}
+                <Link to="/perfil" className="text-white/80 hover:text-white text-sm italic font-bold whitespace-nowrap">
+                  {user?.nombre || user?.email}
+                </Link>
+                
+                {/* Carrito en el medio */}
+                <CartButton />
+                
+                {/* Salir en el extremo derecho */}
+                <button
+                  onClick={logout}
+                  className="border border-white text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-colors"
+                >
+                  Salir
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Carrito pasa a la izquierda si no hay sesión iniciada */}
+                <CartButton />
+
+                {/* Login en el extremo derecho */}
+                <Link
+                  to="/login"
+                  className="border border-white text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-colors"
+                >
+                  Login
+                </Link>
+              </>
+            )}
+          </div>
+
+          {/* Vista Móvil (Mantiene el flujo compacto para pantallas pequeñas) */}
+          <div className="flex md:hidden items-center gap-3">
+            <CartButton />
             <button
-              onClick={logout}
-              className="border border-white text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-black transition-colors cursor-pointer"
+              type="button"
+              onClick={() => setMobileMenuOpen((current) => !current)}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white transition hover:border-white/40"
+              aria-label={mobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
             >
-              Cerrar sesión
+              <span className="sr-only">Abrir menú</span>
+              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                {mobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+                )}
+              </svg>
             </button>
           </div>
-        ) : (
-          <div className="flex items-center gap-4">
-            <Link
-              to="/cart"
-              className="relative border border-white/25 text-white p-2 rounded-full hover:bg-white/10 transition-colors flex items-center justify-center"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
-            <Link
-              to="/login"
-              className="border border-white text-white px-8 py-2.5 rounded-full text-lg font-medium hover:bg-white hover:text-black transition-colors"
-            >
-              Login
-            </Link>
-          </div>
-        )}
+
+        </div>
       </div>
+
+      {/* Menú Móvil Desplegable */}
+      {mobileMenuOpen && (
+        <div className="md:hidden mt-4 rounded-3xl border border-white/10 bg-gray-950/95 backdrop-blur-xl p-5 shadow-2xl shadow-black/40">
+          <div className="space-y-3">
+            {navLinks.map(({ to, label }) => {
+              const isActive = location.pathname === to;
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`block rounded-2xl px-4 py-3 text-base font-medium transition ${isActive ? 'bg-white/10 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="mt-5 border-t border-white/10 pt-5 space-y-3">
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/perfil"
+                  className="block rounded-2xl px-4 py-3 text-base font-medium text-white/80 hover:bg-white/10 hover:text-white"
+                >
+                  {user?.nombre || user?.email}
+                </Link>
+                <button
+                  onClick={logout}
+                  className="w-full rounded-2xl bg-red-600 px-4 py-3 text-sm font-semibold text-white hover:bg-red-700 transition"
+                >
+                  Cerrar sesión
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="block rounded-2xl bg-white px-4 py-3 text-center text-sm font-semibold text-black hover:bg-gray-200 transition"
+              >
+                Login
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

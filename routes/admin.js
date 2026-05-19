@@ -195,6 +195,118 @@ router.get('/exercises', async (req, res) => {
   }
 });
 
+router.get('/trainers', async (req, res) => {
+  try {
+    const [trainers] = await db.query(`
+      SELECT u.id_usuario, u.nombre, u.apellidos, u.email,
+             COUNT(ec.id_cliente) AS clientsCount
+      FROM usuarios u
+      LEFT JOIN entrenador_cliente ec ON u.id_usuario = ec.id_entrenador AND ec.estado = 'activo'
+      WHERE u.id_rol = 4
+      GROUP BY u.id_usuario
+      ORDER BY clientsCount DESC, u.nombre ASC
+    `);
+    res.json(trainers);
+  } catch (error) {
+    console.error('Error al obtener entrenadores admin:', error);
+    res.status(500).json({ error: 'Error al obtener entrenadores' });
+  }
+});
+
+router.get('/trainers/:id/clients', async (req, res) => {
+  try {
+    const trainerId = parseInt(req.params.id, 10);
+    if (!trainerId) {
+      return res.status(400).json({ error: 'ID de entrenador inválido' });
+    }
+
+    const [clients] = await db.query(`
+      SELECT u.id_usuario, u.nombre, u.apellidos, u.email, u.peso, u.objetivo, ec.fecha_asignacion
+      FROM usuarios u
+      JOIN entrenador_cliente ec ON u.id_usuario = ec.id_cliente
+      WHERE ec.id_entrenador = ? AND ec.estado = 'activo'
+      ORDER BY ec.fecha_asignacion DESC
+    `, [trainerId]);
+
+    res.json(clients);
+  } catch (error) {
+    console.error('Error al obtener clientes del entrenador:', error);
+    res.status(500).json({ error: 'Error al obtener clientes' });
+  }
+});
+
+router.put('/trainers/:id_cliente/unassign', async (req, res) => {
+  try {
+    const clienteId = parseInt(req.params.id_cliente, 10);
+    if (!clienteId) {
+      return res.status(400).json({ error: 'ID de cliente inválido' });
+    }
+
+    const [result] = await db.query(`
+      UPDATE entrenador_cliente
+      SET estado = 'inactivo'
+      WHERE id_cliente = ? AND estado = 'activo'
+    `, [clienteId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'No se encontró una asignación activa para este cliente' });
+    }
+
+    res.json({ message: 'Cliente desasignado del entrenador' });
+  } catch (error) {
+    console.error('Error al desasignar cliente:', error);
+    res.status(500).json({ error: 'Error al desasignar cliente' });
+  }
+});
+
+router.get('/unassigned-clients', async (req, res) => {
+  try {
+    const [clients] = await db.query(`
+      SELECT u.id_usuario, u.nombre, u.apellidos, u.email
+      FROM usuarios u
+      LEFT JOIN entrenador_cliente ec ON u.id_usuario = ec.id_cliente AND ec.estado = 'activo'
+      WHERE u.id_rol = 2 AND ec.id_cliente IS NULL
+      ORDER BY u.nombre ASC
+    `);
+    res.json(clients);
+  } catch (error) {
+    console.error('Error al obtener clientes sin entrenador:', error);
+    res.status(500).json({ error: 'Error al obtener clientes' });
+  }
+});
+
+router.post('/trainers/:id_entrenador/assign/:id_cliente', async (req, res) => {
+  try {
+    const idEntrenador = parseInt(req.params.id_entrenador, 10);
+    const idCliente = parseInt(req.params.id_cliente, 10);
+
+    if (!idEntrenador || !idCliente) {
+      return res.status(400).json({ error: 'IDs inválidos' });
+    }
+
+    // Inactivar asignaciones previas si las hubiera
+    await db.query(`
+      UPDATE entrenador_cliente
+      SET estado = 'inactivo'
+      WHERE id_cliente = ? AND estado = 'activo'
+    `, [idCliente]);
+
+    // Crear nueva asignación o reactivar una existente
+    await db.query(`
+      INSERT INTO entrenador_cliente (id_entrenador, id_cliente, fecha_asignacion, estado)
+      VALUES (?, ?, NOW(), 'activo')
+      ON DUPLICATE KEY UPDATE 
+        estado = 'activo', 
+        fecha_asignacion = NOW()
+    `, [idEntrenador, idCliente]);
+
+    res.json({ message: 'Cliente asignado correctamente' });
+  } catch (error) {
+    console.error('Error al asignar cliente:', error);
+    res.status(500).json({ error: 'Error al asignar cliente' });
+  }
+});
+
 router.post('/exercises', async (req, res) => {
   try {
     const id = await Exercise.create(req.body);
