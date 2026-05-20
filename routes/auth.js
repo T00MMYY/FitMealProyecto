@@ -6,9 +6,9 @@ const AuthController = require('../controllers/authController');
 const User = require('../models/User');
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 60 * 1000, // 1 minute
   max: 10,
-  message: { error: 'Demasiados intentos. Por favor espera 15 minutos.' },
+  message: { error: 'Demasiados intentos. Por favor espera 1 minuto.' },
   standardHeaders: true,
   legacyHeaders: false
 });
