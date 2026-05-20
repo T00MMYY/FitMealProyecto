@@ -25,7 +25,7 @@ function CartButton({ cartCount, onClick }) {
 }
 
 export default function Navbar() {
-  const { user, token, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const { cartCount } = useCart();
   const location = useLocation();
   const [hasTrainer, setHasTrainer] = useState(false);
@@ -37,7 +37,7 @@ export default function Navbar() {
   // Obtener si el usuario tiene entrenador asignado
   useEffect(() => {
     const fetchTrainerStatus = async () => {
-      if (!isAuthenticated || !token) {
+      if (!isAuthenticated) {
         setHasTrainer(false);
         return;
       }
@@ -58,7 +58,7 @@ export default function Navbar() {
       }
     };
     fetchTrainerStatus();
-  }, [isAuthenticated, token, user]);
+  }, [isAuthenticated, user]);
 
   if (hideNav) return null;
 

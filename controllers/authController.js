@@ -69,8 +69,7 @@ class AuthController {
       console.log('✨ Registro exitoso');
       res.status(201).json({
         message: 'Usuario registrado con éxito',
-        user: newUser,
-        token
+        user: newUser
       });
     } catch (error) {
       console.error('❌ Error en registro:', error.message);
@@ -132,8 +131,7 @@ class AuthController {
 
       res.json({
         message: 'Login exitoso',
-        user,
-        token
+        user
       });
     } catch (error) {
       console.error('Error en login:', error);

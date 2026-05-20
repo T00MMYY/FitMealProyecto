@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -27,13 +27,13 @@ import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import Contact from "./pages/Contact";
 import EntrenadorDashboard from "./pages/entrenador/EntrenadorDashboard";
 
-function App() {
+function AppContent() {
+  const { user } = useAuth();
+  const cartOwner = String(user?.id_usuario ?? user?.id ?? 'guest');
+
   return (
-    <>
-      <BrowserRouter>
-        <CartProvider>
-          <AuthProvider>
-            <div className="min-h-screen">
+    <CartProvider key={cartOwner} cartOwner={cartOwner}>
+      <div className="min-h-screen">
               <Navbar />
               <Routes>
                 <Route path="/" element={<Home />} />
@@ -110,9 +110,18 @@ function App() {
                   }
                 />
               </Routes>
-            </div>
-          </AuthProvider>
-        </CartProvider>
+      </div>
+    </CartProvider>
+  );
+}
+
+function App() {
+  return (
+    <>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
       </BrowserRouter>
       <Toaster />
     </>

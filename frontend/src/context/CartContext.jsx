@@ -2,22 +2,40 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const CartContext = createContext();
+const LEGACY_CART_KEY = 'fitmeal_cart';
 
-export function CartProvider({ children }) {
-  // Carga el carrito guardado en localStorage al arrancar
-  const [cartItems, setCartItems] = useState(() => {
-    try {
-      const saved = localStorage.getItem('fitmeal_cart');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
+function readCart(cartStorageKey) {
+  try {
+    const saved = localStorage.getItem(cartStorageKey);
+    if (saved) {
+      return JSON.parse(saved);
     }
-  });
+
+    if (cartStorageKey === 'fitmeal_cart_guest') {
+      const legacyCart = localStorage.getItem(LEGACY_CART_KEY);
+      return legacyCart ? JSON.parse(legacyCart) : [];
+    }
+  } catch {
+    return [];
+  }
+
+  return [];
+}
+
+export function CartProvider({ cartOwner = 'guest', children }) {
+  const cartStorageKey = `fitmeal_cart_${cartOwner}`;
+
+  // Carga el carrito guardado en localStorage al arrancar
+  const [cartItems, setCartItems] = useState(() => readCart(cartStorageKey));
 
   // Guarda el carrito en localStorage cada vez que cambia
   useEffect(() => {
-    localStorage.setItem('fitmeal_cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+    localStorage.setItem(cartStorageKey, JSON.stringify(cartItems));
+
+    if (cartStorageKey === 'fitmeal_cart_guest') {
+      localStorage.removeItem(LEGACY_CART_KEY);
+    }
+  }, [cartItems, cartStorageKey]);
 
   // Añade un producto al carrito.
   // Si ya existe (mismo id y talla), suma la cantidad en vez de duplicarlo.
