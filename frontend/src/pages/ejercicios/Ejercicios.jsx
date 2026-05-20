@@ -41,6 +41,7 @@ export default function Ejercicios() {
 
     // Cargar historial de progreso
     fetchProgress();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchProgress = () => {
@@ -60,7 +61,7 @@ export default function Ejercicios() {
         setIsFavorite(true);
         toast.success("Ejercicio añadido a favoritos");
       }
-    } catch (error) {
+    } catch {
       toast.error("Error al actualizar favoritos");
     }
   };
@@ -71,7 +72,7 @@ export default function Ejercicios() {
       toast.error("Debes ingresar el peso");
       return;
     }
-    
+
     setIsSubmittingProgress(true);
     try {
       await api.post('/api/progress-exercises', {
@@ -82,8 +83,8 @@ export default function Ejercicios() {
       toast.success("Progreso registrado");
       setPeso("");
       setRepeticiones("");
-      fetchProgress(); // Recargar historial
-    } catch (error) {
+      fetchProgress();
+    } catch {
       toast.error("Error al registrar progreso");
     } finally {
       setIsSubmittingProgress(false);
@@ -96,7 +97,7 @@ export default function Ejercicios() {
       await api.delete(`/api/progress-exercises/${id_progreso}`);
       toast.success("Registro eliminado");
       fetchProgress();
-    } catch (error) {
+    } catch {
       toast.error("Error al eliminar registro");
     }
   };
@@ -145,12 +146,18 @@ export default function Ejercicios() {
                 />
               ) : (
                 <>
-                  <img 
-                    src={exercise.imagen || 'https://via.placeholder.com/800x600/121212/ffffff?text=Sin+Imagen'} 
-                    alt={exercise.titulo} 
-                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
+                  <img
+                    src={exercise.imagen || 'https://via.placeholder.com/800x600/121212/ffffff?text=Sin+Imagen'}
+                    alt={exercise.titulo}
+                    className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-0 transition-opacity duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent pointer-events-none"></div>
+                  <img
+                    src={exercise.imagen ? exercise.imagen.replace('/0.jpg', '/1.jpg') : ''}
+                    alt={exercise.titulo}
+                    className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-90 transition-opacity duration-700"
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent pointer-events-none z-10"></div>
                 </>
               )}
               

@@ -94,6 +94,7 @@ export default function Workouts() {
   const rutaModelo = genero === "masculino" ? "/glbs/hombre3D.glb" : "/glbs/mujer3D.glb";
 
   const handleSelect = (parte) => {
+    if (parte === seleccionado && !verFavoritos) return;
     setVerFavoritos(false);
     setCargando(true);
     setSeleccionado(parte);
@@ -114,7 +115,6 @@ export default function Workouts() {
 
   useEffect(() => {
     if (seleccionado && !verFavoritos && seleccionado !== "TUS FAVORITOS") {
-      setCargando(true);
       api.get(`/api/exercises/${seleccionado}`)
         .then((res) => setEjercicios(res.data))
         .catch((err) => {
@@ -220,9 +220,19 @@ export default function Workouts() {
                     {ejercicios.length > 0 ? (
                       ejercicios.map((ex) => (
                         <Link to={`/ejercicios/${ex.id}`} key={ex.id} className="group block bg-[#141414] rounded-2xl overflow-hidden border border-white/5 hover:border-primary/40 transition-all duration-500">
-                          <div className="h-44 bg-zinc-900 relative">
-                            <img src={ex.imagen || `https://via.placeholder.com/500x300?text=${ex.titulo}`} className="w-full h-full object-cover opacity-40 group-hover:opacity-100 transition-all" alt={ex.titulo} />
-                            <span className="absolute top-4 right-4 bg-black/80 px-3 py-1 rounded-full text-[9px] font-black uppercase italic">
+                          <div className="h-44 bg-zinc-900 relative overflow-hidden">
+                            <img
+                              src={ex.imagen || `https://via.placeholder.com/500x300?text=${ex.titulo}`}
+                              className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-0 transition-opacity duration-700"
+                              alt={ex.titulo}
+                            />
+                            <img
+                              src={ex.imagen ? ex.imagen.replace('/0.jpg', '/1.jpg') : ''}
+                              className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-90 transition-opacity duration-1800"
+                              alt={ex.titulo}
+                              onError={(e) => { e.target.style.display = 'none'; }}
+                            />
+                            <span className="absolute top-4 right-4 bg-black/80 px-3 py-1 rounded-full text-[9px] font-black uppercase italic z-10">
                               {ex.dificultad}
                             </span>
                           </div>

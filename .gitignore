@@ -31,3 +31,7 @@ PENDIENTE.md
 
 
 .env.production
+
+# Dataset de ejercicios (free-exercise-db) — descargar con scripts/fetch-exercises-dataset.sh
+compartido/exercises/
+compartido/exercises.json

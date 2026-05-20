@@ -21,12 +21,24 @@ cp .env.example .env
 # Editar .env con tus credenciales locales
 ```
 
-### 4. Levantar contenedores Docker
+### 4. Descargar dataset de ejercicios
+```bash
+bash scripts/fetch-exercises-dataset.sh
+```
+Descarga ~800 ejercicios con imágenes JPG de [free-exercise-db](https://github.com/yuhonas/free-exercise-db) a `compartido/exercises/`. No se sube a git por peso (~30 MB).
+
+### 5. Levantar contenedores Docker
 ```bash
 docker compose up -d --build
 ```
 
-### 5. Verificar que todo funciona
+### 6. Poblar ejercicios en la BD
+```bash
+node migrate_ejercicios.js
+```
+Vacía y repuebla la tabla `ejercicios` con los ~800 del dataset. Las imágenes se sirven automáticamente desde `http://localhost/exercises/`.
+
+### 7. Verificar que todo funciona
 - API: http://localhost:3000
 - Swagger Docs: http://localhost:3000/api-docs
 - phpMyAdmin: http://localhost:8080

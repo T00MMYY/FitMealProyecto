@@ -391,6 +391,351 @@ paths:
           description: Plan no encontrado
         "500":
           description: Error al eliminar plan
+  /api/exercises:
+    get:
+      tags:
+      - Ejercicios
+      summary: Obtener todos los ejercicios
+      responses:
+        "200":
+          description: Lista de ejercicios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ejercicio"
+        "500":
+          description: Error del servidor
+
+  /api/exercises/detail/{id}:
+    get:
+      tags:
+      - Ejercicios
+      summary: Obtener ejercicio por ID
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Ejercicio encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ejercicio"
+        "404":
+          description: Ejercicio no encontrado
+        "500":
+          description: Error del servidor
+
+  /api/exercises/{muscleName}:
+    get:
+      tags:
+      - Ejercicios
+      summary: Obtener ejercicios filtrados por músculo
+      parameters:
+      - name: muscleName
+        in: path
+        required: true
+        schema:
+          type: string
+        example: PECHO
+      responses:
+        "200":
+          description: Ejercicios del músculo indicado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ejercicio"
+        "500":
+          description: Error del servidor
+
+  /api/routines:
+    get:
+      tags:
+      - Rutinas
+      summary: Obtener rutinas del usuario autenticado (con sus ejercicios)
+      security:
+      - BearerAuth: []
+      responses:
+        "200":
+          description: Lista de rutinas con ejercicios incluidos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RutinaConEjercicios"
+        "401":
+          description: Token inválido o ausente
+        "500":
+          description: Error del servidor
+    post:
+      tags:
+      - Rutinas
+      summary: Crear una nueva rutina
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RutinaCreate"
+      responses:
+        "201":
+          description: Rutina creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rutina"
+        "400":
+          description: Nombre requerido
+        "401":
+          description: Token inválido o ausente
+        "500":
+          description: Error del servidor
+
+  /api/routines/{id}:
+    get:
+      tags:
+      - Rutinas
+      summary: Obtener rutina por ID (solo del usuario autenticado)
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Rutina con ejercicios
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RutinaConEjercicios"
+        "404":
+          description: Rutina no encontrada
+        "401":
+          description: Token inválido o ausente
+        "500":
+          description: Error del servidor
+    delete:
+      tags:
+      - Rutinas
+      summary: Eliminar una rutina
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Rutina eliminada
+        "401":
+          description: Token inválido o ausente
+        "500":
+          description: Error del servidor
+
+  /api/routines/{id}/exercises:
+    post:
+      tags:
+      - Rutinas
+      summary: Añadir ejercicio a una rutina
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: ID de la rutina
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RutinaEjercicioCreate"
+      responses:
+        "201":
+          description: Ejercicio añadido a la rutina
+        "403":
+          description: No tienes permiso sobre esta rutina
+        "401":
+          description: Token inválido o ausente
+        "500":
+          description: Error del servidor
+
+  /api/routines/exercise/{id}:
+    delete:
+      tags:
+      - Rutinas
+      summary: Eliminar un ejercicio de una rutina
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: ID del registro en rutina_ejercicios
+      responses:
+        "200":
+          description: Ejercicio eliminado de la rutina
+        "403":
+          description: No tienes permiso
+        "401":
+          description: Token inválido o ausente
+        "500":
+          description: Error del servidor
+
+  /api/favorites-exercises:
+    get:
+      tags:
+      - Favoritos Ejercicios
+      summary: Obtener ejercicios favoritos del usuario
+      security:
+      - BearerAuth: []
+      responses:
+        "200":
+          description: Lista de ejercicios favoritos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ejercicio"
+        "401":
+          description: Token inválido o ausente
+        "500":
+          description: Error del servidor
+    post:
+      tags:
+      - Favoritos Ejercicios
+      summary: Añadir ejercicio a favoritos
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - id_ejercicio
+              properties:
+                id_ejercicio:
+                  type: integer
+      responses:
+        "201":
+          description: Ejercicio añadido a favoritos
+        "401":
+          description: Token inválido o ausente
+        "500":
+          description: Error del servidor
+
+  /api/favorites-exercises/{id_ejercicio}:
+    delete:
+      tags:
+      - Favoritos Ejercicios
+      summary: Eliminar ejercicio de favoritos
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: id_ejercicio
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Ejercicio eliminado de favoritos
+        "401":
+          description: Token inválido o ausente
+        "500":
+          description: Error del servidor
+
+  /api/progress-exercises:
+    post:
+      tags:
+      - Progreso Ejercicios
+      summary: Registrar progreso en un ejercicio
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProgresoCreate"
+      responses:
+        "201":
+          description: Progreso registrado
+        "401":
+          description: Token inválido o ausente
+        "500":
+          description: Error del servidor
+
+  /api/progress-exercises/{id_ejercicio}:
+    get:
+      tags:
+      - Progreso Ejercicios
+      summary: Obtener historial de progreso de un ejercicio
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: id_ejercicio
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Historial de progreso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Progreso"
+        "401":
+          description: Token inválido o ausente
+        "500":
+          description: Error del servidor
+
+  /api/progress-exercises/{id_progreso}:
+    delete:
+      tags:
+      - Progreso Ejercicios
+      summary: Eliminar registro de progreso
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: id_progreso
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Progreso eliminado
+        "401":
+          description: Token inválido o ausente
+        "500":
+          description: Error del servidor
+
 components:
   schemas:
     RegisterRequest:
@@ -711,6 +1056,158 @@ components:
       properties:
         plan:
           $ref: "#/components/schemas/Plan"
+    Ejercicio:
+      type: object
+      properties:
+        id:
+          type: integer
+        titulo:
+          type: string
+        musculo_id:
+          type: integer
+        dificultad:
+          type: string
+          enum: [Baja, Media, Alta]
+        descripcion:
+          type: string
+        imagen:
+          type: string
+          example: /exercises/Air_Bike/0.jpg
+        tipo:
+          type: string
+          example: Fuerza / Hipertrofia
+        puntos_clave:
+          type: string
+
+    Rutina:
+      type: object
+      properties:
+        id:
+          type: integer
+        id_usuario:
+          type: integer
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        dias_semana:
+          type: string
+        nivel:
+          type: string
+          enum: [Baja, Media, Alta]
+        created_at:
+          type: string
+          format: date-time
+
+    RutinaConEjercicios:
+      allOf:
+      - $ref: "#/components/schemas/Rutina"
+      - type: object
+        properties:
+          ejercicios:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                id_rutina:
+                  type: integer
+                id_ejercicio:
+                  type: integer
+                series:
+                  type: integer
+                repeticiones:
+                  type: string
+                peso_objetivo:
+                  type: number
+                descanso_segundos:
+                  type: integer
+                orden:
+                  type: integer
+                titulo:
+                  type: string
+                imagen:
+                  type: string
+                tipo:
+                  type: string
+
+    RutinaCreate:
+      required:
+      - nombre
+      type: object
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        dias_semana:
+          type: string
+          example: Lunes, Miércoles, Viernes
+        nivel:
+          type: string
+          enum: [Baja, Media, Alta]
+          default: Media
+
+    RutinaEjercicioCreate:
+      required:
+      - id_ejercicio
+      type: object
+      properties:
+        id_ejercicio:
+          type: integer
+        series:
+          type: integer
+          default: 3
+        repeticiones:
+          type: string
+          default: 10-12
+        peso_objetivo:
+          type: number
+        descanso_segundos:
+          type: integer
+          default: 60
+        orden:
+          type: integer
+          default: 0
+
+    Progreso:
+      type: object
+      properties:
+        id:
+          type: integer
+        id_usuario:
+          type: integer
+        id_ejercicio:
+          type: integer
+        fecha:
+          type: string
+          format: date
+        series:
+          type: integer
+        repeticiones:
+          type: integer
+        peso:
+          type: number
+        notas:
+          type: string
+
+    ProgresoCreate:
+      required:
+      - id_ejercicio
+      type: object
+      properties:
+        id_ejercicio:
+          type: integer
+        series:
+          type: integer
+        repeticiones:
+          type: integer
+        peso:
+          type: number
+        notas:
+          type: string
+
   securitySchemes:
     BearerAuth:
       type: http

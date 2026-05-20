@@ -2,9 +2,16 @@
 
 ---
 
+## ⏳ Pendiente (futuro)
+
+- [ ] **Traducción ES del catálogo de ejercicios** — los ~800 ejercicios importados de free-exercise-db están en inglés (`titulo`, `descripcion`, `puntos_clave`). Plan: script `scripts/translate-exercises.js` usando Gemini Flash (ya integrado en el proyecto). Añadir columnas `titulo_en`, `descripcion_en` y rellenar las actuales con el español. Coste estimado ~0€ con tier gratuito, ~1h de ejecución en batches de 20.
+
+---
+
 ## API
 
 - [x] Swagger accesible en `http://localhost:3000/api-docs`
+- [x] Swagger actualizado con 4 grupos nuevos: **Ejercicios** (`/api/exercises`), **Rutinas** (`/api/routines`), **Favoritos Ejercicios** (`/api/favorites-exercises`), **Progreso Ejercicios** (`/api/progress-exercises`) — con schemas, parámetros y seguridad JWT correctos.
 - [x] Rutas de autenticación correctas: solo Google OAuth + registro/login normal (GitHub eliminado)
 - [x] Registro y login funcional contra BD — tokens JWT generan `{id_usuario, id_rol, plan}` correctamente
 - [x] `requireRole` corregido para tolerar tokens legacy (`id_rol ?? rol`)
@@ -15,6 +22,8 @@
 
 - [x] Contenedor `fitmeal-api` reconstruido — estaba 5 semanas desactualizado (tokens usaban `{id, rol}` en vez de `{id_usuario, id_rol}`)
 - [x] Volumen Docker `./uploads:/app/uploads` añadido en `docker-compose.yml` — las fotos de perfil ahora persisten entre reconstrucciones del contenedor
+- [x] Volumen `./compartido/exercises:/usr/share/nginx/exercises:ro` añadido a `fitmeal-nginx` — las imágenes del dataset se sirven en `/exercises/` sin contenedor extra
+- [x] `nginx.conf` — bloque `location /exercises/` con `alias /usr/share/nginx/exercises/` y cache 1 año (`Cache-Control: public, immutable`). Nota: montado fuera de `/usr/share/nginx/html` porque ese dir es read-only.
 
 ---
 
@@ -46,6 +55,12 @@
 
 ### Backup
 - [x] `compartido/fitness_platform_backup.sql` regenerado con el estado actual — encoding limpio (utf8mb4), 19 tablas, sin caracteres corruptos. Tus compañeros deben importar este archivo para tener la BD sincronizada.
+
+### Dataset de ejercicios (free-exercise-db)
+- [x] `scripts/fetch-exercises-dataset.sh` — clona [free-exercise-db](https://github.com/yuhonas/free-exercise-db) y copia las imágenes JPG a `compartido/exercises/` (~102 MB, 1746 imágenes). Idempotente, pregunta antes de sobrescribir.
+- [x] `migrate_ejercicios.js` — TRUNCATE + repoblación limpia de `ejercicios` con 873 entradas. Mapeo automático a `musculos` (ids 1–22), `dificultad` (Baja/Media/Alta) y `tipo`. Verifica que `compartido/exercises.json` exista antes de ejecutar.
+- [x] `compartido/exercises/` y `compartido/exercises.json` añadidos a `.gitignore` — el dataset no se versiona por peso (~102 MB).
+- [x] `update-fitmeal.sh` actualizado — descarga y migra el dataset automáticamente en el RPi si la carpeta no existe.
 
 ---
 
