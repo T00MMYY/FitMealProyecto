@@ -43,7 +43,7 @@ const requireRole = (...roles) => {
       return res.status(403).json({ error: 'Token no proporcionado' });
     }
 
-    if (!roles.map(Number).includes(Number(req.user.id_rol))) {
+    if (!roles.map(Number).includes(Number(req.user.id_rol ?? req.user.rol))) {
       return res.status(403).json({ error: 'No tienes permisos para realizar esta acción' });
     }
 
@@ -51,22 +51,25 @@ const requireRole = (...roles) => {
   };
 };
 
-// Middleware para verificar plan premium
-const requirePremium = async (req, res, next) => {
+// Middleware para verificar plan del usuario
+// Uso: requirePlan('avanzado', 'experto') — acepta uno o más planes válidos
+const requirePlan = (...plans) => async (req, res, next) => {
   if (!req.user) {
     return res.status(403).json({ error: 'Token no proporcionado' });
   }
-
   try {
-    const user = await User.findById(req.user.id_usuario);
-    if (!user || user.plan !== 'premium') {
-      return res.status(403).json({ error: 'Esta función requiere un plan premium' });
+    const user = await User.findById(req.user.id_usuario ?? req.user.id);
+    if (!user || !plans.includes(user.plan)) {
+      return res.status(403).json({ error: `Esta función requiere el plan: ${plans.join(' o ')}` });
     }
     next();
   } catch (error) {
     return res.status(500).json({ error: 'Error al verificar plan' });
   }
 };
+
+// Alias para compatibilidad con código existente
+const requirePremium = requirePlan('avanzado', 'experto');
 
 const COOKIE_CONFIG = {
   httpOnly: true,
@@ -76,4 +79,4 @@ const COOKIE_CONFIG = {
   maxAge: 24 * 60 * 60 * 1000
 };
 
-module.exports = { verifyToken, generateToken, requireRole, requirePremium, COOKIE_CONFIG };
+module.exports = { verifyToken, generateToken, requireRole, requirePlan, requirePremium, COOKIE_CONFIG };

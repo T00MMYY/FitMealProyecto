@@ -115,6 +115,10 @@ app.use('/api/admin', adminRouter);
 const contactRouter = require('./routes/contact');
 app.use('/api/contact', contactRouter);
 
+// Rutas de IA (Gemini)
+const aiRouter = require('./routes/ai');
+app.use('/api/ai', aiRouter);
+
 // ============================================
 // MANEJO DE ERRORES
 // ============================================
@@ -122,7 +126,10 @@ app.use('/api/contact', contactRouter);
 // Manejo de errores global
 app.use((err, req, res, next) => {
   console.error('Error:', err);
-  const response = { error: 'Error interno del servidor', stack: err.stack, details: err.message };
+  const response = {
+    error: 'Error interno del servidor',
+    ...(process.env.NODE_ENV !== 'production' && { details: err.message, stack: err.stack })
+  };
   res.status(err.status || 500).json(response);
 });
 

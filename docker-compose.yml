@@ -1,5 +1,3 @@
-version: '3.8'
-
 name: FitMeal
 
 services:
@@ -53,6 +51,8 @@ services:
       DB_HOST: fitmeal-db
       DB_PORT: 3306
       NODE_ENV: production
+    volumes:
+      - ./uploads:/app/uploads
     depends_on:
       fitmeal-db:
         condition: service_healthy

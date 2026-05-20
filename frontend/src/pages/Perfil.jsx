@@ -78,7 +78,7 @@ export default function Perfil() {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      setUserData(prev => ({ ...prev, foto_url: response.data.foto_url }));
+      setUserData(prev => ({ ...prev, foto_perfil: response.data.foto_perfil }));
       toast.success("Foto actualizada correctamente");
     } catch (error) {
       console.error("Error al subir la foto:", error);
@@ -121,8 +121,8 @@ export default function Perfil() {
               onClick={() => !uploading && fileInputRef.current.click()}
             >
               <div className="w-32 h-32 rounded-[2rem] bg-[#1a1a1a] flex items-center justify-center text-5xl font-black italic border border-white/10 shadow-2xl overflow-hidden relative">
-                {displayUser?.foto_url ? (
-                  <img src={displayUser.foto_url.startsWith('http') ? displayUser.foto_url : `${SERVER_URL}${displayUser.foto_url}`} alt="Profile" className="w-full h-full object-cover" />
+                {displayUser?.foto_perfil ? (
+                  <img src={displayUser.foto_perfil.startsWith('http') ? displayUser.foto_perfil : `${SERVER_URL}${displayUser.foto_perfil}`} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
                   <>
                     <div className="absolute inset-0 bg-gradient-to-br from-red-600/20 to-red-900/40 opacity-50"></div>
@@ -182,13 +182,22 @@ export default function Perfil() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-sm font-black uppercase tracking-tighter text-white/80">Plan Actual</h3>
-                    <p className={`text-lg font-bold ${displayUser?.plan === 'premium' ? 'text-yellow-400' : 'text-green-400'}`}>
-                      {displayUser?.plan === 'premium' ? 'Premium ' : 'Básico '}
+                    <p className={`text-lg font-bold ${
+                      displayUser?.plan === 'experto' ? 'text-yellow-400' :
+                      displayUser?.plan === 'avanzado' ? 'text-blue-400' : 'text-green-400'
+                    }`}>
+                      {displayUser?.plan === 'experto' ? 'Experto' :
+                       displayUser?.plan === 'avanzado' ? 'Avanzado' : 'Básico'}
                     </p>
                   </div>
                   {displayUser?.plan === 'basic' && (
+                    <button className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors text-xs uppercase tracking-wider">
+                      Upgrade a Avanzado
+                    </button>
+                  )}
+                  {displayUser?.plan === 'avanzado' && (
                     <button className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-black font-bold rounded-lg transition-colors text-xs uppercase tracking-wider">
-                      Upgrade a Premium
+                      Upgrade a Experto
                     </button>
                   )}
                 </div>
@@ -198,8 +207,8 @@ export default function Perfil() {
               {trainer && (
                 <div className="mt-4 p-4 bg-white/5 rounded-2xl border border-red-600/30 flex items-center gap-4 hover:border-red-600/60 transition-colors">
                   <div className="w-14 h-14 rounded-full bg-black/50 overflow-hidden border-2 border-red-600/50 flex-shrink-0">
-                    {trainer.foto_url ? (
-                      <img src={trainer.foto_url.startsWith('http') ? trainer.foto_url : `${SERVER_URL}${trainer.foto_url}`} alt="Entrenador" className="w-full h-full object-cover" />
+                    {trainer.foto_perfil ? (
+                      <img src={trainer.foto_perfil.startsWith('http') ? trainer.foto_perfil : `${SERVER_URL}${trainer.foto_perfil}`} alt="Entrenador" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-xl font-black text-red-600 italic">{trainer.nombre.charAt(0)}</div>
                     )}

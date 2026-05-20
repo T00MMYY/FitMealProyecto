@@ -59,7 +59,8 @@ class AuthController {
       const token = generateToken({
         id_usuario: newUser.id_usuario,
         email: newUser.email,
-        id_rol: newUser.id_rol
+        id_rol: newUser.id_rol,
+        plan: newUser.plan
       });
 
       // Set httpOnly cookie
@@ -119,7 +120,8 @@ class AuthController {
       const token = generateToken({
         id_usuario: user.id_usuario,
         email: user.email,
-        id_rol: user.id_rol
+        id_rol: user.id_rol,
+        plan: user.plan
       });
 
       // Eliminar el hash del password de la respuesta

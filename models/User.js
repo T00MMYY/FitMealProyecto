@@ -69,7 +69,7 @@ class User {
       'id_rol', 'estado_cuenta', 'ultimo_acceso', 'password_hash',
       'peso', 'altura', 'genero', 'nivel_actividad', 'experiencia',
       'lugar_entrenamiento', 'objetivo', 'preferencia_alimentaria', 
-      'tiempo_cocinar', 'onboarding_completado', 'foto_url', 'plan'
+      'tiempo_cocinar', 'onboarding_completado', 'foto_perfil', 'plan'
     ];
     const fields = [];
     const values = [];
