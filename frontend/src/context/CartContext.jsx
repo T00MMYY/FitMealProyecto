@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 const CartContext = createContext();
 const LEGACY_CART_KEY = 'fitmeal_cart';
@@ -24,9 +24,36 @@ function readCart(cartStorageKey) {
 
 export function CartProvider({ cartOwner = 'guest', children }) {
   const cartStorageKey = `fitmeal_cart_${cartOwner}`;
+  const prevKeyRef = useRef(cartStorageKey);
 
   // Carga el carrito guardado en localStorage al arrancar
   const [cartItems, setCartItems] = useState(() => readCart(cartStorageKey));
+
+  // Cuando el usuario hace login, migra el carrito guest al carrito del usuario
+  useEffect(() => {
+    const prevKey = prevKeyRef.current;
+    if (prevKey !== cartStorageKey) {
+      if (prevKey === 'fitmeal_cart_guest') {
+        const guestCart = readCart(prevKey);
+        if (guestCart.length > 0) {
+          setCartItems((prev) => {
+            const merged = [...prev];
+            for (const guestItem of guestCart) {
+              const exists = merged.find((p) => p.id === guestItem.id && p.formato === guestItem.formato);
+              if (exists) {
+                exists.cantidad += guestItem.cantidad;
+              } else {
+                merged.push(guestItem);
+              }
+            }
+            return merged;
+          });
+          localStorage.removeItem(prevKey);
+        }
+      }
+      prevKeyRef.current = cartStorageKey;
+    }
+  }, [cartStorageKey]);
 
   // Guarda el carrito en localStorage cada vez que cambia
   useEffect(() => {
@@ -41,14 +68,14 @@ export function CartProvider({ cartOwner = 'guest', children }) {
   // Si ya existe (mismo id y talla), suma la cantidad en vez de duplicarlo.
   const addToCart = (item) => {
     setCartItems((prev) => {
-      const yaExiste = prev.find((p) => p.id === item.id && p.talla === item.talla);
+      const yaExiste = prev.find((p) => p.id === item.id && p.formato === item.formato);
 
       if (!yaExiste) {
         return [...prev, item];
       }
 
       return prev.map((p) =>
-        p.id === item.id && p.talla === item.talla
+        p.id === item.id && p.formato === item.formato
           ? { ...p, cantidad: p.cantidad + item.cantidad }
           : p
       );
@@ -56,19 +83,19 @@ export function CartProvider({ cartOwner = 'guest', children }) {
   };
 
   // Cambia la cantidad de un producto (mínimo 1)
-  const updateCartItemQuantity = (id, talla, cantidad) => {
+  const updateCartItemQuantity = (id, formato, cantidad) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === id && item.talla === talla
+        item.id === id && item.formato === formato
           ? { ...item, cantidad: Math.max(1, cantidad) }
           : item
       )
     );
   };
 
-  // Elimina un producto del carrito por id y talla
-  const removeFromCart = (id, talla) => {
-    setCartItems((prev) => prev.filter((item) => !(item.id === id && item.talla === talla)));
+  // Elimina un producto del carrito por id y formato
+  const removeFromCart = (id, formato) => {
+    setCartItems((prev) => prev.filter((item) => !(item.id === id && item.formato === formato)));
   };
 
   // Vacía el carrito entero

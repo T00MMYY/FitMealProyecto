@@ -1,0 +1,22 @@
+SET NAMES utf8mb4;
+
+UPDATE productos SET descripcion = 'Suplemento de ácidos grasos Omega-3 ESN Total Kinetic Sport' WHERE id_producto = 1;
+UPDATE productos SET descripcion = 'Suplemento de Zinc ESN TKS para el sistema inmunológico' WHERE id_producto = 2;
+UPDATE productos SET descripcion = 'Melatonina ESN Total Kinetic Sport para mejorar el descanso' WHERE id_producto = 3;
+UPDATE productos SET descripcion = 'Suplemento vitamínico para la salud renal' WHERE id_producto = 4;
+UPDATE productos SET descripcion = 'Suplemento de Magnesio para músculos y sistema nervioso' WHERE id_producto = 5;
+UPDATE productos SET descripcion = 'Suplemento probiótico con proteína para la salud digestiva' WHERE id_producto = 6;
+UPDATE productos SET descripcion = 'Barrita proteica sabor café con whey protein' WHERE id_producto = 7;
+UPDATE productos SET descripcion = 'Barrita proteica sabor cacahuetes' WHERE id_producto = 8;
+UPDATE productos SET descripcion = 'Barrita proteica sabor avellanas' WHERE id_producto = 9;
+UPDATE productos SET descripcion = 'Barrita proteica sabor stracciatella' WHERE id_producto = 10;
+UPDATE productos SET descripcion = 'Barrita proteica sabor coco' WHERE id_producto = 11;
+UPDATE productos SET descripcion = 'Barrita proteica sabor pistacho' WHERE id_producto = 12;
+UPDATE productos SET descripcion = 'Proteína en polvo sabor café con whey protein premium' WHERE id_producto = 13;
+UPDATE productos SET descripcion = 'Proteína en polvo sabor chocolate con whey protein premium' WHERE id_producto = 14;
+UPDATE productos SET descripcion = 'Proteína en polvo sabor vainilla con whey protein premium' WHERE id_producto = 15;
+UPDATE productos SET descripcion = 'Proteína en polvo sabor cacahuetes premium' WHERE id_producto = 16;
+UPDATE productos SET descripcion = 'Proteína en polvo sabor avellanas premium' WHERE id_producto = 17;
+UPDATE productos SET descripcion = 'Proteína en polvo sabor stracciatella premium' WHERE id_producto = 18;
+UPDATE productos SET descripcion = 'Proteína en polvo sabor coco premium' WHERE id_producto = 19;
+UPDATE productos SET descripcion = 'Proteína en polvo sabor pistacho premium' WHERE id_producto = 20;

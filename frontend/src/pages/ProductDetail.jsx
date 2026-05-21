@@ -1,60 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import api from '../api/axios';
 import { useCart } from '../context/CartContext';
-
-const IMAGENES = {
-  'Protein Whey Coffee': '/products/whey-coffee.png',
-  'Protein Whey Chocolate': '/products/whey-chocolate.jpg',
-  'Protein Whey Vanilla': '/products/whey-vanilla.png',
-  'Protein Cacahuetes': '/products/cacahuetes.png',
-  'Protein Avellanas': '/products/avellanas.jpg',
-  'Protein Stracciatella': '/products/stracciatella.png',
-  'Protein Coconut': '/products/coconut.png',
-  'Protein Pistacho': '/products/pistacho.png',
-  'Vitamina Omega-3': '/products/vitamina-omega3.jpg',
-  'Vitamina Zinc': '/products/vitamina-zinc.jpg',
-  'Melatonina': '/products/melatonina.jpg',
-  'Vitamina Kidney': '/products/vitamina-kidney.png',
-  'Vitamina Magnesium': '/products/vitamina-magnesium.png',
-  'Protein Probiotic+': '/products/protein-probiotic.jpg',
-  'Protein Whey Coffee Bar': '/products/bar-whey-coffee.jpg',
-  'Protein Cacahuetes Bar': '/products/bar-cacahuetes.png',
-  'Protein Avellanas Bar': '/products/bar-avellanas.jpg',
-  'Protein Stracciatella Bar': '/products/bar-stracciatella.jpg',
-  'Protein Coconut Bar': '/products/bar-coconut.png',
-  'Protein Pistacho Bar': '/products/bar-pistacho.png',
-};
-
-const OPCIONES_CATEGORIA = {
-  5: {
-    tieneSabor: true,
-    sabores: ['Chocolate', 'Vainilla', 'Fresa', 'Cookies & Cream', 'Natural', 'Caramelo'],
-    tallas: ['500g', '1kg', '2kg', '5kg'],
-    precios: { '500g': 24.99, '1kg': null, '2kg': 41.99, '5kg': 89.99 },
-    labelTallas: 'Cantidad',
-  },
-  6: {
-    tieneSabor: false,
-    sabores: [],
-    tallas: ['30 caps', '60 caps', '90 caps', '180 caps'],
-    precios: { '30 caps': 9.99, '60 caps': 17.99, '90 caps': 24.99, '180 caps': 44.99 },
-    labelTallas: 'Unidades',
-  },
-  7: {
-    tieneSabor: true,
-    sabores: ['Chocolate', 'Vainilla', 'Caramelo', 'Stracciatella', 'Coco'],
-    tallas: ['1 ud', 'Caja 6', 'Caja 12', 'Caja 24'],
-    precios: { '1 ud': 2.49, 'Caja 6': 13.99, 'Caja 12': 25.99, 'Caja 24': 47.99 },
-    labelTallas: 'Formato',
-  },
-};
+import { useAuth } from '../context/AuthContext';
+import { IMAGENES, OPCIONES_CATEGORIA } from '../constants/products';
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { user } = useAuth();
 
   const [producto, setProducto] = useState(null);
   const [cargando, setCargando] = useState(true);
@@ -63,6 +19,7 @@ export default function ProductDetail() {
   const [talla, setTalla] = useState('');
   const [cantidad, setCantidad] = useState(1);
   const [precioActual, setPrecioActual] = useState(null);
+  const [modalLogin, setModalLogin] = useState(false);
   const [esFavorito, setEsFavorito] = useState(() => {
     const favs = JSON.parse(localStorage.getItem('fitmeal_productos_favoritos') || '[]');
     return favs.includes(Number(id));
@@ -113,7 +70,8 @@ export default function ProductDetail() {
   }
 
   const opciones = OPCIONES_CATEGORIA[producto.id_categoria] || OPCIONES_CATEGORIA[5];
-  const imagen = producto.imagen_url || IMAGENES[producto.nombre_producto];
+  const imagenRaw = producto.imagen_url || IMAGENES[producto.nombre_producto];
+  const imagen = imagenRaw && !/^(https?:)?\//.test(imagenRaw) ? `/${imagenRaw}` : imagenRaw;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-primary selection:text-black relative overflow-hidden">
@@ -237,23 +195,6 @@ export default function ProductDetail() {
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.55 }}
-            className="relative overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-r from-primary/15 via-primary/8 to-transparent px-4 py-3.5"
-          >
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_left,rgba(211,15,21,0.18)_0%,transparent_60%)] pointer-events-none" />
-            <div className="relative flex flex-col gap-1">
-              <p className="text-[12px] font-black uppercase italic tracking-[0.2em] text-primary">
-                Hasta 60% de descuento
-              </p>
-              <p className="text-[9px] uppercase tracking-[0.3em] text-white/40 font-bold">
-                + 5% extra con código FITMEAL
-              </p>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.6 }}
             className="flex gap-1.5 items-center"
           >
@@ -356,25 +297,81 @@ export default function ProductDetail() {
             </div>
 
             <button
+              disabled={producto.stock === 0}
               onClick={() => {
+                if (producto.stock === 0) return;
+                if (!user) { setModalLogin(true); return; }
                 addToCart({
                   id: producto.id_producto,
                   nombre: producto.nombre_producto,
                   precio: precioActual ?? Number(producto.precio),
-                  talla,
+                  formato: talla,
                   cantidad,
                   imagen,
                 });
               }}
-              className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.25em] text-[12px] cursor-pointer transition-all duration-400 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(211,15,21,0.4)] active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg, #D30F15 0%, #a00b10 100%)', color: '#fff' }}
+              className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.25em] text-[12px] transition-all duration-400 active:scale-[0.98]"
+              style={{
+                background: producto.stock === 0 ? '#333' : 'linear-gradient(135deg, #D30F15 0%, #a00b10 100%)',
+                color: '#fff',
+                cursor: producto.stock === 0 ? 'not-allowed' : 'pointer',
+              }}
             >
-              Anadir al carrito
+              {producto.stock === 0 ? 'Agotado' : 'Añadir al carrito'}
             </button>
             <p className="text-[9px] text-white/15 text-center uppercase tracking-widest">Envio gratis a partir de 49 EUR</p>
           </motion.div>
         </motion.div>
       </div>
+
+      <AnimatePresence>
+        {modalLogin && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center px-4"
+            style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }}
+            onClick={() => setModalLogin(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 40, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-zinc-950 rounded-3xl p-8 max-w-sm w-full flex flex-col gap-5 text-center"
+              style={{ border: '1px solid #222' }}
+            >
+              <div className="text-4xl">🔒</div>
+              <h2 className="text-white font-black text-xl uppercase tracking-tight">Inicia sesión para comprar</h2>
+              <p className="text-white/40 text-sm leading-relaxed">
+                Necesitas una cuenta para añadir productos al carrito y completar tu pedido.
+              </p>
+              <button
+                onClick={() => navigate('/login', { state: { from: `/products/${id}` } })}
+                className="w-full py-3.5 rounded-2xl font-black uppercase tracking-widest text-[11px] cursor-pointer transition-all duration-300 hover:scale-[1.02]"
+                style={{ background: 'linear-gradient(135deg, #D30F15 0%, #a00b10 100%)', color: '#fff' }}
+              >
+                Iniciar sesión
+              </button>
+              <button
+                onClick={() => navigate('/register', { state: { from: `/products/${id}` } })}
+                className="w-full py-3.5 rounded-2xl font-black uppercase tracking-widest text-[11px] cursor-pointer transition-all duration-300 hover:bg-white/5"
+                style={{ border: '1px solid #333', color: 'rgba(255,255,255,0.5)' }}
+              >
+                Crear una cuenta
+              </button>
+              <button
+                onClick={() => setModalLogin(false)}
+                className="text-white/20 text-[10px] uppercase tracking-widest hover:text-white/40 transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

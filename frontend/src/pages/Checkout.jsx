@@ -124,6 +124,7 @@ export default function Checkout() {
   const total = cartSubtotal + shipping;
   const cardBrand = useMemo(() => getCardBrand(form.cardNumber), [form.cardNumber]);
 
+
   function updateField(field, value) {
     const formatters = {
       cardNumber: formatCardNumber,

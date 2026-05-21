@@ -51,12 +51,18 @@ class ProductController {
    */
   static async createProduct(req, res) {
     try {
-      const { nombre_producto, nombre, precio } = req.body;
+      const { nombre_producto, precio, stock } = req.body;
 
-      if ((!nombre_producto && !nombre) || precio === undefined) {
-        return res.status(400).json({
-          error: 'Nombre y precio son obligatorios'
-        });
+      if (!nombre_producto || precio === undefined) {
+        return res.status(400).json({ error: 'Nombre y precio son obligatorios' });
+      }
+
+      if (Number(precio) <= 0) {
+        return res.status(400).json({ error: 'El precio debe ser mayor que 0' });
+      }
+
+      if (stock !== undefined && Number(stock) < 0) {
+        return res.status(400).json({ error: 'El stock no puede ser negativo' });
       }
 
       const newProduct = await Product.create(req.body);
@@ -87,12 +93,7 @@ class ProductController {
         return res.status(404).json({ message: 'Producto no encontrado' });
       }
 
-      const product = await Product.findById(productId);
-
-      res.json({
-        message: 'Producto actualizado con éxito',
-        product
-      });
+      res.json({ message: 'Producto actualizado con éxito' });
     } catch (error) {
       console.error('Error al actualizar el producto:', error);
       res.status(500).json({ 
