@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/CartContext';
+import api from '../api/axios';
 
 const inputClass =
   'w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none transition placeholder:text-white/25 focus:border-red-500';
@@ -112,12 +113,6 @@ function validatePayment(form) {
   return nextErrors;
 }
 
-function createOrderNumber() {
-  const timePart = Date.now().toString().slice(-6);
-  const randomPart = Math.floor(100 + Math.random() * 900);
-  return `FM-${timePart}-${randomPart}`;
-}
-
 export default function Checkout() {
   const { cartItems, cartSubtotal, clearCart } = useCart();
   const [form, setForm] = useState(emptyForm);
@@ -146,7 +141,7 @@ export default function Checkout() {
     });
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     const nextErrors = validatePayment(form);
@@ -159,22 +154,35 @@ export default function Checkout() {
 
     setProcessing(true);
 
-    const order = {
-      number: createOrderNumber(),
-      email: form.email.trim(),
-      items: cartItems,
-      subtotal: cartSubtotal,
-      shipping,
-      total,
-      paidAt: new Date().toLocaleString('es-ES'),
-    };
+    const direccionEnvio = `${form.address.trim()}, ${form.city.trim()} (${form.postalCode.trim()})`;
 
-    window.setTimeout(() => {
-      setCompletedOrder(order);
-      setProcessing(false);
+    try {
+      const { data } = await api.post('/api/orders', {
+        email: form.email.trim(),
+        direccion_envio: direccionEnvio,
+        items: cartItems.map((item) => ({
+          id_producto: item.id,
+          cantidad: item.cantidad,
+          formato: item.talla,
+        })),
+      });
+
+      setCompletedOrder({
+        number: `FM-${String(data.order.id_pedido).padStart(6, '0')}`,
+        email: form.email.trim(),
+        items: cartItems,
+        subtotal: data.order.subtotal,
+        shipping: data.order.envio,
+        total: data.order.total,
+        paidAt: new Date().toLocaleString('es-ES'),
+      });
       clearCart();
-      toast.success('Pago realizado correctamente');
-    }, 900);
+      toast.success(data.emailSent ? 'Pedido realizado y email enviado' : 'Pedido realizado correctamente');
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'No se pudo crear el pedido.');
+    } finally {
+      setProcessing(false);
+    }
   }
 
   if (completedOrder) {
@@ -192,7 +200,7 @@ export default function Checkout() {
               Pedido confirmado
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-white/60">
-              Tu pago simulado se ha procesado correctamente. Hemos enviado la confirmacion a {completedOrder.email}.
+              Tu pedido se ha registrado correctamente. Hemos enviado la confirmacion a {completedOrder.email}.
             </p>
           </div>
 

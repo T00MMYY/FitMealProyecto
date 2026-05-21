@@ -11,6 +11,7 @@ import Products from "./pages/products";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import MisPedidos from "./pages/MisPedidos";
 import Ejercicios from "./pages/ejercicios/Ejercicios";
 import Recetas from "./pages/Recetas";
 import RecetaDetalle from "./pages/RecetaDetalle";
@@ -34,8 +35,8 @@ function AppContent() {
   return (
     <CartProvider key={cartOwner} cartOwner={cartOwner}>
       <div className="min-h-screen">
-              <Navbar />
-              <Routes>
+        <Navbar />
+        <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
@@ -43,6 +44,7 @@ function AppContent() {
                 <Route path="/products/:id" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+                <Route path="/pedidos" element={<ProtectedRoute><MisPedidos /></ProtectedRoute>} />
                 <Route path="/workouts" element={<Workouts />} />
                 <Route path="/ejercicios/:id" element={<Ejercicios />} />
                 <Route path="/recetas" element={<Recetas />} />

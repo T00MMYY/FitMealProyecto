@@ -72,6 +72,10 @@ export default function Navbar() {
   if (isAuthenticated && hasTrainer) {
     navLinks.push({ to: '/rutina', label: 'Mi Rutina' });
   }
+
+  if (isAuthenticated) {
+    navLinks.push({ to: '/pedidos', label: 'Mis pedidos' });
+  }
   
   if (isAuthenticated && user && (Number(user.id_rol) === 1 || Number(user.rol) === 1)) {
     navLinks.push({ to: '/admin', label: 'Admin' });
