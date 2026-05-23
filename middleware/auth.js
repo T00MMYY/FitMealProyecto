@@ -52,7 +52,7 @@ const requireRole = (...roles) => {
 };
 
 // Middleware para verificar plan del usuario
-// Uso: requirePlan('avanzado', 'experto') — acepta uno o más planes válidos
+// Uso: requirePlan('basic', 'premium') — acepta uno o más planes válidos
 const requirePlan = (...plans) => async (req, res, next) => {
   if (!req.user) {
     return res.status(403).json({ error: 'Token no proporcionado' });
@@ -69,7 +69,7 @@ const requirePlan = (...plans) => async (req, res, next) => {
 };
 
 // Alias para compatibilidad con código existente
-const requirePremium = requirePlan('avanzado', 'experto');
+const requirePremium = requirePlan('premium');
 
 const COOKIE_CONFIG = {
   httpOnly: true,

@@ -62,6 +62,8 @@ export default function Perfil() {
   if (loading) return <LoadingSpinner />;
 
   const displayUser = userData || user;
+  const normalizedPlan = displayUser?.plan?.toString().toLowerCase() || '';
+  const isPremiumPlan = normalizedPlan.includes('premium');
   const macros = calculateMacros(displayUser);
 
   const handlePhotoChange = async (e) => {
@@ -183,21 +185,17 @@ export default function Perfil() {
                   <div>
                     <h3 className="text-sm font-black uppercase tracking-tighter text-white/80">Plan Actual</h3>
                     <p className={`text-lg font-bold ${
-                      displayUser?.plan === 'experto' ? 'text-yellow-400' :
-                      displayUser?.plan === 'avanzado' ? 'text-blue-400' : 'text-green-400'
+                      isPremiumPlan ? 'text-yellow-400' : 'text-green-400'
                     }`}>
-                      {displayUser?.plan === 'experto' ? 'Experto' :
-                       displayUser?.plan === 'avanzado' ? 'Avanzado' : 'Básico'}
+                      {isPremiumPlan ? 'Premium' : 'Básico'}
                     </p>
                   </div>
-                  {displayUser?.plan === 'basic' && (
-                    <button className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors text-xs uppercase tracking-wider">
-                      Upgrade a Avanzado
-                    </button>
-                  )}
-                  {displayUser?.plan === 'avanzado' && (
-                    <button className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-black font-bold rounded-lg transition-colors text-xs uppercase tracking-wider">
-                      Upgrade a Experto
+                  {!isPremiumPlan && (
+                    <button
+                      onClick={() => navigate('/suscripcion?planId=2')}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors text-xs uppercase tracking-wider"
+                    >
+                      Upgrade a Premium
                     </button>
                   )}
                 </div>

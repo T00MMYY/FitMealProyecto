@@ -11,6 +11,7 @@ import Products from "./pages/products";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import Suscripcion from "./pages/Suscripcion";
 import MisPedidos from "./pages/MisPedidos";
 import Ejercicios from "./pages/ejercicios/Ejercicios";
 import Recetas from "./pages/Recetas";
@@ -44,6 +45,7 @@ function AppContent() {
                 <Route path="/products/:id" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+                <Route path="/suscripcion" element={<Suscripcion />} />
                 <Route path="/pedidos" element={<ProtectedRoute><MisPedidos /></ProtectedRoute>} />
                 <Route path="/workouts" element={<Workouts />} />
                 <Route path="/ejercicios/:id" element={<Ejercicios />} />
@@ -125,7 +127,7 @@ function App() {
           <AppContent />
         </AuthProvider>
       </BrowserRouter>
-      <Toaster />
+      <Toaster position="top-right" />
     </>
   );
 }

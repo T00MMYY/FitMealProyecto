@@ -91,6 +91,7 @@ const AdminUsers = () => {
                 <th className="p-5 font-bold border-b border-white/5">Nombre</th>
                 <th className="p-5 font-bold border-b border-white/5">Email</th>
                 <th className="p-5 font-bold border-b border-white/5">Estado</th>
+                <th className="p-5 font-bold border-b border-white/5">Plan</th>
                 <th className="p-5 font-bold border-b border-white/5">Rol</th>
                 <th className="p-5 font-bold border-b border-white/5">Entrenador</th>
                 <th className="p-5 font-bold border-b border-white/5 text-right">Acciones</th>
@@ -114,6 +115,11 @@ const AdminUsers = () => {
                     </span>
                   </td>
                   <td className="p-5">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 bg-white/5 px-2 py-1 rounded-md">
+                      {u.plan || 'basic'}
+                    </span>
+                  </td>
+                  <td className="p-5">
                     <select
                       value={u.id_rol}
                       onChange={(e) => handleRoleChange(u.id_usuario, e.target.value)}
@@ -122,7 +128,6 @@ const AdminUsers = () => {
                     >
                       <option value={1}>Admin</option>
                       <option value={2}>Usuario</option>
-                      <option value={3}>Premium</option>
                       <option value={4}>Entrenador</option>
                     </select>
                   </td>

@@ -1,7 +1,9 @@
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import { useAuth } from '../context/AuthContext';
 import Footer from '../components/Footer';
+import api from '../api/axios';
 
 function TextReveal({ text, className, delay = 0 }) {
   const words = text.split(' ');
@@ -77,47 +79,20 @@ function FadeUp({ children, delay = 0, className = '' }) {
   );
 }
 
-const plans = [
+const planAssets = [
   {
-    name: 'Plan Básico',
-    price: 'FREE',
-    features: [
-      'Evaluación inicial simple',
-      'Plan de alimentación general',
-      'Rutina de ejercicios 3x por semana',
-      'Dashboard de progreso',
-      'Tips semanales',
-    ],
     img: 'delicious-grain-bowl-with-chicken-and-vegetables-2026-03-19-01-52-11-utc.webp',
     imgAlt: 'Healthy Bowl',
     featured: false,
     dotColor: 'bg-white',
   },
   {
-    name: 'Plan Avanzado',
-    price: '9,99 € /mes',
-    features: [
-      'Todo del Básico',
-      'Plan personalizado (calorías)',
-      'Rutinas 4-5 por semana',
-      'Seguimiento mensual',
-      'Acceso a comunidad',
-    ],
     img: 'healthy-chicken-salad-with-fresh-vegetables-2026-03-18-15-10-01-utc.webp',
     imgAlt: 'Chicken Meal',
     featured: true,
     dotColor: 'bg-primary',
   },
   {
-    name: 'Plan Premium',
-    price: '19,99 € /mes',
-    features: [
-      'Todo del Avanzado',
-      'Revisión mensual con asesor',
-      'Alimentación adaptable',
-      'Recordatorios personalizados',
-      'Desafíos con recompensas',
-    ],
     img: 'rice-bowl-with-tomatoes-radishes-spinach-and-mea-2026-03-23-18-01-58-utc.webp',
     imgAlt: 'Avocado Salad',
     featured: false,
@@ -159,6 +134,41 @@ const products = [
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [plans, setPlans] = useState([]);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await api.get('/api/plans');
+        // Unir datos de la DB con los assets visuales estáticos (imágenes, colores)
+        const combinedPlans = response.data.plans.map((p, index) => {
+          const asset = planAssets[index % planAssets.length];
+          return {
+            id: p.id_plan,
+            name: p.nombre_plan,
+            price: Number(p.precio_mensual) === 0 ? 'GRATIS' : `${p.precio_mensual} € /mes`,
+            features: p.caracteristicas ? p.caracteristicas.split(',') : [],
+            ...asset
+          };
+        });
+        setPlans(combinedPlans);
+      } catch (error) {
+        console.error('Error fetching plans:', error);
+      }
+    };
+    fetchPlans();
+  }, []);
+
+  const handlePlanClick = (plan) => {
+    if (!isAuthenticated) {
+      navigate('/register');
+      return;
+    }
+    // Si ya está logueado, redirigir al checkout del plan
+    // Pasamos el plan elegido por estado y por query para mantenerlo en refresh/back
+    navigate(`/suscripcion?planId=${plan.id}`, { state: { plan } });
+  };
 
   return (
     <div className="font-body min-h-screen bg-black text-white">
@@ -313,7 +323,7 @@ export default function Home() {
           </div>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-80px' }}
@@ -343,15 +353,18 @@ export default function Home() {
                 </div>
                 <div className="mt-8 mb-8 flex-grow">
                   <ul className="space-y-3 text-sm text-gray-300">
-                    {plan.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2">
-                        <span className={`w-1.5 h-1.5 ${plan.dotColor} rounded-full`} />
-                        {f}
+                    {plan.features.map((f, idx) => (
+                      <li key={idx} className="flex items-center gap-2">
+                        <span className={`w-1.5 h-1.5 shrink-0 ${plan.dotColor} rounded-full`} />
+                        <span>{f.trim()}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
-                <button className="w-full py-3 rounded-full bg-primary hover:bg-primary-hover text-white font-bold italic tracking-wide transition-colors shadow-[0_0_15px_rgba(211,15,21,0.3)]">
+                <button 
+                  onClick={() => handlePlanClick(plan)}
+                  className="w-full py-3 rounded-full bg-primary hover:bg-primary-hover text-white font-bold italic tracking-wide transition-colors shadow-[0_0_15px_rgba(211,15,21,0.3)]"
+                >
                   {plan.price}
                 </button>
               </motion.div>

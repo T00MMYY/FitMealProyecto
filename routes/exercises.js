@@ -28,6 +28,40 @@ router.get('/detail/:id', async (req, res, next) => {
   }
 });
 
+router.get('/muscles', async (req, res, next) => {
+  try {
+    const query = 'SELECT id, nombre_key FROM musculos ORDER BY nombre_key ASC';
+    const [rows] = await db.execute(query);
+
+    if (rows.length === 0) {
+      const fallbackQuery = `
+        SELECT DISTINCT e.musculo_id AS id,
+               COALESCE(m.nombre_key, CONCAT('MUSCULO_', e.musculo_id)) AS nombre_key
+        FROM ejercicios e
+        LEFT JOIN musculos m ON e.musculo_id = m.id
+        ORDER BY nombre_key ASC
+      `;
+      const [fallbackRows] = await db.execute(fallbackQuery);
+      return res.json(fallbackRows);
+    }
+
+    res.json(rows);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/muscles/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const query = 'SELECT * FROM ejercicios WHERE musculo_id = ? ORDER BY titulo ASC';
+    const [rows] = await db.execute(query, [id]);
+    res.json(rows);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/:muscleName', async (req, res, next) => {
   try {
     const { muscleName } = req.params;
