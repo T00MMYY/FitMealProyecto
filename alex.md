@@ -67,3 +67,8 @@ El backend hace **dos envíos**:
 2. **Al usuario** — confirmación de que se ha recibido su mensaje
 
 Requiere las mismas credenciales de Gmail del `.env`. Sin ellas el formulario da error.
+
+
+
+Email: testuser2@test.com
+testuser2@test.com  test1234
