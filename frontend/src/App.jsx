@@ -125,7 +125,7 @@ function App() {
           <AppContent />
         </AuthProvider>
       </BrowserRouter>
-      <Toaster />
+      <Toaster position="top-right" />
     </>
   );
 }

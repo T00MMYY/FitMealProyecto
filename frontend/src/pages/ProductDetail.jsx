@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import api from '../api/axios';
@@ -308,6 +309,10 @@ export default function ProductDetail() {
                   formato: talla,
                   cantidad,
                   imagen,
+                });
+                toast.success(`${producto.nombre_producto} añadido al carrito`, {
+                  position: 'top-right',
+                  duration: 3000,
                 });
               }}
               className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.25em] text-[12px] transition-all duration-400 active:scale-[0.98]"
