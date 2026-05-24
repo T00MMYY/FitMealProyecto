@@ -99,6 +99,18 @@ async function createOrder(req, res) {
   }
 }
 
+
+//listar pedidos
+async function listAllOrders(req, res) {
+  try {
+    const orders = await Order.findAll();
+    res.json({ orders });
+  } catch (error) {
+    console.error('Error listando todos los pedidos:', error);
+    res.status(500).json({ error: 'No se pudieron cargar los pedidos' });
+  }
+}
+
 async function listMyOrders(req, res) {
   try {
     const id_usuario = req.user.id_usuario || req.user.id;
@@ -126,4 +138,4 @@ async function getMyOrder(req, res) {
   }
 }
 
-module.exports = { createOrder, listMyOrders, getMyOrder };
+module.exports = { createOrder, listAllOrders, listMyOrders, getMyOrder };

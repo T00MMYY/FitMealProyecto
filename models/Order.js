@@ -120,6 +120,18 @@ class Order {
     }
   }
 
+//modelo
+  static async findAll() {
+    const [orders] = await db.query(
+      `SELECT p.id_pedido, p.fecha_pedido, p.total, p.estado, p.direccion_envio,
+              u.nombre, u.email
+       FROM pedidos p
+       JOIN usuarios u ON u.id_usuario = p.id_usuario
+       ORDER BY p.fecha_pedido DESC`
+    );
+    return orders;
+  }
+
   static async findByUser(id_usuario) {
     const [orders] = await db.query(
       `SELECT id_pedido, fecha_pedido, total, estado, metodo_pago
