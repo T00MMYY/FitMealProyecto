@@ -301,6 +301,7 @@ export default function Checkout() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <form onSubmit={handleSubmit} className="lg:col-span-2">
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 md:p-6">
+              {/* TARJETA VISUAL */}
               <div className="mb-6 rounded-2xl border border-white/10 bg-gradient-to-br from-zinc-800 via-zinc-950 to-red-950 p-6 shadow-2xl">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-black uppercase tracking-widest text-white/70">{cardBrand}</p>
@@ -323,6 +324,7 @@ export default function Checkout() {
                 </div>
               </div>
 
+              {/* INPUTS — cada onChange actualiza el estado form y React redibuja la tarjeta */}
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <label className="block">
                   <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-white/50">

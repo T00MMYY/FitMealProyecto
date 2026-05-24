@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars 
 import api from '../api/axios';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -13,6 +13,9 @@ export default function ProductDetail() {
   const { addToCart } = useCart();
   const { user } = useAuth();
 
+  
+
+  //estados
   const [producto, setProducto] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [estrellas, setEstrellas] = useState(0);
@@ -21,11 +24,9 @@ export default function ProductDetail() {
   const [cantidad, setCantidad] = useState(1);
   const [precioActual, setPrecioActual] = useState(null);
   const [modalLogin, setModalLogin] = useState(false);
-  const [esFavorito, setEsFavorito] = useState(() => {
-    const favs = JSON.parse(localStorage.getItem('fitmeal_productos_favoritos') || '[]');
-    return favs.includes(Number(id));
-  });
 
+
+  //click en producto
   useEffect(() => {
     api.get(`/api/products/${id}`)
       .then((res) => {
@@ -40,13 +41,6 @@ export default function ProductDetail() {
       .finally(() => setCargando(false));
   }, [id]);
 
-  function toggleFavorito() {
-    const favs = JSON.parse(localStorage.getItem('fitmeal_productos_favoritos') || '[]');
-    const idNum = Number(id);
-    const nuevos = favs.includes(idNum) ? favs.filter((x) => x !== idNum) : [...favs, idNum];
-    localStorage.setItem('fitmeal_productos_favoritos', JSON.stringify(nuevos));
-    setEsFavorito(!esFavorito);
-  }
 
   if (cargando) {
     return (
@@ -116,28 +110,6 @@ export default function ProductDetail() {
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#0a0a0a]/20 pointer-events-none" />
             <div className="absolute inset-0 rounded-3xl pointer-events-none" style={{ boxShadow: 'inset 0 0 60px rgba(0,0,0,0.3)' }} />
 
-            <motion.button
-              onClick={toggleFavorito}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-              aria-label={esFavorito ? 'Quitar de favoritos' : 'Anadir a favoritos'}
-              className="absolute top-5 right-5 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-colors duration-300 cursor-pointer group/heart"
-              style={{
-                background: esFavorito ? 'rgba(211,15,21,0.9)' : 'rgba(10,10,10,0.55)',
-                border: `1px solid ${esFavorito ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.12)'}`,
-                boxShadow: esFavorito ? '0 0 25px rgba(211,15,21,0.45)' : '0 4px 20px rgba(0,0,0,0.35)',
-              }}
-            >
-              <span
-                className="material-symbols-outlined text-2xl transition-all duration-300"
-                style={{
-                  color: esFavorito ? '#ffffff' : 'rgba(255,255,255,0.85)',
-                  fontVariationSettings: esFavorito ? '"FILL" 1, "wght" 600' : '"FILL" 0, "wght" 400',
-                }}
-              >
-                favorite
-              </span>
-            </motion.button>
           </div>
           <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-primary/10 blur-2xl rounded-full" />
         </motion.div>

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/axios';
 import { IMAGENES, PESOS, RATINGS, CATEGORIAS } from '../constants/products';
 
@@ -81,14 +81,16 @@ export default function Products() {
   const [error, setError] = useState(null);
   const [categoriaActiva, setCategoriaActiva] = useState(5);
 
+  //backend
+
   useEffect(() => {
     api.get('/api/products')
-      .then((res) => setProductos(res.data.products || []))
+      .then((respuestaProductos) => setProductos(respuestaProductos.data.products || []))
       .catch(() => setError('No se pudieron cargar los productos.'))
       .finally(() => setCargando(false));
   }, []);
 
-  const productosFiltrados = productos.filter((p) => p.id_categoria === categoriaActiva);
+  const productosFiltrados = productos.filter((producto) => producto.id_categoria === categoriaActiva);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-primary selection:text-black">
