@@ -24,7 +24,7 @@ const AdminOrders = () => {
           <p className="text-white/40">No hay pedidos.</p>
         ) : (
           <div className="overflow-x-auto rounded-2xl border border-white/5">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[760px] text-sm">
               <thead>
                 <tr className="border-b border-white/5 text-white/40 uppercase text-xs tracking-widest">
                   <th className="px-4 py-3 text-left">ID</th>

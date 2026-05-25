@@ -41,22 +41,8 @@ const AdminTrainers = () => {
       setTrainers(response.data);
       setErrorMessage(null);
     } catch (error) {
-      const status = error.response?.status;
-      const responseData = error.response?.data;
-      console.error('Error al cargar entrenadores', status, responseData || error.message);
-
-      if (!error.response) {
-        setErrorMessage('No se pudo conectar con el backend. Verifica que el servidor esté en ejecución y que la URL de la API sea correcta.');
-      } else if (status === 401 || status === 403) {
-        setErrorMessage('No tienes autorización para acceder a esta información. Inicia sesión como administrador.');
-      } else if (status === 404) {
-        setErrorMessage('Ruta de administradores no encontrada. Verifica la configuración del backend.');
-      } else if (status >= 500) {
-        setErrorMessage('El servidor respondió con un error. Intenta de nuevo más tarde.');
-      } else {
-        setErrorMessage('No se pudieron cargar los entrenadores. Intenta de nuevo más tarde.');
-      }
-
+      console.error('Error al cargar entrenadores', error);
+      setErrorMessage('No se pudieron cargar los entrenadores.');
       toast.error('No se pudieron cargar los entrenadores');
     } finally {
       setLoading(false);
@@ -128,9 +114,10 @@ const AdminTrainers = () => {
     <AdminLayout>
       <div className="p-6">
         <div className="flex flex-col gap-6">
+
           <div>
             <h1 className="text-4xl font-black italic uppercase mb-2">Entrenadores</h1>
-            <p className="text-white/60 max-w-2xl">
+            <p className="text-white/60 max-w-2xl text-sm md:text-base">
               Administra entrenadores y revisa qué clientes tienen asignados. Desde aquí puedes desasignar clientes y ver rápidamente la carga de cada entrenador.
             </p>
             {errorMessage && (
@@ -141,13 +128,14 @@ const AdminTrainers = () => {
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-[360px_1fr] gap-6">
+            
             <div className="bg-[#0d0d0d] rounded-3xl border border-white/5 p-5 shadow-xl">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-4 gap-2">
                 <div>
                   <p className="text-sm uppercase tracking-[0.3em] text-white/40">Entrenadores</p>
                   <h2 className="text-2xl font-bold">Listado</h2>
                 </div>
-                <span className="text-xs text-white/40">{filteredTrainers.length} encontrados</span>
+                <span className="text-sm text-white/40 whitespace-nowrap">{filteredTrainers.length} encontrados</span>
               </div>
 
               <div className="mb-4">
@@ -161,26 +149,27 @@ const AdminTrainers = () => {
               </div>
 
               {loading ? (
-                <div className="py-12 text-center text-white/40">Cargando entrenadores...</div>
+                <div className="py-12 text-center text-sm text-white/40">Cargando entrenadores...</div>
               ) : filteredTrainers.length === 0 ? (
-                <div className="py-12 text-center text-white/40">No se encontraron entrenadores.</div>
+                <div className="py-12 text-center text-sm text-white/40">No se encontraron entrenadores.</div>
               ) : (
                 <div className="space-y-3">
                   {filteredTrainers.map((trainer) => (
                     <button
                       key={trainer.id_usuario}
                       onClick={() => fetchTrainerClients(trainer)}
-                      className={`w-full text-left rounded-3xl p-4 transition-all border ${selectedTrainer?.id_usuario === trainer.id_usuario
+                      className={`w-full text-left rounded-3xl p-4 transition-all border ${
+                        selectedTrainer?.id_usuario === trainer.id_usuario
                           ? 'border-red-600/30 bg-red-600/10'
                           : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
-                        }`}
+                      }`}
                     >
                       <div className="flex items-center justify-between gap-4">
-                        <div>
-                          <p className="font-bold text-white">{trainer.nombre} {trainer.apellidos}</p>
-                          <p className="text-sm text-white/50">{trainer.email}</p>
+                        <div className="min-w-0">
+                          <p className="font-bold text-white text-base truncate">{trainer.nombre} {trainer.apellidos}</p>
+                          <p className="text-sm text-white/50 truncate">{trainer.email}</p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right flex-shrink-0">
                           <p className="text-xs uppercase tracking-[0.2em] text-white/40">Clientes</p>
                           <p className="text-lg font-black text-red-500">{trainer.clientsCount || 0}</p>
                         </div>
@@ -192,16 +181,17 @@ const AdminTrainers = () => {
             </div>
 
             <div className="bg-[#0d0d0d] rounded-3xl border border-white/5 p-5 shadow-xl min-h-80">
-              <div className="flex items-center justify-between mb-6 gap-4">
+              
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6 gap-4">
                 <div>
                   <p className="text-sm uppercase tracking-[0.3em] text-white/40">Detalles</p>
-                  <h2 className="text-2xl font-bold">
+                  <h2 className="text-2xl font-bold break-words">
                     {selectedTrainer ? `${selectedTrainer.nombre} ${selectedTrainer.apellidos}` : 'Selecciona un entrenador'}
                   </h2>
                 </div>
                 {selectedTrainer && (
-                  <div className="flex gap-3">
-                    <span className="rounded-full bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.3em] text-white/60">
+                  <div className="flex flex-wrap gap-3 items-center justify-start lg:justify-end">
+                    <span className="rounded-full bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.3em] text-white/60 whitespace-nowrap">
                       {clients.length} clientes
                     </span>
                     <button
@@ -218,36 +208,38 @@ const AdminTrainers = () => {
                 <div className="space-y-4">
                   <div className="rounded-3xl bg-white/5 p-4 border border-white/10">
                     <p className="text-sm text-white/50 mb-2">Email</p>
-                    <p className="text-white">{selectedTrainer.email}</p>
+                    <p className="text-white text-sm md:text-base break-all">{selectedTrainer.email}</p>
                   </div>
 
                   {loadingClients ? (
-                    <div className="py-16 text-center text-white/40">Cargando clientes...</div>
+                    <div className="py-16 text-center text-sm text-white/40">Cargando clientes...</div>
                   ) : clients.length === 0 ? (
-                    <div className="py-16 text-center text-white/40">
+                    <div className="py-16 text-center text-sm text-white/40">
                       Este entrenador no tiene clientes asignados actualmente.
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {clients.map((client) => (
                         <div key={client.id_usuario} className="rounded-3xl border border-white/10 bg-white/5 p-4 flex flex-col gap-3">
+                          
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                            <div>
-                              <p className="font-bold text-white">{client.nombre} {client.apellidos}</p>
-                              <p className="text-sm text-white/50">{client.email}</p>
+                            <div className="min-w-0">
+                              <p className="font-bold text-white text-base truncate">{client.nombre} {client.apellidos}</p>
+                              <p className="text-sm text-white/50 truncate">{client.email}</p>
                             </div>
                             <button
                               onClick={() => handleUnassignClient(client.id_usuario)}
-                              className="inline-flex items-center justify-center rounded-full bg-red-600 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white transition hover:bg-red-700"
+                              className="inline-flex items-center justify-center rounded-full bg-red-600 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white transition hover:bg-red-700 w-full sm:w-auto"
                             >
                               Desasignar
                             </button>
                           </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-white/50">
-                            <p>Peso: {client.peso ?? 'N/A'} kg</p>
-                            <p>Objetivo: {client.objetivo ? client.objetivo.replace(/_/g, ' ') : 'N/A'}</p>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-white/50 border-t border-white/5 pt-2">
+                            <p>Peso: <span className="text-white font-semibold">{client.peso ?? 'N/A'} kg</span></p>
+                            <p>Objetivo: <span className="text-white font-semibold capitalize">{client.objetivo ? client.objetivo.replace(/_/g, ' ') : 'N/A'}</span></p>
                           </div>
-                          <p className="text-[11px] uppercase tracking-[0.25em] text-white/30">
+                          <p className="text-xs uppercase tracking-[0.25em] text-white/30">
                             Asignado el: {client.fecha_asignacion ? new Date(client.fecha_asignacion).toLocaleDateString() : 'Sin fecha'}
                           </p>
                         </div>
@@ -256,7 +248,7 @@ const AdminTrainers = () => {
                   )}
                 </div>
               ) : (
-                <div className="py-16 text-center text-white/40">
+                <div className="py-16 text-center text-sm text-white/40">
                   Selecciona un entrenador para ver sus clientes y desasignarlos.
                 </div>
               )}
@@ -265,10 +257,9 @@ const AdminTrainers = () => {
         </div>
       </div>
 
-      {/* Modal para asignar cliente */}
       {isAssignModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md bg-[#0d0d0d] rounded-3xl border border-white/10 p-6 shadow-2xl relative">
+          <div className="w-full max-w-md bg-[#0d0d0d] rounded-3xl border border-white/10 p-6 shadow-2xl relative mx-2">
             <button
               onClick={() => setIsAssignModalOpen(false)}
               className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
@@ -288,14 +279,12 @@ const AdminTrainers = () => {
                 Cliente a asignar
               </label>
 
-              {/* Contenedor relativo para posicionar nuestra propia flecha */}
               <div className="relative">
                 <select
                   value={selectedClientToAssign}
                   onChange={(e) => setSelectedClientToAssign(e.target.value)}
                   className="w-full rounded-2xl bg-white/5 border border-white/10 pl-4 pr-10 py-3.5 text-sm text-white outline-none focus:border-red-500/50 appearance-none cursor-pointer transition-all"
                 >
-                  {/* Clases bg-[#0d0d0d] para forzar que el desplegable sea oscuro */}
                   <option value="" className="bg-[#0d0d0d] text-white/50">-- Selecciona un cliente --</option>
                   {unassignedClients.map(client => (
                     <option
@@ -308,7 +297,6 @@ const AdminTrainers = () => {
                   ))}
                 </select>
 
-                {/* Icono de flecha personalizado que reemplaza al del sistema operativo */}
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-white/40">
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

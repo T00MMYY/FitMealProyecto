@@ -54,19 +54,6 @@ const AdminUsers = () => {
     }
   };
 
-  const handleBan = async (u) => {
-    const isBanned = u.estado_cuenta === 'baneado';
-    const msg = isBanned ? `¿Desbanear a ${u.nombre}?` : `¿Banear a ${u.nombre}?`;
-    if (!window.confirm(msg)) return;
-    try {
-      const res = await api.put(`/api/admin/users/${u.id_usuario}/ban`);
-      setUsers(prev => prev.map(x => x.id_usuario === u.id_usuario ? { ...x, estado_cuenta: res.data.estado } : x));
-      toast.success(res.data.message);
-    } catch (error) {
-      toast.error(error.response?.data?.error || 'Error al cambiar estado');
-    }
-  };
-
   const handleDelete = async (u) => {
     if (!window.confirm(`¿Eliminar permanentemente a ${u.nombre} (${u.email})? Esta acción no se puede deshacer.`)) return;
     try {
@@ -84,8 +71,8 @@ const AdminUsers = () => {
     <AdminLayout>
       <div className="p-6">
         <h1 className="text-4xl font-black italic uppercase mb-8">Usuarios</h1>
-        <div className="bg-[#0d0d0d] border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto rounded-2xl border border-white/5 bg-[#0d0d0d] shadow-2xl">
+          <table className="w-full min-w-[900px] text-left border-collapse">
             <thead className="bg-white/[0.02] text-white/40 text-[10px] uppercase tracking-widest">
               <tr>
                 <th className="p-5 font-bold border-b border-white/5">Nombre</th>
@@ -153,26 +140,14 @@ const AdminUsers = () => {
                     )}
                   </td>
                   <td className="p-5 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end gap-2 flex-wrap sm:flex-nowrap">
                       {!isSelf(u) && (
-                        <>
-                          <button
-                            onClick={() => handleBan(u)}
-                            className={`font-bold text-xs uppercase tracking-wider transition-colors px-3 py-1.5 rounded-lg ${
-                              u.estado_cuenta === 'baneado'
-                                ? 'text-green-400 bg-green-500/10 hover:bg-green-500/20'
-                                : 'text-yellow-400 bg-yellow-500/10 hover:bg-yellow-500/20'
-                            }`}
-                          >
-                            {u.estado_cuenta === 'baneado' ? 'Desbanear' : 'Banear'}
-                          </button>
                           <button
                             onClick={() => handleDelete(u)}
                             className="text-red-500 hover:text-red-400 font-bold text-xs uppercase tracking-wider transition-colors bg-red-500/10 hover:bg-red-500/20 px-3 py-1.5 rounded-lg"
                           >
                             Eliminar
                           </button>
-                        </>
                       )}
                     </div>
                   </td>
