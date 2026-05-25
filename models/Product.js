@@ -1,13 +1,12 @@
 const db = require('../config/database');
 
 class Product {
-  static async findAll(offset = 0, limit = 20) {
+  static async findAll() {
     const [rows] = await db.query(`
       SELECT p.*, c.nombre AS categoria_nombre
       FROM productos p
       LEFT JOIN categorias_productos c ON p.id_categoria = c.id_categoria
-      LIMIT ? OFFSET ?
-    `, [limit, offset]);
+    `);
     return rows;
   }
 

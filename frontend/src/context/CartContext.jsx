@@ -2,18 +2,18 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 const CartContext = createContext();
-const LEGACY_CART_KEY = 'fitmeal_cart';
+const CLAVE_CARRITO_ANTIGUO = 'fitmeal_cart';
 
-function readCart(cartStorageKey) {
+function leerCarritoDeStorage(claveStorage) {
   try {
-    const saved = localStorage.getItem(cartStorageKey);
-    if (saved) {
-      return JSON.parse(saved);
+    const carritoGuardado = localStorage.getItem(claveStorage);
+    if (carritoGuardado) {
+      return JSON.parse(carritoGuardado);
     }
 
-    if (cartStorageKey === 'fitmeal_cart_guest') {
-      const legacyCart = localStorage.getItem(LEGACY_CART_KEY);
-      return legacyCart ? JSON.parse(legacyCart) : [];
+    if (claveStorage === 'fitmeal_cart_guest') {
+      const carritoAntiguo = localStorage.getItem(CLAVE_CARRITO_ANTIGUO);
+      return carritoAntiguo ? JSON.parse(carritoAntiguo) : [];
     }
   } catch {
     return [];
@@ -23,98 +23,97 @@ function readCart(cartStorageKey) {
 }
 
 export function CartProvider({ cartOwner = 'guest', children }) {
-  const cartStorageKey = `fitmeal_cart_${cartOwner}`;
-  const prevKeyRef = useRef(cartStorageKey);
+  const claveStorage = `fitmeal_cart_${cartOwner}`;
+  const claveAnteriorRef = useRef(claveStorage);
 
   // Carga el carrito guardado en localStorage al arrancar
-  const [cartItems, setCartItems] = useState(() => readCart(cartStorageKey));
+  const [productosCarrito, setProductosCarrito] = useState(() => leerCarritoDeStorage(claveStorage));
 
-  // Cuando el usuario hace login, migra el carrito guest al carrito del usuario
+  // fusionar guest con usuario
   useEffect(() => {
-    const prevKey = prevKeyRef.current;
-    if (prevKey !== cartStorageKey) {
-      if (prevKey === 'fitmeal_cart_guest') {
-        const guestCart = readCart(prevKey);
-        if (guestCart.length > 0) {
-          setCartItems((prev) => {
-            const merged = [...prev];
-            for (const guestItem of guestCart) {
-              const exists = merged.find((p) => p.id === guestItem.id && p.formato === guestItem.formato);
-              if (exists) {
-                exists.cantidad += guestItem.cantidad;
+    const claveAnterior = claveAnteriorRef.current;
+    if (claveAnterior !== claveStorage) {
+      if (claveAnterior === 'fitmeal_cart_guest') {
+        const carritoGuest = leerCarritoDeStorage(claveAnterior);
+        if (carritoGuest.length > 0) {
+          setProductosCarrito((productosActuales) => {
+            const carritoFusionado = [...productosActuales];
+            for (const productoGuest of carritoGuest) {
+              const yaExiste = carritoFusionado.find((p) => p.id === productoGuest.id && p.formato === productoGuest.formato);
+              if (yaExiste) {
+                yaExiste.cantidad += productoGuest.cantidad;
               } else {
-                merged.push(guestItem);
+                carritoFusionado.push(productoGuest);
               }
             }
-            return merged;
+            return carritoFusionado;
           });
-          localStorage.removeItem(prevKey);
+          localStorage.removeItem(claveAnterior);
         }
       }
-      prevKeyRef.current = cartStorageKey;
+      claveAnteriorRef.current = claveStorage;
     }
-  }, [cartStorageKey]);
+  }, [claveStorage]);
 
   // Guarda el carrito en localStorage cada vez que cambia
   useEffect(() => {
-    localStorage.setItem(cartStorageKey, JSON.stringify(cartItems));
+    localStorage.setItem(claveStorage, JSON.stringify(productosCarrito));
 
-    if (cartStorageKey === 'fitmeal_cart_guest') {
-      localStorage.removeItem(LEGACY_CART_KEY);
+    if (claveStorage === 'fitmeal_cart_guest') {
+      localStorage.removeItem(CLAVE_CARRITO_ANTIGUO);
     }
-  }, [cartItems, cartStorageKey]);
+  }, [productosCarrito, claveStorage]);
 
-  // Añade un producto al carrito.
-  // Si ya existe (mismo id y talla), suma la cantidad en vez de duplicarlo.
-  const addToCart = (item) => {
-    setCartItems((prev) => {
-      const yaExiste = prev.find((p) => p.id === item.id && p.formato === item.formato);
+  // Añade un producto al carrito. Si ya existe (mismo id y talla), suma la cantidad.
+  const addToCart = (productoNuevo) => {
+    setProductosCarrito((productosActuales) => {
+      const yaExiste = productosActuales.find((p) => p.id === productoNuevo.id && p.formato === productoNuevo.formato);
 
       if (!yaExiste) {
-        return [...prev, item];
+        return [...productosActuales, productoNuevo];
       }
 
-      return prev.map((p) =>
-        p.id === item.id && p.formato === item.formato
-          ? { ...p, cantidad: p.cantidad + item.cantidad }
-          : p
+      return productosActuales.map((producto) =>
+        producto.id === productoNuevo.id && producto.formato === productoNuevo.formato
+          ? { ...producto, cantidad: producto.cantidad + productoNuevo.cantidad }
+          : producto
       );
     });
   };
 
   // Cambia la cantidad de un producto (mínimo 1)
-  const updateCartItemQuantity = (id, formato, cantidad) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id && item.formato === formato
-          ? { ...item, cantidad: Math.max(1, cantidad) }
-          : item
+  const updateCartItemQuantity = (idProducto, formato, nuevaCantidad) => {
+    setProductosCarrito((productosActuales) =>
+      productosActuales.map((producto) =>
+        producto.id === idProducto && producto.formato === formato
+          ? { ...producto, cantidad: Math.max(1, nuevaCantidad) }
+          : producto
       )
     );
   };
 
   // Elimina un producto del carrito por id y formato
-  const removeFromCart = (id, formato) => {
-    setCartItems((prev) => prev.filter((item) => !(item.id === id && item.formato === formato)));
+  const removeFromCart = (idProducto, formato) => {
+    setProductosCarrito((productosActuales) => productosActuales.filter((producto) => !(producto.id === idProducto && producto.formato === formato)));
   };
 
   // Vacía el carrito entero
-  const clearCart = () => setCartItems([]);
+  const clearCart = () => setProductosCarrito([]);
 
   // Total de unidades en el carrito
   const cartCount = useMemo(
-    () => cartItems.reduce((total, item) => total + (item.cantidad || 0), 0),
-    [cartItems]
+    () => productosCarrito.reduce((total, producto) => total + (producto.cantidad || 0), 0),
+    [productosCarrito]
   );
 
   // Precio total del carrito
   const cartSubtotal = useMemo(
-    () => cartItems.reduce((total, item) => total + Number(item.precio) * Number(item.cantidad), 0),
-    [cartItems]
+    () => productosCarrito.reduce((total, producto) => total + Number(producto.precio) * Number(producto.cantidad), 0),
+    [productosCarrito]
   );
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, updateCartItemQuantity, removeFromCart, clearCart, cartCount, cartSubtotal }}>
+    <CartContext.Provider value={{ cartItems: productosCarrito, addToCart, updateCartItemQuantity, removeFromCart, clearCart, cartCount, cartSubtotal }}>
       {children}
     </CartContext.Provider>
   );

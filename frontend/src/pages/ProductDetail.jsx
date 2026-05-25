@@ -269,6 +269,9 @@ export default function ProductDetail() {
               </p>
             </div>
 
+
+
+            {/* AÑADIR AL CARRITO — guarda el producto en CartContext (localStorage) */}
             <button
               disabled={producto.stock === 0}
               onClick={() => {
