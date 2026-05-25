@@ -122,7 +122,6 @@ export default function Checkout() {
 
   const shipping = cartSubtotal >= 49 || cartItems.length === 0 ? 0 : 4.99;
   const total = cartSubtotal + shipping;
-  const cardBrand = useMemo(() => getCardBrand(form.cardNumber), [form.cardNumber]);
 
 
   function updateField(field, value) {
@@ -301,30 +300,9 @@ export default function Checkout() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <form onSubmit={handleSubmit} className="lg:col-span-2">
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 md:p-6">
-              {/* TARJETA VISUAL */}
-              <div className="mb-6 rounded-2xl border border-white/10 bg-gradient-to-br from-zinc-800 via-zinc-950 to-red-950 p-6 shadow-2xl">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-black uppercase tracking-widest text-white/70">{cardBrand}</p>
-                  <p className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-white/60">
-                    Demo
-                  </p>
-                </div>
-                <p className="mt-10 text-2xl font-black tracking-widest md:text-3xl">
-                  {maskCardNumber(form.cardNumber)}
-                </p>
-                <div className="mt-8 flex items-end justify-between gap-4">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Titular</p>
-                    <p className="mt-1 min-h-6 font-black uppercase">{form.name || 'Nombre Apellido'}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Caduca</p>
-                    <p className="mt-1 min-h-6 font-black">{form.expiry || 'MM/AA'}</p>
-                  </div>
-                </div>
-              </div>
+              <p className="mb-6 text-xs font-black uppercase tracking-[0.3em] text-white/40">Datos de pago</p>
 
-              {/* INPUTS — cada onChange actualiza el estado form y React redibuja la tarjeta */}
+              {/* INPUTS */}
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <label className="block">
                   <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-white/50">

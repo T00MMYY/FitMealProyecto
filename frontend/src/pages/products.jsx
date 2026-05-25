@@ -12,7 +12,7 @@ function ProductCard({ product, index }) {
   const navigate = useNavigate();
 
   const goToProduct = () => {
-    navigate(`/products/${product.id_producto}`);
+    navigate(`/products/${product.id_producto}`); 
   };
 
   const handleComprarClick = (e) => {
