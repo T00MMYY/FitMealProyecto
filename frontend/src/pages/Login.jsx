@@ -186,7 +186,7 @@ export default function Login() {
           {/* OAuth Buttons */}
           <div className="space-y-3">
             <a
-              href={`${import.meta.env.VITE_API_URL || "https://fitmeal.website"}/auth/google`}
+              href={`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/auth/google`}
               className="flex items-center justify-center gap-3 w-full bg-gray-800/80 hover:bg-gray-700/80 border border-gray-700 text-white py-3 rounded-xl font-medium transition-colors"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
