@@ -93,7 +93,7 @@ export default function Products() {
   const productosFiltrados = productos.filter((producto) => producto.id_categoria === categoriaActiva);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-primary selection:text-black">
+    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-primary selection:text-black pt-20">
 
       {/* COVER */}
       <div className="flex flex-col items-center justify-center py-20 gap-4 relative overflow-hidden">

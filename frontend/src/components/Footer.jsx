@@ -24,7 +24,6 @@ export default function Footer() {
               <li><Link to="/workouts" className="hover:text-white transition-colors">Workouts</Link></li>
               <li><Link to="/recetas" className="hover:text-white transition-colors">Recetas</Link></li>
               <li><Link to="/products" className="hover:text-white transition-colors">Productos</Link></li>
-              <li><Link to="/suscripcion" className="hover:text-white transition-colors">Suscripción</Link></li>
             </ul>
           </div>
 
@@ -54,7 +53,6 @@ export default function Footer() {
 
         <div className="border-t border-white/5 pt-5 flex flex-col md:flex-row justify-between items-center gap-2">
           <p className="text-white/15 text-xs">© 2026 FitMeal. Todos los derechos reservados.</p>
-          <p className="text-white/15 text-xs">Hecho con ❤️ en Barcelona</p>
         </div>
       </div>
     </footer>

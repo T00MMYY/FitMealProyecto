@@ -32,13 +32,11 @@ function Model({ url, onSelect, genero }) {
           const applyMaterial = (mat) => {
             if (mat.color) mat.color.set("#E8BEAC");
             mat.roughness = 0.6;
+            mat.vertexColors = false;
+            mat.needsUpdate = true;
           };
-
-          if (Array.isArray(obj.material)) {
-            obj.material.forEach(applyMaterial);
-          } else {
-            applyMaterial(obj.material);
-          }
+          if (Array.isArray(obj.material)) obj.material.forEach(applyMaterial);
+          else applyMaterial(obj.material);
         }
       });
     }
@@ -126,7 +124,7 @@ export default function Workouts() {
   }, [seleccionado, verFavoritos]);
 
   return (
-    <div className="flex h-[calc(100vh-80px)] w-full bg-[#0a0a0a] text-white font-sans overflow-hidden relative">
+    <div className="flex h-[calc(100vh-80px)] w-full bg-[#0a0a0a] text-white font-sans overflow-hidden relative" style={{ marginTop: '80px' }}>
       <div className="absolute top-6 left-6 z-50 flex gap-2 bg-black/40 backdrop-blur-md p-1.5 rounded-full border border-white/10 shadow-xl">
         <button
           onClick={() => {
@@ -177,9 +175,9 @@ export default function Workouts() {
         </button>
       </div>
 
-      <main className="flex flex-1 overflow-hidden relative w-full h-full">
-        <div className={`relative transition-all duration-700 h-full ${seleccionado ? "w-1/2" : "w-full"}`}>
-          <Canvas dpr={[1, 2]} camera={{ fov: 15 }}>
+      <main className="flex flex-1 overflow-hidden relative w-full h-full bg-[#0a0a0a]">
+        <div className={`relative transition-all duration-700 h-full bg-[#0a0a0a] ${seleccionado ? "w-1/2" : "w-full"}`}>
+          <Canvas dpr={[1, 2]} camera={{ fov: 15 }} style={{ background: '#0a0a0a' }} onCreated={({ gl }) => { gl.setClearColor('#0a0a0a', 1); }}>
             <Suspense fallback={null}>
               <Stage environment="city" intensity={0.1} adjustCamera={true}>
                 <Model key={rutaModelo} url={rutaModelo} onSelect={handleSelect} genero={genero} />
@@ -189,7 +187,6 @@ export default function Workouts() {
           </Canvas>
         </div>
 
-        {/* PANEL DERECHO CON DATOS DE LA DB */}
         <div className={`bg-[#0d0d0d] border-l border-white/5 transition-all duration-700 overflow-y-auto shadow-2xl ${seleccionado ? "w-1/2" : "w-0"}`}>
           {seleccionado && (
             <div className="p-12 min-w-[450px]">

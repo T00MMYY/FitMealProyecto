@@ -40,10 +40,10 @@ export default function Login() {
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4 py-16">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[radial-gradient(ellipse_at_center,rgba(211,15,21,0.07)_0%,transparent_70%)] pointer-events-none" />
 
-      <div className="w-full max-w-4xl rounded-3xl overflow-hidden flex min-h-[560px]" style={{ border: '1px solid #1a1a1a' }}>
+      <div className="w-full max-w-4xl rounded-3xl overflow-hidden flex min-h-[560px] backdrop-blur-xl" style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}>
 
         {/* Panel izquierdo: branding */}
-        <div className="hidden md:flex flex-col justify-between w-1/2 bg-[#0f0f0f] p-10" style={{ borderRight: '1px solid #1a1a1a' }}>
+        <div className="hidden md:flex flex-col justify-between w-1/2 p-10" style={{ borderRight: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
           <div className="flex flex-col gap-3">
             <button
               onClick={() => navigate(-1)}
@@ -71,7 +71,7 @@ export default function Login() {
         </div>
 
         {/* Panel derecho: formulario */}
-        <div className="flex flex-col justify-center w-full md:w-1/2 bg-[#0a0a0a] p-10">
+        <div className="flex flex-col justify-center w-full md:w-1/2 p-10" style={{ background: 'rgba(10,10,10,0.6)' }}>
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2">Acceso</p>
           <h1 className="text-3xl font-black uppercase tracking-tighter text-white mb-8">Iniciar sesión</h1>
 
