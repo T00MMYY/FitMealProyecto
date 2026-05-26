@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+:root {
+  --accent: #D30F15;
+  --dark: #0a0a0a;
+  --white: #f5f5f5;
+}
+
+
 @theme {
   --color-primary: #D30F15;
   --color-primary-hover: #b00c11;

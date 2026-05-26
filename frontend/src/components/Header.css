@@ -1,0 +1,87 @@
+.header {
+  position: fixed;
+  top: 20px;
+  /* start hidden — GSAP animates it in */
+  opacity: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  width: min(1200px, calc(100% - 40px));
+
+  /* Glassmorphism */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+}
+
+.logo-img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cart-btn {
+  background: none;
+  border: none;
+  color: var(--white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  opacity: 0.85;
+  transition: opacity 0.2s, color 0.2s;
+  padding: 0;
+}
+
+.cart-btn:hover {
+  opacity: 1;
+  color: var(--accent);
+}
+
+.login-btn {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  padding: 5px 16px;
+  font-size: 0.85rem;
+  transition: border-color 0.2s, color 0.2s, opacity 0.2s;
+}
+
+.login-btn:hover {
+  border-color: var(--accent);
+}
+
+.nav-list {
+  display: flex;
+  list-style: none;
+  gap: 32px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--white);
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.85;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.nav-link:hover {
+  opacity: 1;
+  color: var(--accent);
+}
