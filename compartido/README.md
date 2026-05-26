@@ -13,18 +13,11 @@ Guía completa para tener el proyecto funcionando desde cero.
 
 ---
 
-<<<<<<< HEAD
 ## 1. Clonar el repositorio
 
 ```bash
 git clone [URL_DEL_REPO]
 cd FitMealProyecto
-=======
-## 1. Actualizar el repositorio
-
-```bash
-git pull origin main
->>>>>>> b59b0b2 (readme compartido)
 ```
 
 ---

@@ -79,10 +79,7 @@ export default function MiRutina() {
     if (imagePath.startsWith('http')) {
       return imagePath;
     }
-    if (imagePath.startsWith('/')) {
-      return `${SERVER_URL}${imagePath}`;
-    }
-    return `${SERVER_URL}/${imagePath}`;
+    return imagePath;
   };
 
   useEffect(() => {
