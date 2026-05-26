@@ -56,53 +56,56 @@ export default function Cart() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
-            {cartItems.map((item) => (
-              <article
-                key={`${item.id}-${item.talla}`}
-                className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 md:p-5 flex flex-col md:flex-row gap-4"
-              >
-                <div className="w-full md:w-36 h-36 rounded-xl overflow-hidden bg-zinc-900 flex-shrink-0">
-                  {item.imagen ? (
-                    <img src={item.imagen} alt={item.nombre} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-white/30 text-xs">
-                      Sin imagen
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex-1">
-                  <p className="text-lg font-black uppercase tracking-wide">{item.nombre}</p>
-                  <p className="text-white/50 text-sm mt-1">Formato: {item.talla}</p>
-                  <p className="text-white font-bold mt-3">{currency(item.precio)} EUR / ud</p>
-
-                  <div className="flex items-center justify-between mt-4">
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => updateCartItemQuantity(item.id, item.talla, item.cantidad - 1)}
-                        className="w-9 h-9 rounded-lg border border-white/15 text-white/80 hover:bg-white/10"
-                      >
-                        -
-                      </button>
-                      <span className="w-8 text-center font-bold">{item.cantidad}</span>
-                      <button
-                        onClick={() => updateCartItemQuantity(item.id, item.talla, item.cantidad + 1)}
-                        className="w-9 h-9 rounded-lg border border-white/15 text-white/80 hover:bg-white/10"
-                      >
-                        +
-                      </button>
-                    </div>
-
-                    <button
-                      onClick={() => removeFromCart(item.id, item.talla)}
-                      className="text-red-400 hover:text-red-300 text-xs uppercase tracking-widest font-bold"
-                    >
-                      Eliminar
-                    </button>
+            {cartItems.map((item) => {
+              const formato = item.formato || item.talla || 'Estándar';
+              return (
+                <article
+                  key={`${item.id}-${formato}`}
+                  className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 md:p-5 flex flex-col md:flex-row gap-4"
+                >
+                  <div className="w-full md:w-36 h-36 rounded-xl overflow-hidden bg-zinc-900 flex-shrink-0">
+                    {item.imagen ? (
+                      <img src={item.imagen} alt={item.nombre} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-white/30 text-xs">
+                        Sin imagen
+                      </div>
+                    )}
                   </div>
-                </div>
-              </article>
-            ))}
+
+                  <div className="flex-1">
+                    <p className="text-lg font-black uppercase tracking-wide">{item.nombre}</p>
+                    <p className="text-white/50 text-sm mt-1">Formato: {formato}</p>
+                    <p className="text-white font-bold mt-3">{currency(item.precio)} EUR / ud</p>
+
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => updateCartItemQuantity(item.id, formato, item.cantidad - 1)}
+                          className="w-9 h-9 rounded-lg border border-white/15 text-white/80 hover:bg-white/10"
+                        >
+                          -
+                        </button>
+                        <span className="w-8 text-center font-bold">{item.cantidad}</span>
+                        <button
+                          onClick={() => updateCartItemQuantity(item.id, formato, item.cantidad + 1)}
+                          className="w-9 h-9 rounded-lg border border-white/15 text-white/80 hover:bg-white/10"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <button
+                        onClick={() => removeFromCart(item.id, formato)}
+                        className="text-red-400 hover:text-red-300 text-xs uppercase tracking-widest font-bold"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
           </div>
 
           <aside className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 h-fit lg:sticky lg:top-24">
