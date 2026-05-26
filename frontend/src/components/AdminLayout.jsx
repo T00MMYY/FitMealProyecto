@@ -15,7 +15,7 @@ const AdminLayout = ({ children }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col md:flex-row pt-20">
       
       {/* 1. BARRA SUPERIOR HAMBURGUESA (Móvil) - Con z-40 para que no choque con tus otros componentes */}
       <div className="flex items-center justify-between border-b border-white/5 bg-[#0a0a0a] px-4 py-3 md:hidden sticky top-0 z-40 w-full">
@@ -35,7 +35,7 @@ const AdminLayout = ({ children }) => {
       {/* 2. SIDEBAR (En móvil usa z-[100] para pasar por encima de todo lo demás de la pantalla) */}
       <aside
         className={`fixed inset-y-0 left-0 z-[100] w-64 transform bg-[#0d0d0d] border-r border-white/5 flex flex-col transition-transform duration-300 ease-in-out 
-          md:static md:translate-x-0 md:h-screen md:sticky md:top-0 ${
+          md:static md:translate-x-0 md:h-[calc(100vh-80px)] md:sticky md:top-20 ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >

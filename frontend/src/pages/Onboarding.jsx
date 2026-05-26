@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import OnboardingWizard from "../components/FormularioInicial";
-
+import toast from "react-hot-toast";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 
@@ -31,18 +31,11 @@ const Onboarding = () => {
 
       await api.put(`/api/users/${user.id_usuario || user.id}`, datosAEnviar);
 
-      alert("¡Perfil guardado! Redirigiendo...");
-      navigate("/");
+      toast.success("¡Perfil guardado!");
+      navigate("/perfil");
     } catch (error) {
       console.error("Error al guardar onboarding:", error);
-      const serverDetails =
-        error.response?.data?.details ||
-        error.response?.data?.error ||
-        error.message;
-      alert(
-        "Hubo un error del servidor. Aquí está el fallo exacto:\n" +
-          serverDetails,
-      );
+      toast.error(error.response?.data?.error || "Error al guardar el perfil");
     }
   };
 

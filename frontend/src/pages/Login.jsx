@@ -43,17 +43,14 @@ export default function Login() {
       <div className="w-full max-w-4xl rounded-3xl overflow-hidden flex min-h-[560px] backdrop-blur-xl" style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}>
 
         {/* Panel izquierdo: branding */}
-        <div className="hidden md:flex flex-col justify-between w-1/2 p-10" style={{ borderRight: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
-          <div className="flex flex-col gap-3">
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-white/30 hover:text-white transition-colors text-xs font-black uppercase tracking-widest w-fit"
-            >
-              ← Atrás
-            </button>
-            <img src="/FitMeal_logoblanco.png" alt="FitMeal" className="h-12 w-12 object-contain mt-2" />
-          </div>
-
+        <div className="hidden md:flex flex-col justify-center items-start w-1/2 p-10 gap-6" style={{ borderRight: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-white/30 hover:text-white transition-colors text-xs font-black uppercase tracking-widest"
+          >
+            ← Atrás
+          </button>
+          <img src="/FitMeal_logoblanco.png" alt="FitMeal" className="h-12 w-12 object-contain" />
           <div>
             <h2 className="text-5xl font-black text-white uppercase leading-tight tracking-tighter mb-4">
               Bienvenido<br /><span style={{ color: '#D30F15' }}>a FitMeal</span>
@@ -61,12 +58,6 @@ export default function Login() {
             <p className="text-white/40 text-sm leading-relaxed">
               Tu viaje personalizado hacia una alimentación saludable empieza aquí.
             </p>
-          </div>
-
-          <div className="flex gap-4 text-white/20 text-xs">
-            <Link to="/privacidad" className="hover:text-white/40 transition-colors">Política de privacidad</Link>
-            <span>•</span>
-            <Link to="/terminos" className="hover:text-white/40 transition-colors">Términos de uso</Link>
           </div>
         </div>
 
