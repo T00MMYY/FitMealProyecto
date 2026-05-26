@@ -51,6 +51,24 @@ async function sendOrderEmail({ to, order }) {
     `,
   });
 
+  await transporter.sendMail({
+    from: `"FitMeal" <${process.env.GMAIL_USER}>`,
+    to: process.env.GMAIL_USER,
+    subject: `Nuevo pedido - FM-${String(order.id_pedido).padStart(6, '0')} de ${to}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; background: #0a0a0a; color: #fff; padding: 32px; border-radius: 12px;">
+        <h1 style="color: #D30F15; font-style: italic; margin: 0 0 8px;">FITMEAL</h1>
+        <h2 style="margin: 0 0 12px;">Nuevo pedido recibido</h2>
+        <p style="color: #bbb; margin: 0 0 24px;">Pedido <strong>FM-${String(order.id_pedido).padStart(6, '0')}</strong> de <strong>${to}</strong>.</p>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+          ${rows}
+        </table>
+        <p style="color: #bbb; margin: 0 0 6px;">Envio: ${formatCurrency(order.envio)}</p>
+        <p style="font-size: 22px; font-weight: 800; margin: 0;">Total: ${formatCurrency(order.total)}</p>
+      </div>
+    `,
+  });
+
   return true;
 }
 

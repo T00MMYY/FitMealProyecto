@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 
 const infoCards = [
   { icon: 'phone', label: 'Teléfono', value: '+688 493 491', sub: 'Lun–Vie, 9:00–18:00' },
-  { icon: 'mail', label: 'Correo electrónico', value: 'FitMeal@gmail.com', sub: 'Respuesta en 24h' },
+  { icon: 'mail', label: 'Correo electrónico', value: 'fitmealtks@gmail.com', sub: 'Respuesta en 24h' },
   { icon: 'chat_bubble', label: 'WhatsApp', value: '+688 493 491', sub: 'Respuesta inmediata' },
   { icon: 'location_on', label: 'Oficina', value: 'Calle FitMeal, Barcelona', sub: 'España' },
 ];
