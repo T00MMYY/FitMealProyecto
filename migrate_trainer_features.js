@@ -13,7 +13,44 @@ async function migrate() {
   try {
     console.log("Iniciando migración de funcionalidades de Entrenador...");
 
-    // 1. Añadir columna dia_semana a rutinas_asignadas
+    // 0. Crear tabla rutinas_asignadas si no existe
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS rutinas_asignadas (
+        id_rutina INT AUTO_INCREMENT PRIMARY KEY,
+        id_entrenador INT NOT NULL,
+        id_cliente INT NOT NULL,
+        id_ejercicio INT NOT NULL,
+        series INT NOT NULL DEFAULT 3,
+        repeticiones VARCHAR(50) NOT NULL DEFAULT '10-12',
+        notas TEXT,
+        dia_semana VARCHAR(20) DEFAULT 'General',
+        fecha_asignacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        KEY fk_ra_entrenador (id_entrenador),
+        KEY fk_ra_cliente (id_cliente),
+        KEY fk_ra_ejercicio (id_ejercicio),
+        CONSTRAINT fk_ra_entrenador FOREIGN KEY (id_entrenador) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+        CONSTRAINT fk_ra_cliente FOREIGN KEY (id_cliente) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+        CONSTRAINT fk_ra_ejercicio FOREIGN KEY (id_ejercicio) REFERENCES ejercicios(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+    console.log("✅ Tabla 'rutinas_asignadas' creada/verificada correctamente.");
+
+    // 1. Corregir tipo de columna repeticiones en rutina_ejercicios para aceptar rangos como 10-12
+    try {
+      await connection.query(`
+        ALTER TABLE rutina_ejercicios
+        MODIFY COLUMN repeticiones VARCHAR(50) NOT NULL DEFAULT '10-12'
+      `);
+      console.log("✅ Columna 'repeticiones' en 'rutina_ejercicios' convertida a VARCHAR(50).");
+    } catch (e) {
+      if (e.code === 'ER_BAD_FIELD_ERROR') {
+        console.log("ℹ️ La columna 'repeticiones' no existe en 'rutina_ejercicios' o ya fue modificada.");
+      } else {
+        throw e;
+      }
+    }
+
+    // 2. Añadir columna dia_semana a rutinas_asignadas
     try {
       await connection.query(`
         ALTER TABLE rutinas_asignadas 
