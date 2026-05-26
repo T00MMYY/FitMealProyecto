@@ -8,6 +8,7 @@ router.use(verifyToken);
 
 router.get('/all', requireRole(1), listAllOrders);
 router.post('/', createOrder);
+router.get('/', listMyOrders);
 router.get('/mine', listMyOrders);
 router.get('/:id', getMyOrder);
 
