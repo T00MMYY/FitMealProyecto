@@ -37,6 +37,12 @@ const planAssetsById = {
     featured: true,
     dotColor: 'bg-primary',
   },
+  3: {
+    img: 'rice-bowl-with-tomatoes-radishes-spinach-and-mea-2026-03-23-18-01-58-utc.webp',
+    imgAlt: 'Avocado Salad',
+    featured: false,
+    dotColor: 'bg-white',
+  },
 };
 
 export default function Suscripcion() {

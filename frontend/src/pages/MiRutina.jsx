@@ -20,7 +20,6 @@ const MUSCLE_DISPLAY_NAMES = {
   ADUCTORES: 'Aductores',
   CUELLO: 'Cuello',
   CORE: 'Core',
-  'TRICEPS': 'Tríceps'
 };
 
 const formatMuscleName = (value) => {
