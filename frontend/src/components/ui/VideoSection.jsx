@@ -4,8 +4,8 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './VideoSection.css'
 
-const FRAME_COUNT = 168
-const SCROLL_DISTANCE = 10080
+const FRAME_COUNT = 75
+const SCROLL_DISTANCE = 4500
 
 function frameUrl(i) {
   return `/frames/ezgif-frame-${String(i + 1).padStart(3, '0')}.webp`

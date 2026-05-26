@@ -54,6 +54,16 @@ const AdminUsers = () => {
     }
   };
 
+  const handlePlanChange = async (id, newPlan) => {
+    try {
+      await api.put(`/api/users/${id}`, { plan: newPlan });
+      setUsers(prev => prev.map(u => u.id_usuario === id ? { ...u, plan: newPlan } : u));
+      toast.success('Plan actualizado correctamente');
+    } catch (error) {
+      toast.error('Error al cambiar el plan');
+    }
+  };
+
   const handleDelete = async (u) => {
     if (!window.confirm(`¿Eliminar permanentemente a ${u.nombre} (${u.email})? Esta acción no se puede deshacer.`)) return;
     try {
@@ -102,9 +112,15 @@ const AdminUsers = () => {
                     </span>
                   </td>
                   <td className="p-5">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 bg-white/5 px-2 py-1 rounded-md">
-                      {u.plan || 'basic'}
-                    </span>
+                    <select
+                      value={u.plan || 'basic'}
+                      onChange={(e) => handlePlanChange(u.id_usuario, e.target.value)}
+                      className="bg-[#1a1a1a] border border-white/10 text-white text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-red-600 transition-all cursor-pointer"
+                    >
+                      <option value="basic">Básico</option>
+                      <option value="avanzado">Avanzado</option>
+                      <option value="experto">Experto</option>
+                    </select>
                   </td>
                   <td className="p-5">
                     <select

@@ -137,6 +137,13 @@ Responde ÚNICAMENTE con este JSON sin texto adicional:
 }`;
 }
 
+function normalizarNivel(nivel) {
+  const v = (nivel || '').toLowerCase();
+  if (v.includes('alt') || v.includes('high') || v.includes('avan') || v.includes('exper')) return 'Alta';
+  if (v.includes('baj') || v.includes('low') || v.includes('beg') || v.includes('inic')) return 'Baja';
+  return 'Media';
+}
+
 async function saveRutina(id_usuario, rutina) {
   // Eliminar rutina anterior generada por IA para este usuario
   const [existing] = await db.query(
@@ -149,7 +156,7 @@ async function saveRutina(id_usuario, rutina) {
 
   const [result] = await db.query(
     'INSERT INTO rutinas (id_usuario, nombre, descripcion, dias_semana, nivel) VALUES (?, ?, ?, ?, ?)',
-    [id_usuario, rutina.nombre, `[IA] ${rutina.descripcion}`, rutina.dias_semana, rutina.nivel]
+    [id_usuario, rutina.nombre, `[IA] ${rutina.descripcion}`, rutina.dias_semana, normalizarNivel(rutina.nivel)]
   );
   const id_rutina = result.insertId;
 

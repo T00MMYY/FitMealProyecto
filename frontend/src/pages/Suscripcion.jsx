@@ -49,7 +49,7 @@ export default function Suscripcion() {
   const location = useLocation();
   const { state } = location;
   const navigate = useNavigate();
-  const { user, login } = useAuth(); // asumiendo que login puede refrescar el user
+  const { user, refreshUser } = useAuth();
 
   const planId = new URLSearchParams(location.search).get('planId');
   const [plan, setPlan] = useState(state?.plan ?? null);
@@ -149,8 +149,10 @@ export default function Suscripcion() {
       // Determinamos el string del plan según el nombre del plan de suscripción
       let planString = 'basic';
       const nombrePlan = plan.name.toLowerCase();
-      if (nombrePlan.includes('premium')) {
-        planString = 'premium';
+      if (nombrePlan.includes('experto')) {
+        planString = 'experto';
+      } else if (nombrePlan.includes('avanzado')) {
+        planString = 'avanzado';
       } else if (nombrePlan.includes('básico') || nombrePlan.includes('basico') || nombrePlan.includes('basic')) {
         planString = 'basic';
       }
@@ -160,12 +162,11 @@ export default function Suscripcion() {
         plan: planString
       });
 
+      await refreshUser();
+
       setSuccess(true);
       toast.success(`¡Suscripción al ${plan.name} activada!`);
-      
-      // En un flujo real, aquí recargaríamos el token o los datos del usuario en el contexto
-      // para que la interfaz se actualice al instante con los nuevos permisos.
-      
+
     } catch (error) {
       toast.error(error.response?.data?.error || 'No se pudo procesar la suscripción.');
     } finally {
@@ -264,7 +265,7 @@ export default function Suscripcion() {
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
                 <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary">credit_card</span>
-                  Datos de Pago (Simulado)
+                  Datos de Pago
                 </h3>
                 
                 <div className="space-y-5">

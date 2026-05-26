@@ -43,7 +43,12 @@ async function translateBatch(exercises) {
     }
     return JSON.parse(text);
   } catch (error) {
-    console.error('❌ Error llamando a Gemini o parseando JSON:', error.message);
+    // Extraer el retryDelay sugerido por la API (ej: "Please retry in 32.6s")
+    const retryMatch = error.message.match(/retry in (\d+(?:\.\d+)?)s/);
+    const waitMs = retryMatch ? Math.ceil(parseFloat(retryMatch[1])) * 1000 + 3000 : 65000;
+    console.error(`❌ Error Gemini: ${error.message.split('\n')[0]}`);
+    console.log(`⏳ Esperando ${Math.round(waitMs / 1000)}s (tiempo sugerido por la API)...`);
+    await new Promise(res => setTimeout(res, waitMs));
     return null;
   }
 }
@@ -92,8 +97,6 @@ async function start() {
       const translations = await translateBatch(pendientes);
 
       if (!translations || !Array.isArray(translations)) {
-          console.log('⏳ Esperando 5 segundos antes de reintentar (posible límite de API)...');
-          await new Promise(res => setTimeout(res, 5000));
           continue;
       }
 

@@ -66,6 +66,12 @@ export default function MiRutina() {
   const [activeTab, setActiveTab] = useState('General');
   const [diasDisponibles, setDiasDisponibles] = useState([]);
 
+  // RUTINA IA
+  const [iaRoutine, setIaRoutine] = useState(null);
+  const [generatingIA, setGeneratingIA] = useState(false);
+  const normalizedPlan = user?.plan?.toString().toLowerCase() || 'basic';
+  const hasPlanIA = normalizedPlan === 'avanzado' || normalizedPlan === 'experto';
+
   const SERVER_URL = 'http://localhost:3000';
 
   const DEFAULT_EXERCISE_IMAGE = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
@@ -156,13 +162,15 @@ export default function MiRutina() {
           setRoutineError('Aún no tienes una rutina asignada.');
         }
 
-        // Cargar mis rutinas
+        // Cargar mis rutinas (separar IA de manuales)
         try {
           const myRes = await api.get('/api/routines');
-          setMyRoutines(myRes.data || []);
-          if ((myRes.data || []).length > 0) {
-            setSelectedMyRoutine(myRes.data[0]);
-          }
+          const all = myRes.data || [];
+          const aiRutina = all.find(r => r.descripcion?.includes('[IA]'));
+          const userRutinas = all.filter(r => !r.descripcion?.includes('[IA]'));
+          setIaRoutine(aiRutina || null);
+          setMyRoutines(userRutinas);
+          if (userRutinas.length > 0) setSelectedMyRoutine(userRutinas[0]);
         } catch (e) {
           console.error('Error cargando mis rutinas', e);
         }
@@ -200,6 +208,24 @@ export default function MiRutina() {
     };
     if (user) fetchRoutine();
   }, [user, navigate]);
+
+  const generateIARoutine = async () => {
+    setGeneratingIA(true);
+    try {
+      await api.post('/api/ai/generate-plan');
+      const myRes = await api.get('/api/routines');
+      const all = myRes.data || [];
+      const aiRutina = all.find(r => r.descripcion?.includes('[IA]'));
+      const userRutinas = all.filter(r => !r.descripcion?.includes('[IA]'));
+      setIaRoutine(aiRutina || null);
+      setMyRoutines(userRutinas);
+      toast.success('¡Rutina generada con IA!');
+    } catch (e) {
+      toast.error(e.response?.data?.error || 'Error al generar la rutina');
+    } finally {
+      setGeneratingIA(false);
+    }
+  };
 
   const toggleExerciseComplete = async (idRutina, e) => {
     e.stopPropagation(); 
@@ -436,6 +462,11 @@ export default function MiRutina() {
         <div className="flex flex-wrap gap-4 items-center">
           <button onClick={() => setViewMode('assigned')} className={`px-4 py-2 rounded-xl font-black ${viewMode === 'assigned' ? 'bg-red-600' : 'bg-white/5'}`}>Rutina Asignada</button>
           <button onClick={() => setViewMode('my')} className={`px-4 py-2 rounded-xl font-black ${viewMode === 'my' ? 'bg-red-600' : 'bg-white/5'}`}>Mi Rutina</button>
+          {hasPlanIA && (
+            <button onClick={() => setViewMode('ia')} className={`px-4 py-2 rounded-xl font-black flex items-center gap-2 ${viewMode === 'ia' ? 'bg-purple-600' : 'bg-white/5'}`}>
+              <span className="material-symbols-outlined text-sm">auto_awesome</span> Rutina IA
+            </button>
+          )}
           {viewMode === 'my' && (
             <div className="ml-auto flex flex-wrap items-center gap-3">
               <button
@@ -644,6 +675,121 @@ export default function MiRutina() {
               })}
             </div>
           </>
+        ) : viewMode === 'ia' ? (
+          <div className="space-y-6">
+            <div className="bg-[#111] rounded-4xl p-8 border border-purple-600/20 shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/5 rounded-full blur-3xl" />
+              <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-purple-400 mb-2">Inteligencia Artificial</p>
+                  <h2 className="text-3xl font-black italic uppercase tracking-tighter">
+                    {iaRoutine ? iaRoutine.nombre : 'Rutina Personalizada IA'}
+                  </h2>
+                  {iaRoutine && (
+                    <p className="text-white/40 text-sm mt-2">{iaRoutine.descripcion?.replace('[IA] ', '')}</p>
+                  )}
+                </div>
+                <button
+                  onClick={generateIARoutine}
+                  disabled={generatingIA}
+                  className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 disabled:opacity-60 disabled:cursor-not-allowed rounded-2xl text-sm font-black uppercase tracking-widest transition-all shrink-0"
+                >
+                  {generatingIA ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Generando...
+                    </>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined text-sm">auto_awesome</span>
+                      {iaRoutine ? 'Regenerar' : 'Generar mi rutina'}
+                    </>
+                  )}
+                </button>
+              </div>
+              {iaRoutine && (
+                <div className="flex gap-6 mt-6 pt-6 border-t border-white/5 relative z-10">
+                  <div>
+                    <p className="text-[9px] text-white/30 uppercase font-black tracking-widest">Ejercicios</p>
+                    <p className="text-2xl font-black italic">{iaRoutine.ejercicios?.length || 0}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-white/30 uppercase font-black tracking-widest">Nivel</p>
+                    <p className="text-2xl font-black italic">{iaRoutine.nivel || 'Media'}</p>
+                  </div>
+                  {iaRoutine.dias_semana && (
+                    <div>
+                      <p className="text-[9px] text-white/30 uppercase font-black tracking-widest">Días</p>
+                      <p className="text-sm font-black italic text-purple-400 mt-1">{iaRoutine.dias_semana}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {!iaRoutine && !generatingIA && (
+              <div className="py-24 text-center bg-[#111] rounded-4xl border border-dashed border-purple-600/20 flex flex-col items-center gap-4">
+                <span className="material-symbols-outlined text-6xl text-purple-400 opacity-40">auto_awesome</span>
+                <h3 className="text-xl font-black italic uppercase">Sin rutina generada</h3>
+                <p className="text-white/40 text-sm max-w-md">
+                  Pulsa "Generar mi rutina" y la IA creará un plan personalizado basado en tu perfil, objetivo y nivel de experiencia.
+                </p>
+              </div>
+            )}
+
+            {generatingIA && (
+              <div className="py-24 text-center bg-[#111] rounded-4xl border border-purple-600/10 flex flex-col items-center gap-4">
+                <div className="w-12 h-12 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                <p className="text-white/60 font-black uppercase tracking-widest text-sm">Generando tu rutina personalizada...</p>
+                <p className="text-white/30 text-xs">Esto puede tardar unos segundos</p>
+              </div>
+            )}
+
+            {iaRoutine && !generatingIA && iaRoutine.ejercicios?.length > 0 && (
+              <div className="grid gap-5">
+                {iaRoutine.ejercicios.map((ex, index) => (
+                  <div
+                    key={ex.id}
+                    onClick={() => handleCardClick(ex.id_ejercicio)}
+                    className="group bg-[#111] rounded-3xl p-6 border border-white/5 hover:border-purple-600/30 flex flex-col md:flex-row items-center gap-6 transition-all cursor-pointer shadow-lg"
+                  >
+                    <div className="flex items-center gap-5 w-full md:w-auto shrink-0">
+                      <span className="text-4xl font-black italic text-white/5">{String(index + 1).padStart(2, '0')}</span>
+                      <div className="w-28 h-28 bg-black/50 rounded-2xl overflow-hidden border border-white/10">
+                        <img
+                          src={getImageUrl(ex.imagen)}
+                          onError={(e) => { e.target.src = DEFAULT_EXERCISE_IMAGE; }}
+                          className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-500"
+                          alt={ex.titulo}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex-1 w-full">
+                      <h3 className="text-xl font-black italic uppercase tracking-tighter group-hover:text-purple-400 transition-colors mb-3">{ex.titulo}</h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="bg-black/30 px-3 py-2 rounded-xl border border-white/5 text-center">
+                          <p className="text-[9px] text-white/30 uppercase font-black tracking-widest">Series</p>
+                          <p className="text-lg font-black italic">{ex.series}</p>
+                        </div>
+                        <div className="bg-black/30 px-3 py-2 rounded-xl border border-white/5 text-center">
+                          <p className="text-[9px] text-white/30 uppercase font-black tracking-widest">Reps</p>
+                          <p className="text-lg font-black italic">{ex.repeticiones}</p>
+                        </div>
+                        <div className="bg-black/30 px-3 py-2 rounded-xl border border-white/5 text-center">
+                          <p className="text-[9px] text-white/30 uppercase font-black tracking-widest">Descanso</p>
+                          <p className="text-lg font-black italic">{ex.descanso_segundos}s</p>
+                        </div>
+                        <div className="bg-black/30 px-3 py-2 rounded-xl border border-white/5 text-center">
+                          <p className="text-[9px] text-white/30 uppercase font-black tracking-widest">Tipo</p>
+                          <p className="text-sm font-black italic text-purple-400 mt-1">{ex.tipo || '—'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         ) : viewMode === 'my' ? (
           <>
             {showCreateRoutineForm && (

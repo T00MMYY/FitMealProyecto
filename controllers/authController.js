@@ -143,15 +143,21 @@ class AuthController {
   }
 
   /**
-   * Verificar token (ya implementado en routes/auth.js)
+   * Verificar token y devolver datos frescos del usuario desde la BD
    * GET /auth/verify
    */
   static async verifyToken(req, res) {
-    // Si llegamos aquí, el token es válido (ya fue verificado por el middleware)
-    res.json({ 
-      valid: true, 
-      user: req.user 
-    });
+    try {
+      const userId = req.user.id_usuario || req.user.id;
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(401).json({ error: 'Usuario no encontrado' });
+      }
+      delete user.password_hash;
+      res.json({ valid: true, user });
+    } catch (error) {
+      res.status(500).json({ error: 'Error al verificar sesión' });
+    }
   }
 }
 

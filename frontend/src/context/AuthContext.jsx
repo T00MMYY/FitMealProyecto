@@ -80,6 +80,14 @@ export function AuthProvider({ children }) {
     setUser(userData);
   };
 
+  const refreshUser = async () => {
+    const response = await api.get('/auth/verify');
+    const verifiedUser = response.data.user;
+    setUser(verifiedUser);
+    localStorage.setItem('user', JSON.stringify(verifiedUser));
+    return verifiedUser;
+  };
+
   const value = {
     user,
     loading,
@@ -89,6 +97,7 @@ export function AuthProvider({ children }) {
     register,
     logout,
     setUserFromOAuth,
+    refreshUser,
   };
 
   return (

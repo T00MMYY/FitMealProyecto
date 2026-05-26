@@ -200,13 +200,13 @@ class UserController {
         return res.status(400).json({ error: 'No se subió ninguna imagen' });
       }
 
-      const foto_url = `${req.protocol}://${req.get('host')}/uploads/profiles/${req.file.filename}`;
+      const foto_perfil = `/uploads/profiles/${req.file.filename}`;
 
-      await User.update(targetUserId, { foto_url });
+      await User.update(targetUserId, { foto_perfil });
 
       res.json({
         message: 'Foto subida correctamente',
-        foto_url
+        foto_perfil
       });
     } catch (error) {
       console.error('Error al subir foto:', error);

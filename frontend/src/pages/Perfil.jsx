@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { calculateMacros } from '../utils/macrosCalculator';
 
 export default function Perfil() {
-  const { user, logout } = useAuth();
+  const { user, logout, refreshUser } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef(null); 
   const [userData, setUserData] = useState(null);
@@ -25,7 +25,9 @@ export default function Perfil() {
         if (!id) return;
         
         const response = await api.get(`/api/users/${id}`);
-        setUserData(response.data.user || response.data);
+        const freshUser = response.data.user || response.data;
+        setUserData(freshUser);
+        refreshUser().catch(() => {});
 
         try {
           const trainerRes = await api.get('/api/trainers/my-trainer');
@@ -62,8 +64,12 @@ export default function Perfil() {
   if (loading) return <LoadingSpinner />;
 
   const displayUser = userData || user;
-  const normalizedPlan = displayUser?.plan?.toString().toLowerCase() || '';
-  const isPremiumPlan = normalizedPlan.includes('premium');
+  const normalizedPlan = displayUser?.plan?.toString().toLowerCase() || 'basic';
+  const isExpertPlan = normalizedPlan === 'experto';
+  const isAdvancedPlan = normalizedPlan === 'avanzado';
+  const isBasicPlan = !isAdvancedPlan && !isExpertPlan;
+  const planLabel = isExpertPlan ? 'Experto' : isAdvancedPlan ? 'Avanzado' : 'Básico';
+  const planColor = isExpertPlan ? 'text-purple-400' : isAdvancedPlan ? 'text-yellow-400' : 'text-green-400';
   const macros = calculateMacros(displayUser);
 
   const handlePhotoChange = async (e) => {
@@ -77,7 +83,7 @@ export default function Perfil() {
       setUploading(true);
       const id = user?.id_usuario || user?.id;
       const response = await api.post(`/api/users/${id}/photo`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': undefined }
       });
 
       setUserData(prev => ({ ...prev, foto_perfil: response.data.foto_perfil }));
@@ -184,18 +190,22 @@ export default function Perfil() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-sm font-black uppercase tracking-tighter text-white/80">Plan Actual</h3>
-                    <p className={`text-lg font-bold ${
-                      isPremiumPlan ? 'text-yellow-400' : 'text-green-400'
-                    }`}>
-                      {isPremiumPlan ? 'Premium' : 'Básico'}
-                    </p>
+                    <p className={`text-lg font-bold ${planColor}`}>{planLabel}</p>
                   </div>
-                  {!isPremiumPlan && (
+                  {isBasicPlan && (
                     <button
                       onClick={() => navigate('/suscripcion?planId=2')}
                       className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors text-xs uppercase tracking-wider"
                     >
-                      Upgrade a Premium
+                      Upgrade a Avanzado
+                    </button>
+                  )}
+                  {isAdvancedPlan && (
+                    <button
+                      onClick={() => navigate('/suscripcion?planId=5')}
+                      className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg transition-colors text-xs uppercase tracking-wider"
+                    >
+                      Upgrade a Experto
                     </button>
                   )}
                 </div>
