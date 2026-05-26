@@ -63,7 +63,7 @@ export default function Navbar() {
     { to: '/products', label: 'Productos' },
     { to: '/contacto', label: 'Contacto' },
   ];
-  if (isAuthenticated && hasTrainer) navLinks.push({ to: '/rutina', label: 'Mi Rutina' });
+  if (isAuthenticated) navLinks.push({ to: '/rutina', label: 'Mi Rutina' });
   if (isAuthenticated && Number(user?.id_rol || user?.rol) !== 1) navLinks.push({ to: '/pedidos', label: 'Mis pedidos' });
   if (isAuthenticated && (Number(user?.id_rol) === 1 || Number(user?.rol) === 1)) navLinks.push({ to: '/admin', label: 'Admin' });
   if (isAuthenticated && (Number(user?.id_rol) === 4 || Number(user?.rol) === 4)) navLinks.push({ to: '/entrenador', label: 'Entrenador' });
