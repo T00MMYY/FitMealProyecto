@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
-import {
-  Link,
-  useNavigate,
-  useSearchParams,
-  useLocation,
-} from "react-router-dom";
+import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+
+const inputClass = "w-full px-4 py-3 bg-white/[0.04] border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-red-500 transition-colors text-sm";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -20,9 +17,7 @@ export default function Login() {
 
   useEffect(() => {
     if (searchParams.get("error") === "oauth_failed") {
-      setError(
-        "Error al iniciar sesión con proveedor externo. Inténtalo de nuevo.",
-      );
+      setError("Error al iniciar sesión con proveedor externo. Inténtalo de nuevo.");
     }
   }, [searchParams]);
 
@@ -30,12 +25,9 @@ export default function Login() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       const response = await login(email, password);
-      const from =
-        location.state?.from?.pathname ||
-        (response?.user?.id_rol === 1 ? "/admin" : "/");
+      const from = location.state?.from?.pathname || (response?.user?.id_rol === 1 ? "/admin" : "/");
       navigate(from, { replace: true });
     } catch (err) {
       setError(err.response?.data?.error || "Error al iniciar sesion");
@@ -45,181 +37,92 @@ export default function Login() {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat p-4"
-      style={{ backgroundImage: "url('/fondologin2.jpg')" }}
-    >
-      {/* Card contenedor de 2 columnas */}
-      <div className="w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl flex min-h-[560px]">
-        {/* ── Panel izquierdo: branding ── */}
-        <div className="hidden md:flex flex-col justify-between w-1/2 bg-gray-900/70 backdrop-blur-sm p-10">
-          {/* Atrás + Logo */}
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4 py-16">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[radial-gradient(ellipse_at_center,rgba(211,15,21,0.07)_0%,transparent_70%)] pointer-events-none" />
+
+      <div className="w-full max-w-4xl rounded-3xl overflow-hidden flex min-h-[560px]" style={{ border: '1px solid #1a1a1a' }}>
+
+        {/* Panel izquierdo: branding */}
+        <div className="hidden md:flex flex-col justify-between w-1/2 bg-[#0f0f0f] p-10" style={{ borderRight: '1px solid #1a1a1a' }}>
           <div className="flex flex-col gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium w-fit"
+              className="flex items-center gap-2 text-white/30 hover:text-white transition-colors text-xs font-black uppercase tracking-widest w-fit"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              Atrás
+              ← Atrás
             </button>
-            <img
-              src="/FitMeal_logoblanco.png"
-              alt="FitMeal"
-              className="h-14 w-14 object-contain"
-            />
+            <img src="/FitMeal_logoblanco.png" alt="FitMeal" className="h-12 w-12 object-contain mt-2" />
           </div>
 
-          {/* Texto central */}
           <div>
-            <h2 className="text-5xl font-black text-white uppercase leading-tight tracking-tight mb-4">
-              Bienvenido
-              <br />a FitMeal
+            <h2 className="text-5xl font-black text-white uppercase leading-tight tracking-tighter mb-4">
+              Bienvenido<br /><span style={{ color: '#D30F15' }}>a FitMeal</span>
             </h2>
-            <p className="text-gray-300 text-sm leading-relaxed">
-              Tu viaje personalizado hacia una alimentación saludable empieza
-              aquí. Planifica comidas, sigue tu nutrición y vive mejor.
+            <p className="text-white/40 text-sm leading-relaxed">
+              Tu viaje personalizado hacia una alimentación saludable empieza aquí.
             </p>
           </div>
 
-          {/* Footer legal */}
-          <div className="flex gap-4 text-gray-500 text-xs">
-            <span className="cursor-pointer hover:text-gray-300 transition-colors">
-              Política de privacidad
-            </span>
+          <div className="flex gap-4 text-white/20 text-xs">
+            <span className="cursor-pointer hover:text-white/40 transition-colors">Política de privacidad</span>
             <span>•</span>
-            <span className="cursor-pointer hover:text-gray-300 transition-colors">
-              Términos de uso
-            </span>
+            <span className="cursor-pointer hover:text-white/40 transition-colors">Términos de uso</span>
           </div>
         </div>
 
-        {/* ── Panel derecho: formulario ── */}
-        <div className="flex flex-col justify-center w-full md:w-1/2 bg-gray-950/85 backdrop-blur-sm p-10">
-          {/* Cabecera */}
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-2xl font-bold text-white">Iniciar sesion</h1>
-            <span className="text-gray-500 text-sm cursor-pointer hover:text-gray-300 transition-colors">
-              ¿Necesitas ayuda?
-            </span>
-          </div>
+        {/* Panel derecho: formulario */}
+        <div className="flex flex-col justify-center w-full md:w-1/2 bg-[#0a0a0a] p-10">
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-2">Acceso</p>
+          <h1 className="text-3xl font-black uppercase tracking-tighter text-white mb-8">Iniciar sesión</h1>
 
-          {/* Error */}
           {error && (
-            <div className="bg-red-900/40 border border-red-700/60 text-red-300 px-4 py-3 rounded-xl mb-5 text-sm">
+            <div className="bg-red-500/10 border border-red-500/20 text-red-300 px-4 py-3 rounded-xl mb-5 text-sm">
               {error}
             </div>
           )}
 
-          {/* Formulario */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2"
-              >
-                Correo electrónico
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-gray-800/80 border border-gray-700 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors"
-                placeholder="nombre@ejemplo.com"
-              />
+              <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Correo electrónico</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className={inputClass} placeholder="nombre@ejemplo.com" />
             </div>
-
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label
-                  htmlFor="password"
-                  className="block text-xs font-semibold text-gray-400 uppercase tracking-widest"
-                >
-                  Contraseña
-                </label>
-                <span className="text-xs text-gray-500 hover:text-gray-300 cursor-pointer transition-colors">
-                  ¿Olvidaste?
-                </span>
-              </div>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-gray-800/80 border border-gray-700 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors"
-                placeholder="••••••••"
-              />
+              <label className="block text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">Contraseña</label>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className={inputClass} placeholder="••••••••" />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-white hover:bg-gray-100 disabled:bg-gray-300 disabled:cursor-not-allowed text-gray-900 py-3 rounded-xl font-bold transition-colors cursor-pointer mt-2"
+              className="w-full py-3.5 rounded-xl font-black uppercase tracking-widest text-[11px] text-white transition-all duration-300 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              style={{ background: '#D30F15' }}
             >
-              {loading ? "Iniciando sesion..." : "Iniciar sesion"}
+              {loading ? "Iniciando sesión..." : "Iniciar sesión"}
             </button>
           </form>
 
-          {/* Separador */}
           <div className="flex items-center my-6">
-            <div className="flex-1 border-t border-gray-700"></div>
-            <span className="px-4 text-gray-600 text-xs uppercase tracking-widest">
-              O
-            </span>
-            <div className="flex-1 border-t border-gray-700"></div>
+            <div className="flex-1 border-t border-white/10" />
+            <span className="px-4 text-white/20 text-[10px] uppercase tracking-widest">O</span>
+            <div className="flex-1 border-t border-white/10" />
           </div>
 
-          {/* OAuth Buttons */}
-          <div className="space-y-3">
-            <a
-              href={`${import.meta.env.VITE_API_URL || "https://fitmeal.website"}/auth/google`}
-              className="flex items-center justify-center gap-3 w-full bg-gray-800/80 hover:bg-gray-700/80 border border-gray-700 text-white py-3 rounded-xl font-medium transition-colors"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
-              </svg>
-              Continuar con Google
-            </a>
-          </div>
+          <a
+            href={`${import.meta.env.VITE_API_URL || "https://fitmeal.website"}/auth/google`}
+            className="flex items-center justify-center gap-3 w-full bg-white/[0.04] hover:bg-white/[0.07] border border-white/10 text-white py-3 rounded-xl text-sm font-bold transition-colors"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continuar con Google
+          </a>
 
-          {/* Register link */}
-          <p className="text-center text-gray-500 mt-6 text-sm">
+          <p className="text-center text-white/30 mt-6 text-sm">
             ¿No tienes cuenta?{" "}
-            <Link
-              to="/register"
-              className="text-white font-bold hover:text-gray-300 transition-colors"
-            >
-              Registrate
-            </Link>
+            <Link to="/register" className="text-white font-black hover:text-white/70 transition-colors">Regístrate</Link>
           </p>
         </div>
       </div>

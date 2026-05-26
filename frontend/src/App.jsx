@@ -3,6 +3,8 @@ import { Toaster } from "react-hot-toast";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 import Home from "./pages/Home";
 import Workouts from "./pages/ejercicios/workouts";
 import Login from "./pages/Login";
@@ -29,6 +31,9 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import Contact from "./pages/Contact";
 import EntrenadorDashboard from "./pages/entrenador/EntrenadorDashboard";
+import Privacidad from "./pages/Privacidad";
+import Terminos from "./pages/Terminos";
+import Cookies from "./pages/Cookies";
 
 function AppContent() {
   const { user } = useAuth();
@@ -36,8 +41,10 @@ function AppContent() {
 
   return (
     <CartProvider key={cartOwner} cartOwner={cartOwner}>
-      <div className="min-h-screen">
+      <div className="min-h-screen flex flex-col">
+        <ScrollToTop />
         <Navbar />
+        <div className="flex-1">
         <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
@@ -105,6 +112,9 @@ function AppContent() {
                   }
                 />
                 <Route path="/entrenador" element={<EntrenadorDashboard />} />
+                <Route path="/privacidad" element={<Privacidad />} />
+                <Route path="/terminos" element={<Terminos />} />
+                <Route path="/cookies" element={<Cookies />} />
                 <Route
                   path="*"
                   element={
@@ -123,6 +133,8 @@ function AppContent() {
                   }
                 />
               </Routes>
+        </div>
+        <Footer />
       </div>
     </CartProvider>
   );

@@ -1,119 +1,62 @@
-import { motion } from "framer-motion"; // eslint-disable-line no-unused-vars
+import { Link } from "react-router-dom";
 
-function FadeUp({ children, delay = 0, className = "" }) {
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-//a
 export default function Footer() {
   return (
-    <footer className="bg-[#0a0a0a] pt-20 pb-10 border-t border-white/5">
-      <FadeUp className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          <div>
-            <div className="flex items-center mb-6">
-              <img
-                src="/FitMeal_logoblanco.png"
-                alt="FitMeal logo"
-                className="h-10 w-auto"
-              />
-            </div>
-            <p className="text-gray-500 text-sm leading-relaxed mb-6">
-              Transformando vidas a través de la nutrición inteligente y el
-              entrenamiento efectivo. Únete a nuestra comunidad global.
+    <footer className="bg-[#0a0a0a] border-t border-white/5 pt-10 pb-6">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+
+          {/* Marca */}
+          <div className="col-span-2 md:col-span-1">
+            <img src="/FitMeal_logoblanco.png" alt="FitMeal" className="h-8 w-auto mb-3" />
+            <p className="text-white/30 text-xs leading-relaxed">
+              Nutrición inteligente y entrenamiento efectivo para transformar tu vida.
             </p>
-            <div className="flex gap-4">
-              {["facebook-f", "instagram", "twitter"].map((icon) => (
-                <a
-                  key={icon}
-                  className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition-all"
-                  href="#"
-                >
-                  <i className={`fab fa-${icon}`} />
-                </a>
-              ))}
-            </div>
+            <a href="mailto:fitmealtks@gmail.com" className="text-white/30 hover:text-white text-xs mt-3 block transition-colors">
+              fitmealtks@gmail.com
+            </a>
           </div>
 
+          {/* Plataforma */}
           <div>
-            <h4 className="text-white font-bold mb-6">Plataforma</h4>
-            <ul className="space-y-4 text-sm text-gray-500">
-              {[
-                "Planes de Comida",
-                "Entrenamientos",
-                "Dashboard",
-                "Comunidad",
-              ].map((item) => (
-                <li key={item}>
-                  <a className="hover:text-primary transition-colors" href="#">
-                    {item}
-                  </a>
-                </li>
-              ))}
+            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 mb-3">Plataforma</p>
+            <ul className="flex flex-col gap-2 text-xs text-white/40">
+              <li><Link to="/workouts" className="hover:text-white transition-colors">Workouts</Link></li>
+              <li><Link to="/recetas" className="hover:text-white transition-colors">Recetas</Link></li>
+              <li><Link to="/products" className="hover:text-white transition-colors">Productos</Link></li>
+              <li><Link to="/suscripcion" className="hover:text-white transition-colors">Suscripción</Link></li>
             </ul>
           </div>
 
+          {/* Cuenta */}
           <div>
-            <h4 className="text-white font-bold mb-6">Compañía</h4>
-            <ul className="space-y-4 text-sm text-gray-500">
-              {["Sobre Nosotros", "Carreras", "Blog", "Contacto"].map(
-                (item) => (
-                  <li key={item}>
-                    <a
-                      className="hover:text-primary transition-colors"
-                      href="#"
-                    >
-                      {item}
-                    </a>
-                  </li>
-                ),
-              )}
+            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 mb-3">Cuenta</p>
+            <ul className="flex flex-col gap-2 text-xs text-white/40">
+              <li><Link to="/login" className="hover:text-white transition-colors">Iniciar sesión</Link></li>
+              <li><Link to="/register" className="hover:text-white transition-colors">Registrarse</Link></li>
+              <li><Link to="/perfil" className="hover:text-white transition-colors">Mi perfil</Link></li>
+              <li><Link to="/pedidos" className="hover:text-white transition-colors">Mis pedidos</Link></li>
             </ul>
           </div>
 
+          {/* Legal */}
           <div>
-            <h4 className="text-white font-bold mb-6">Suscríbete</h4>
-            <p className="text-gray-500 text-sm mb-4">
-              Recibe tips semanales y ofertas exclusivas.
-            </p>
-            <form className="flex flex-col gap-3">
-              <input
-                className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-primary transition-colors"
-                placeholder="Tu email"
-                type="email"
-              />
-              <button
-                className="bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors"
-                type="submit"
-              >
-                Suscribirse
-              </button>
-            </form>
+            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 mb-3">Legal</p>
+            <ul className="flex flex-col gap-2 text-xs text-white/40">
+              <li><Link to="/privacidad" className="hover:text-white transition-colors">Privacidad</Link></li>
+              <li><Link to="/terminos" className="hover:text-white transition-colors">Términos de uso</Link></li>
+              <li><Link to="/cookies" className="hover:text-white transition-colors">Cookies</Link></li>
+              <li><Link to="/contacto" className="hover:text-white transition-colors">Contacto</Link></li>
+            </ul>
           </div>
+
         </div>
 
-        <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-gray-600 text-xs">
-            © 2024 FitMeal Inc. Todos los derechos reservados.
-          </p>
-          <div className="flex gap-6 text-gray-600 text-xs">
-            {["Privacidad", "Términos", "Cookies"].map((l) => (
-              <a key={l} className="hover:text-white" href="#">
-                {l}
-              </a>
-            ))}
-          </div>
+        <div className="border-t border-white/5 pt-5 flex flex-col md:flex-row justify-between items-center gap-2">
+          <p className="text-white/15 text-xs">© 2026 FitMeal. Todos los derechos reservados.</p>
+          <p className="text-white/15 text-xs">Hecho con ❤️ en Barcelona</p>
         </div>
-      </FadeUp>
+      </div>
     </footer>
   );
 }

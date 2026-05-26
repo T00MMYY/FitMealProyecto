@@ -33,8 +33,8 @@ export default function Contact() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-primary selection:text-black pt-28 pb-20">
-      <div className="max-w-[1350px] mx-auto px-6">
+    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-primary selection:text-black pt-40 pb-8">
+      <div className="max-w-5xl mx-auto px-6">
 
         {/* HEADER */}
         <div className="mb-20 relative">

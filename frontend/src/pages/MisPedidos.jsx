@@ -62,7 +62,7 @@ export default function MisPedidos() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] px-6 py-12 text-white">
+    <div className="min-h-screen bg-[#0a0a0a] px-6 pt-28 pb-16 text-white">
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>

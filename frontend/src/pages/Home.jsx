@@ -4,7 +4,6 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { useAuth } from '../context/AuthContext'
-import Footer from '../components/Footer'
 import VideoSection from '../components/VideoSection'
 import PlansSection from '../components/PlansSection'
 import Carousel from '../components/Carousel'
@@ -74,7 +73,6 @@ export default function Home() {
       <VideoSection />
       <PlansSection plans={plans} onPlanClick={handlePlanClick} />
       <Carousel />
-      <Footer />
     </div>
   )
 }
