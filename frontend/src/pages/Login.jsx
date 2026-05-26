@@ -64,9 +64,9 @@ export default function Login() {
           </div>
 
           <div className="flex gap-4 text-white/20 text-xs">
-            <span className="cursor-pointer hover:text-white/40 transition-colors">Política de privacidad</span>
+            <Link to="/privacidad" className="hover:text-white/40 transition-colors">Política de privacidad</Link>
             <span>•</span>
-            <span className="cursor-pointer hover:text-white/40 transition-colors">Términos de uso</span>
+            <Link to="/terminos" className="hover:text-white/40 transition-colors">Términos de uso</Link>
           </div>
         </div>
 
