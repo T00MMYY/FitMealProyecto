@@ -187,7 +187,7 @@ export default function Checkout() {
 
   if (completedOrder) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] px-6 py-12 text-white">
+      <div className="min-h-screen bg-[#0a0a0a] px-6 py-12 pt-28 text-white">
         <div className="mx-auto max-w-4xl">
           <div className="rounded-2xl border border-green-400/30 bg-green-400/10 p-8 text-center">
             <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-green-500 text-3xl font-black text-black">
@@ -261,7 +261,7 @@ export default function Checkout() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] px-6 py-16 text-white">
+      <div className="min-h-screen bg-[#0a0a0a] px-6 py-16 pt-28 text-white">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="mb-4 text-4xl font-black uppercase italic tracking-tight md:text-5xl">
             No hay productos para pagar
@@ -280,7 +280,7 @@ export default function Checkout() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] px-6 py-10 text-white">
+    <div className="min-h-screen bg-[#0a0a0a] px-6 py-10 pt-28 text-white">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>

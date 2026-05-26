@@ -82,6 +82,63 @@ function Model({ url, onSelect, genero }) {
   );
 }
 
+function PanelEjercicios({ seleccionado, cargando, ejercicios, onClose, mobile }) {
+  return (
+    <div className={mobile ? "p-6 pb-10" : "p-8 w-full"}>
+      <button
+        onClick={onClose}
+        className="text-white/30 hover:text-primary text-[10px] font-black mb-8 uppercase tracking-[0.2em]"
+      >
+        ← Volver
+      </button>
+
+      <div className="mb-10">
+        <h2 className={`font-black italic uppercase leading-none tracking-tighter ${mobile ? "text-4xl" : "text-6xl"}`}>
+          {seleccionado}
+        </h2>
+        <div className="h-1 w-40 bg-primary mt-4 mb-2"></div>
+      </div>
+
+      <div className="grid gap-6 pb-6">
+        {cargando ? (
+          <p className="animate-pulse text-primary font-black">CARGANDO...</p>
+        ) : ejercicios.length > 0 ? (
+          ejercicios.map((ex) => (
+            <Link to={`/ejercicios/${ex.id}`} key={ex.id} className="group block bg-[#141414] rounded-2xl overflow-hidden border border-white/5 hover:border-primary/40 transition-all duration-500">
+              <div className="h-44 bg-zinc-900 relative overflow-hidden">
+                <img
+                  src={ex.imagen || `https://via.placeholder.com/500x300?text=${ex.titulo}`}
+                  className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-0 transition-opacity duration-700"
+                  alt={ex.titulo}
+                />
+                <img
+                  src={ex.imagen ? ex.imagen.replace('/0.jpg', '/1.jpg') : ''}
+                  className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-90 transition-opacity duration-700"
+                  alt={ex.titulo}
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+                <span className="absolute top-4 right-4 bg-black/80 px-3 py-1 rounded-full text-[9px] font-black uppercase italic z-10">
+                  {ex.dificultad}
+                </span>
+              </div>
+              <div className="p-5">
+                <h3 className="font-black italic uppercase text-lg group-hover:text-primary transition-colors">
+                  {ex.titulo}
+                </h3>
+                <p className="text-white/20 text-[10px] mt-1 font-bold uppercase tracking-widest">
+                  Ver detalles técnicos →
+                </p>
+              </div>
+            </Link>
+          ))
+        ) : (
+          <p className="text-white/20 italic">No hay ejercicios para este músculo todavía.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Workouts() {
   const [seleccionado, setSeleccionado] = useState(null);
   const [genero, setGenero] = useState("masculino");
@@ -176,10 +233,11 @@ export default function Workouts() {
       </div>
 
       <main className="flex flex-1 overflow-hidden relative w-full h-full bg-[#0a0a0a]">
-        <div className={`relative transition-all duration-700 h-full bg-[#0a0a0a] ${seleccionado ? "w-1/2" : "w-full"}`}>
+        {/* CANVAS — en móvil ocupa todo, en desktop se encoge */}
+        <div className={`relative transition-all duration-700 h-full bg-[#0a0a0a] w-full ${seleccionado ? "md:w-1/2" : "md:w-full"}`}>
           <Canvas dpr={[1, 2]} camera={{ fov: 15 }} style={{ background: '#0a0a0a' }} onCreated={({ gl }) => { gl.setClearColor('#0a0a0a', 1); }}>
             <Suspense fallback={null}>
-              <Stage environment="city" intensity={0.1} adjustCamera={true}>
+              <Stage environment="city" intensity={0.1} adjustCamera={true} shadows={false}>
                 <Model key={rutaModelo} url={rutaModelo} onSelect={handleSelect} genero={genero} />
               </Stage>
             </Suspense>
@@ -187,71 +245,30 @@ export default function Workouts() {
           </Canvas>
         </div>
 
-        <div className={`bg-[#0d0d0d] border-l border-white/5 transition-all duration-700 overflow-y-auto shadow-2xl ${seleccionado ? "w-1/2" : "w-0"}`}>
-          {seleccionado && (
-            <div className="p-12 min-w-[450px]">
-              <button
-                onClick={() => {
-                  setCargando(false);
-                  setEjercicios([]);
-                  setSeleccionado(null);
-                  setVerFavoritos(false);
-                }}
-                className="text-white/30 hover:text-primary text-[10px] font-black mb-10 uppercase tracking-[0.2em]"
-              >
-                ← Back to Model
-              </button>
-
-              <div className="mb-12">
-                <h2 className="text-6xl font-black italic uppercase leading-none tracking-tighter">
-                  {seleccionado}
-                </h2>
-                <div className="h-1 w-80 bg-primary mt-4 mb-2"></div>
-              </div>
-
-              <div className="grid gap-8 pb-10">
-                {cargando ? (
-                  <p className="animate-pulse text-primary font-black">CARGANDO...</p>
-                ) : (
-                  <>
-                    {ejercicios.length > 0 ? (
-                      ejercicios.map((ex) => (
-                        <Link to={`/ejercicios/${ex.id}`} key={ex.id} className="group block bg-[#141414] rounded-2xl overflow-hidden border border-white/5 hover:border-primary/40 transition-all duration-500">
-                          <div className="h-44 bg-zinc-900 relative overflow-hidden">
-                            <img
-                              src={ex.imagen || `https://via.placeholder.com/500x300?text=${ex.titulo}`}
-                              className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-0 transition-opacity duration-700"
-                              alt={ex.titulo}
-                            />
-                            <img
-                              src={ex.imagen ? ex.imagen.replace('/0.jpg', '/1.jpg') : ''}
-                              className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-90 transition-opacity duration-1800"
-                              alt={ex.titulo}
-                              onError={(e) => { e.target.style.display = 'none'; }}
-                            />
-                            <span className="absolute top-4 right-4 bg-black/80 px-3 py-1 rounded-full text-[9px] font-black uppercase italic z-10">
-                              {ex.dificultad}
-                            </span>
-                          </div>
-                          <div className="p-6">
-                            <h3 className="font-black italic uppercase text-xl group-hover:text-primary transition-colors">
-                              {ex.titulo}
-                            </h3>
-                            <p className="text-white/20 text-[10px] mt-1 font-bold uppercase tracking-widest">
-                              Ver detalles técnicos →
-                            </p>
-                          </div>
-                        </Link>
-                      ))
-                    ) : (
-                      <p className="text-white/20 italic">No hay ejercicios para este músculo todavía.</p>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-          )}
+        {/* PANEL DESKTOP — lateral derecho */}
+        <div className={`hidden md:block bg-[#0d0d0d] border-l border-white/5 transition-all duration-700 overflow-y-auto overflow-x-hidden shadow-2xl ${seleccionado ? "md:w-1/2" : "md:w-0"}`}>
+          {seleccionado && <PanelEjercicios seleccionado={seleccionado} cargando={cargando} ejercicios={ejercicios} onClose={() => { setCargando(false); setEjercicios([]); setSeleccionado(null); setVerFavoritos(false); }} />}
         </div>
+
+        {/* PANEL MÓVIL — bottom sheet */}
+        <div
+          className={`md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d0d0d] border-t border-white/10 rounded-t-3xl shadow-2xl transition-transform duration-500 ${seleccionado ? "translate-y-0" : "translate-y-full"}`}
+          style={{ maxHeight: '70vh', overflowY: 'auto' }}
+        >
+          {/* Handle */}
+          <div className="flex justify-center pt-3 pb-1">
+            <div className="w-10 h-1 bg-white/20 rounded-full" />
+          </div>
+          {seleccionado && <PanelEjercicios seleccionado={seleccionado} cargando={cargando} ejercicios={ejercicios} onClose={() => { setCargando(false); setEjercicios([]); setSeleccionado(null); setVerFavoritos(false); }} mobile />}
+        </div>
+
+        {/* Overlay oscuro móvil */}
+        {seleccionado && (
+          <div
+            className="md:hidden fixed inset-0 z-30 bg-black/40"
+            onClick={() => { setCargando(false); setEjercicios([]); setSeleccionado(null); setVerFavoritos(false); }}
+          />
+        )}
       </main>
     </div>
   );

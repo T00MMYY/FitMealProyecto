@@ -19,7 +19,7 @@ export default function Cart() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white px-6 py-16">
+      <div className="min-h-screen bg-[#0a0a0a] text-white px-6 py-16 pt-24">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-black uppercase italic tracking-tight mb-4">
             Tu carrito esta vacio
@@ -40,7 +40,7 @@ export default function Cart() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white px-6 py-10">
+    <div className="min-h-screen bg-[#0a0a0a] text-white px-6 py-10 pt-24">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between gap-4 mb-8">
           <h1 className="text-3xl md:text-4xl font-black uppercase italic tracking-tight">
@@ -63,7 +63,7 @@ export default function Cart() {
                   key={`${item.id}-${formato}`}
                   className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 md:p-5 flex flex-col md:flex-row gap-4"
                 >
-                  <div className="w-full md:w-36 h-36 rounded-xl overflow-hidden bg-zinc-900 flex-shrink-0">
+                  <div className="w-full h-48 md:w-36 md:h-36 rounded-xl overflow-hidden bg-zinc-900 flex-shrink-0">
                     {item.imagen ? (
                       <img src={item.imagen} alt={item.nombre} className="w-full h-full object-cover" />
                     ) : (

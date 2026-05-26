@@ -121,23 +121,28 @@ export default function Products() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.5 }}
-        className="flex justify-center gap-3 pb-10"
+        className="flex flex-col items-center gap-4 pb-10"
       >
-        {CATEGORIAS.map((cat) => ( 
-          <button
-            key={cat.id}
-            onClick={() => setCategoriaActiva(cat.id)}
-            className="px-7 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 cursor-pointer"
-            style={{
-              background: categoriaActiva === cat.id ? '#D30F15' : 'transparent',
-              color:      categoriaActiva === cat.id ? '#fff' : 'rgba(255,255,255,0.5)',
-              border:     '1px solid ' + (categoriaActiva === cat.id ? '#D30F15' : 'rgba(255,255,255,0.1)'),
-              boxShadow:  categoriaActiva === cat.id ? '0 0 20px rgba(211,15,21,0.4)' : 'none',
-            }}
-          >
-            {cat.label}
-          </button>
-        ))}
+        <div className="flex justify-center gap-3">
+          {CATEGORIAS.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setCategoriaActiva(cat.id)}
+              className="px-7 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 cursor-pointer"
+              style={{
+                background: categoriaActiva === cat.id ? '#D30F15' : 'transparent',
+                color:      categoriaActiva === cat.id ? '#fff' : 'rgba(255,255,255,0.5)',
+                border:     '1px solid ' + (categoriaActiva === cat.id ? '#D30F15' : 'rgba(255,255,255,0.1)'),
+                boxShadow:  categoriaActiva === cat.id ? '0 0 20px rgba(211,15,21,0.4)' : 'none',
+              }}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-white/30 text-xs tracking-wider text-center max-w-md">
+          {CATEGORIAS.find(c => c.id === categoriaActiva)?.descripcion}
+        </p>
       </motion.div>
 
       {/* GRID */}

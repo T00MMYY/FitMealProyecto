@@ -1,4 +1,4 @@
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -9,7 +9,9 @@ import AppRouter from './router';
 
 function AppContent() {
   const { user } = useAuth();
+  const { pathname } = useLocation();
   const cartOwner = String(user?.id_usuario ?? user?.id ?? 'guest');
+  const isAdmin = pathname.startsWith('/admin') || pathname.startsWith('/entrenador');
 
   return (
     <CartProvider key={cartOwner} cartOwner={cartOwner}>
@@ -19,7 +21,7 @@ function AppContent() {
         <div className="flex-1">
           <AppRouter />
         </div>
-        <Footer />
+        {!isAdmin && <Footer />}
       </div>
     </CartProvider>
   );

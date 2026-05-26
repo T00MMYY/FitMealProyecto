@@ -122,7 +122,7 @@ export default function Ejercicios() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-primary selection:text-black">
       {/* Botón Flotante para Volver */}
-      <div className="fixed top-24 left-10 z-50">
+      <div className="fixed top-[88px] left-6 z-50">
         <button 
           onClick={() => navigate(-1)} 
           className="group flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 px-6 py-3 rounded-full hover:bg-primary hover:text-black transition-all duration-300"
@@ -132,11 +132,11 @@ export default function Ejercicios() {
         </button>
       </div>
 
-      <main className="max-w-7xl mx-auto pt-40 pb-20 px-6">
+      <main className="max-w-7xl mx-auto pt-28 pb-20 px-6">
         <div className="grid lg:grid-cols-2 gap-16 items-start">
           
           {/* COLUMNA IZQUIERDA: VISUAL */}
-          <div className="sticky top-40 space-y-6">
+          <div className="lg:sticky lg:top-24 space-y-6">
             <div className="rounded-[40px] overflow-hidden border border-white/10 bg-[#121212] aspect-video relative group">
               {exercise.video ? (
                 <video 

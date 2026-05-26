@@ -74,9 +74,10 @@ export default function Navbar() {
     <nav
       ref={navRef}
       style={{ display: hideNav ? 'none' : undefined }}
-      className="fixed top-5 left-1/2 -translate-x-1/2 z-[100] w-[min(1200px,calc(100%-40px))] opacity-0
-                 bg-white/[0.08] backdrop-blur-[18px] border border-white/15 rounded-full
-                 shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+      className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] w-[min(1200px,calc(100%-40px))] opacity-0
+                 bg-white/[0.08] backdrop-blur-[18px] border border-white/15
+                 shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-[border-radius] duration-300
+                 ${mobileMenuOpen ? 'rounded-3xl' : 'rounded-full'}`}
     >
       <div className="flex items-center justify-between px-6 py-3">
 
