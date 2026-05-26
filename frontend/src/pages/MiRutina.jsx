@@ -124,10 +124,32 @@ export default function MiRutina() {
           try {
             const progressRes = await api.get('/api/trainers/today-progress');
             const progressMap = {};
+            const weightsMap = {};
+            const repsMap = {};
+
             progressRes.data.forEach(log => {
               progressMap[log.id_rutina] = log.completado === 1 || log.completado === true;
+
+              let seriesData = [];
+              if (log.series_data) {
+                if (typeof log.series_data === 'string') {
+                  try {
+                    seriesData = JSON.parse(log.series_data);
+                  } catch (parseError) {
+                    seriesData = [];
+                  }
+                } else {
+                  seriesData = log.series_data;
+                }
+              }
+
+              weightsMap[log.id_rutina] = seriesData.map(item => item?.peso != null ? String(item.peso) : '');
+              repsMap[log.id_rutina] = seriesData.map(item => item?.reps != null ? String(item.reps) : '');
             });
+
             setCompletedExercises(progressMap);
+            setSerieWeights(weightsMap);
+            setSerieReps(repsMap);
           } catch (e) {
             console.error("Error cargando progreso:", e);
           }
