@@ -296,7 +296,12 @@ export default function EntrenadorDashboard() {
                               <div className="flex items-center gap-4 min-w-0">
                                 <div className="w-14 h-14 rounded-lg bg-black overflow-hidden flex-shrink-0 border border-white/10">
                                   {ej.imagen ? (
-                                    <img src={`http://localhost:3000${ej.imagen}`} alt={ej.titulo} className="w-full h-full object-cover" />
+                                    <img
+                                      src={ej.imagen}
+                                      alt={ej.titulo}
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => { e.target.style.display = 'none'; }}
+                                    />
                                   ) : (
                                     <div className="w-full h-full bg-gray-900 flex items-center justify-center">
                                       <span className="text-[10px] text-white/20">Sin img</span>
