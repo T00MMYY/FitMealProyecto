@@ -56,6 +56,7 @@ export default function MiRutina() {
   const [selectedMuscleId, setSelectedMuscleId] = useState(null);
   const [selectedExerciseId, setSelectedExerciseId] = useState(null);
   const [exerciseQuery, setExerciseQuery] = useState('');
+  const [selectedExerciseDetails, setSelectedExerciseDetails] = useState(null);
   const [routineError, setRoutineError] = useState(null);
   
   // ESTADO INTERACTIVO DE COMPLETADO
@@ -67,9 +68,13 @@ export default function MiRutina() {
 
   const SERVER_URL = 'http://localhost:3000';
 
+  const DEFAULT_EXERCISE_IMAGE = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="500" height="300"><rect width="100%" height="100%" fill="#111"/><text x="50%" y="50%" fill="#fff" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" dominant-baseline="middle">Sin imagen</text></svg>'
+  )}`;
+
   const getImageUrl = (imagePath) => {
     if (!imagePath) {
-      return 'https://via.placeholder.com/400x240/111111/ffffff?text=Sin+imagen';
+      return DEFAULT_EXERCISE_IMAGE;
     }
     if (imagePath.startsWith('http')) {
       return imagePath;
@@ -245,6 +250,27 @@ export default function MiRutina() {
     }
   };
 
+  const deleteRoutine = async (routineId) => {
+    if (!routineId) return;
+    if (!window.confirm('¿Seguro que quieres eliminar esta rutina? Esta acción no se puede deshacer.')) return;
+
+    try {
+      await api.delete(`/api/routines/${routineId}`);
+      setMyRoutines(prev => {
+        const remaining = prev.filter(r => r.id !== routineId);
+        setSelectedMyRoutine(curr => {
+          if (!curr || curr.id !== routineId) return curr;
+          return remaining.length > 0 ? remaining[0] : null;
+        });
+        return remaining;
+      });
+      toast.success('Rutina eliminada correctamente');
+    } catch (e) {
+      console.error('Error eliminando rutina', e);
+      toast.error('No se pudo eliminar la rutina');
+    }
+  };
+
   const addExerciseToSelectedRoutine = async (id_ejercicio) => {
     if (!selectedMyRoutine) {
       toast.error('Selecciona una rutina');
@@ -282,13 +308,24 @@ export default function MiRutina() {
   const filteredExercises = useMemo(() => {
     const query = exerciseQuery.trim().toLowerCase();
     return visibleExercises.filter(ex => {
-      if (!query) return true;
       const muscleName = muscles.find(m => String(m.id) === String(ex.musculo_id))?.name || '';
-      return [ex.titulo, ex.tipo, ex.descripcion, muscleName]
+      const matchesQuery = !query || [ex.titulo, ex.tipo, ex.descripcion, muscleName]
         .filter(Boolean)
         .some(value => String(value).toLowerCase().includes(query));
+      const matchesMuscle = !selectedMuscleId || String(ex.musculo_id) === String(selectedMuscleId);
+      return matchesQuery && matchesMuscle;
     });
-  }, [visibleExercises, exerciseQuery, muscles]);
+  }, [visibleExercises, exerciseQuery, muscles, selectedMuscleId]);
+
+  useEffect(() => {
+    if (selectedExerciseId) {
+      setSelectedExerciseDetails(
+        visibleExercises.find(ex => Number(ex.id) === Number(selectedExerciseId)) || null
+      );
+    } else {
+      setSelectedExerciseDetails(null);
+    }
+  }, [selectedExerciseId, visibleExercises]);
 
   useEffect(() => {
     if (filteredExercises.length > 0) {
@@ -474,8 +511,8 @@ export default function MiRutina() {
                       <span className="text-5xl font-black italic text-white/5">{String(index + 1).padStart(2, '0')}</span>
                       <div className="w-32 h-32 md:w-40 md:h-40 bg-black/50 rounded-2xl overflow-hidden border border-white/10 shrink-0 relative">
                         <img
-                          src={ex.imagen?.startsWith('http') ? ex.imagen : `${SERVER_URL}${ex.imagen}`}
-                          onError={(e) => { e.target.src = `https://via.placeholder.com/500x300?text=${ex.titulo}` }}
+                          src={getImageUrl(ex.imagen)}
+                          onError={(e) => { e.target.src = DEFAULT_EXERCISE_IMAGE; }}
                           className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
                           alt={ex.titulo}
                         />
@@ -686,32 +723,55 @@ export default function MiRutina() {
                   className="w-full bg-[#050505] border border-white/10 rounded-2xl px-4 py-3 text-white focus:border-red-600 outline-none"
                 />
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {filteredExercises.slice(0, 8).map(ex => (
-                    <div key={ex.id} className="bg-black/40 border border-white/10 rounded-3xl p-4 flex flex-col gap-4 overflow-hidden">
-                      <div className="relative h-36 overflow-hidden rounded-3xl bg-black/30 border border-white/10">
+                <div className="grid gap-4">
+                  <div className="bg-black/30 rounded-3xl border border-white/10 p-5 flex flex-col gap-4 md:flex-row md:items-center">
+                    <div className="w-full md:w-40 h-40 rounded-3xl overflow-hidden bg-black/50 border border-white/10 flex items-center justify-center">
+                      {selectedExerciseDetails?.imagen ? (
                         <img
-                          src={getImageUrl(ex.imagen)}
-                          alt={ex.titulo}
-                          className="h-full w-full object-cover transition duration-700 hover:scale-105"
-                          onError={(event) => { event.target.src = 'https://via.placeholder.com/350x210?text=Ejercicio'; }}
+                          src={getImageUrl(selectedExerciseDetails.imagen)}
+                          alt={selectedExerciseDetails.titulo || 'Ejercicio seleccionado'}
+                          className="h-full w-full object-cover"
+                          onError={(event) => { event.target.src = DEFAULT_EXERCISE_IMAGE; }}
                         />
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between gap-4">
-                          <h3 className="font-black text-lg leading-tight">{ex.titulo}</h3>
-                          <span className="text-[10px] uppercase tracking-[0.3em] text-white/40">{muscles.find(m => String(m.id) === String(ex.musculo_id))?.name || 'General'}</span>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center text-white/40 text-center px-3">
+                          <span className="text-4xl">🏋️</span>
+                          <p className="text-xs mt-2">Sin imagen disponible</p>
                         </div>
-                        <p className="text-white/40 text-sm line-clamp-3">{ex.descripcion || 'Ejercicio recomendado para el músculo seleccionado.'}</p>
-                      </div>
-                      <button
-                        onClick={() => addExerciseToSelectedRoutine(ex.id)}
-                        className="mt-2 w-full bg-red-600 hover:bg-red-500 rounded-2xl px-4 py-3 text-xs font-black uppercase tracking-widest"
-                      >Añadir</button>
+                      )}
                     </div>
-                  ))}
+                    <div className="flex-1 space-y-3">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <h3 className="font-black text-xl">{selectedExerciseDetails?.titulo || 'Selecciona un ejercicio'}</h3>
+                          <p className="text-white/40 text-sm mt-1">{selectedExerciseDetails?.descripcion ? 'Revisa la ficha antes de añadirlo a tu rutina.' : 'Selecciona un ejercicio del desplegable para ver sus detalles aquí.'}</p>
+                        </div>
+                        {selectedExerciseDetails && (
+                          <span className="inline-flex items-center rounded-full bg-white/5 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-white/60 border border-white/10">
+                            {muscles.find(m => String(m.id) === String(selectedExerciseDetails.musculo_id))?.name || 'General'}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                        <div className="rounded-3xl bg-white/5 border border-white/10 p-3 text-center">
+                          <p className="text-white/40 uppercase text-[10px] tracking-[0.3em]">Tipo</p>
+                          <p className="text-white font-black mt-2">{selectedExerciseDetails?.tipo || 'N/A'}</p>
+                        </div>
+                        <div className="rounded-3xl bg-white/5 border border-white/10 p-3 text-center">
+                          <p className="text-white/40 uppercase text-[10px] tracking-[0.3em]">Músculo</p>
+                          <p className="text-white font-black mt-2">{muscles.find(m => String(m.id) === String(selectedExerciseDetails?.musculo_id))?.name || 'General'}</p>
+                        </div>
+                        <div className="rounded-3xl bg-white/5 border border-white/10 p-3 text-center">
+                          <p className="text-white/40 uppercase text-[10px] tracking-[0.3em]">Estado</p>
+                          <p className="text-white font-black mt-2">{selectedExerciseDetails ? 'Listo para añadir' : 'Sin selección'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {filteredExercises.length === 0 && (
-                    <div className="col-span-full rounded-3xl border border-dashed border-white/10 p-6 text-center text-white/40">
+                    <div className="rounded-3xl border border-dashed border-white/10 p-6 text-center text-white/40">
                       No se encontró ningún ejercicio. Cambia de parte del cuerpo o prueba otra búsqueda.
                     </div>
                   )}
@@ -720,16 +780,23 @@ export default function MiRutina() {
             )}
 
             <div className="bg-[#111] rounded-4xl p-6 border border-white/5 flex flex-col gap-6 shadow-xl">
-              <div className="flex gap-4 items-center">
-                <div className="flex-1">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex-1 min-w-0">
                   <label className="text-xs text-white/40">Selecciona rutina</label>
                   <select value={selectedMyRoutine?.id || ''} onChange={(e) => setSelectedMyRoutine(myRoutines.find(r => r.id === Number(e.target.value)) || null)} className="w-full bg-[#050505] border border-white/10 rounded-xl px-4 py-3 text-white">
                     {myRoutines.map(r => <option key={r.id} value={r.id}>{r.nombre}</option>)}
                   </select>
                 </div>
-                <div className="w-48 text-right">
-                  <div className="text-[10px] text-white/30 uppercase font-black">Ejercicios</div>
-                  <div className="text-xl font-black">{selectedMyRoutine?.ejercicios?.length || 0}</div>
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <button
+                    onClick={() => deleteRoutine(selectedMyRoutine?.id)}
+                    disabled={!selectedMyRoutine}
+                    className="rounded-2xl bg-red-700 hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed min-w-45 px-5 py-3 text-sm font-black uppercase tracking-widest transition-all"
+                  >Eliminar rutina</button>
+                  <div className="w-48 text-right">
+                    <div className="text-[10px] text-white/30 uppercase font-black">Ejercicios</div>
+                    <div className="text-xl font-black">{selectedMyRoutine?.ejercicios?.length || 0}</div>
+                  </div>
                 </div>
               </div>
 
