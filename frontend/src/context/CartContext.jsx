@@ -20,8 +20,7 @@ function leerCarritoDeStorage(claveStorage) {
   }
 
   return [];
-}
-
+} 
 export function CartProvider({ cartOwner = 'guest', children }) {
   const claveStorage = `fitmeal_cart_${cartOwner}`;
   const claveAnteriorRef = useRef(claveStorage);
