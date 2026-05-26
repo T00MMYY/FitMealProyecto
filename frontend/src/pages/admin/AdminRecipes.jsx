@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import api from '../../api/axios';
-import AdminLayout from '../../components/AdminLayout';
+import AdminLayout from '../../components/layout/AdminLayout';
 
 const AdminRecipes = () => {
   const [recipes, setRecipes] = useState([]);

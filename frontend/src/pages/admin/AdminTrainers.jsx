@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import api from '../../api/axios';
-import AdminLayout from '../../components/AdminLayout';
+import AdminLayout from '../../components/layout/AdminLayout';
 import { useAuth } from '../../context/AuthContext';
 
 const AdminTrainers = () => {

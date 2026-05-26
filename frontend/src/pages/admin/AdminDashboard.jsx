@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/axios';
-import AdminLayout from '../../components/AdminLayout';
+import AdminLayout from '../../components/layout/AdminLayout';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({

@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import OnboardingWizard from "../components/FormularioInicial";
+import OnboardingWizard from "../components/auth/FormularioInicial";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";

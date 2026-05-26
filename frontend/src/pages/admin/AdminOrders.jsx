@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../api/axios';
-import AdminLayout from '../../components/AdminLayout';
+import AdminLayout from '../../components/layout/AdminLayout';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
